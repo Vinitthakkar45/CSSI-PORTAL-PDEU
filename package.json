@@ -6,14 +6,32 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint . --fix",
+    "prepare": "husky install"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pnpm lint-staged"
+    }
+  },
+  "lint-staged": {
+  "!(*pnpm-lock.yaml|package.json|src/drizzle/migrations/**|.prettierignore|tsconfig.json|*.css|*.scss)": [
+    "prettier --write"
+  ],
+  "**/*.{js,jsx,ts,tsx}": [
+    "eslint --fix",
+    "prettier --write"
+  ]
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
+    "@tailwindcss/postcss": "^4.0.8",
     "drizzle-orm": "^0.39.3",
     "next": "15.1.7",
+    "postcss": "^8.5.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",
@@ -23,6 +41,11 @@
     "drizzle-kit": "^0.30.4",
     "eslint": "^9.21.0",
     "eslint-config-next": "15.1.7",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.5.2",
     "typescript": "^5.7.3"
   },
   "pnpm": {

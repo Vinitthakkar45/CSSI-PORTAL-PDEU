@@ -1,0 +1,6 @@
+.husky/*
+pnpm-lock.yaml
+package.json
+src/drizzle/migrations/**
+.prettierrc.json
+tsconfig.json
