@@ -19,6 +19,23 @@ export const postsTable = pgTable('posts_table', {
     .$onUpdate(() => new Date()),
 });
 
+export const student = pgTable('students', {
+  id: serial('id').primaryKey(),
+  rollNumber: text('roll_number').notNull().unique(),
+  email: text('email').notNull().unique(),
+  hashedPassword: text('hashed_password').notNull(),
+  department: text('department').notNull(),
+  ngoName: text('ngo_name'),
+  ngoLocation: text('ngo_location'),
+  ngoNumber: text('ngo_number'),
+  ngoDescription: text('ngo_description'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export type InsertStudent = typeof student.$inferInsert;
+export type SelectStudent = typeof student.$inferSelect;
+
 export type InsertUser = typeof usersTable.$inferInsert;
 export type SelectUser = typeof usersTable.$inferSelect;
 
