@@ -1,11 +1,11 @@
 {
-  "id": "109d5119-422f-4180-8a79-70981a3fdd77",
+  "id": "6a44e7c3-5353-499f-98ba-c2314c5880e0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.posts_table": {
-      "name": "posts_table",
+    "public.admin": {
+      "name": "admin",
       "schema": "",
       "columns": {
         "id": {
@@ -14,47 +14,84 @@
           "primaryKey": true,
           "notNull": true
         },
-        "title": {
-          "name": "title",
+        "email": {
+          "name": "email",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "content": {
-          "name": "content",
+        "password": {
+          "name": "password",
           "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "admin_email_unique": {
+          "name": "admin_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.evaluator_student": {
+      "name": "evaluator_student",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "evaluator_id": {
+          "name": "evaluator_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "student_id": {
+          "name": "student_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
       "foreignKeys": {
-        "posts_table_user_id_users_table_id_fk": {
-          "name": "posts_table_user_id_users_table_id_fk",
-          "tableFrom": "posts_table",
-          "tableTo": "users_table",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
+        "evaluator_student_evaluator_id_faculty_id_fk": {
+          "name": "evaluator_student_evaluator_id_faculty_id_fk",
+          "tableFrom": "evaluator_student",
+          "tableTo": "faculty",
+          "columnsFrom": [
+            "evaluator_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "evaluator_student_student_id_student_id_fk": {
+          "name": "evaluator_student_student_id_student_id_fk",
+          "tableFrom": "evaluator_student",
+          "tableTo": "student",
+          "columnsFrom": [
+            "student_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -64,8 +101,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.users_table": {
-      "name": "users_table",
+    "public.faculty": {
+      "name": "faculty",
       "schema": "",
       "columns": {
         "id": {
@@ -78,11 +115,127 @@
           "name": "name",
           "type": "text",
           "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true
         },
-        "age": {
-          "name": "age",
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "department": {
+          "name": "department",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sitting": {
+          "name": "sitting",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "free_time_slots": {
+          "name": "free_time_slots",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "ARRAY[]::text[]"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "faculty_email_unique": {
+          "name": "faculty_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.mentor_student": {
+      "name": "mentor_student",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "mentor_id": {
+          "name": "mentor_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "student_id": {
+          "name": "student_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "mentor_student_mentor_id_faculty_id_fk": {
+          "name": "mentor_student_mentor_id_faculty_id_fk",
+          "tableFrom": "mentor_student",
+          "tableTo": "faculty",
+          "columnsFrom": [
+            "mentor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "mentor_student_student_id_student_id_fk": {
+          "name": "mentor_student_student_id_student_id_fk",
+          "tableFrom": "mentor_student",
+          "tableTo": "student",
+          "columnsFrom": [
+            "student_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.student": {
+      "name": "student",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "roll_number": {
+          "name": "roll_number",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -91,16 +244,54 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "department": {
+          "name": "department",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_name": {
+          "name": "ngo_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_location": {
+          "name": "ngo_location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_phone": {
+          "name": "ngo_phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_description": {
+          "name": "ngo_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "users_table_email_unique": {
-          "name": "users_table_email_unique",
+        "student_email_unique": {
+          "name": "student_email_unique",
           "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": [
+            "email"
+          ]
         }
       },
       "policies": {},
