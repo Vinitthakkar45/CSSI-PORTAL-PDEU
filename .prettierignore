@@ -4,3 +4,8 @@ package.json
 src/drizzle/migrations/**
 .prettierrc.json
 tsconfig.json
+public/**/*.svg
+public/**/*.png
+public/**/*.jpg
+public/**/*.jpeg
+public/**/*.ico
