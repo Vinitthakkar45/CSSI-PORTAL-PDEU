@@ -1,6 +1,6 @@
-import AboutSectionOne from '@/components/About/AboutSectionOne';
-import AboutSectionTwo from '@/components/About/AboutSectionTwo';
-import Breadcrumb from '@/components/Common/Breadcrumb';
+import AboutSectionOne from '@/components/Landing/About/AboutSectionOne';
+import AboutSectionTwo from '@/components/Landing/About/AboutSectionTwo';
+import Breadcrumb from '@/components/Landing/Common/Breadcrumb';
 
 import { Metadata } from 'next';
 

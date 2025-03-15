@@ -24,20 +24,38 @@
     ]
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/list": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
     "@neondatabase/serverless": "^0.10.4",
-    "@tailwindcss/postcss": "^4.0.8",
+    "@react-jvectormap/core": "^1.0.4",
+    "@react-jvectormap/world": "^1.1.2",
+    "@tailwindcss/forms": "^0.5.9",
+    "apexcharts": "^4.3.0",
+    "autoprefixer": "^10.4.20",
     "drizzle-orm": "^0.39.3",
+    "flatpickr": "^4.6.13",
     "next": "15.1.7",
     "next-themes": "^0.4.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-apexcharts": "^1.7.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dom": "^19.0.0",
+    "react-dropzone": "^14.3.5",
+    "react-flatpickr": "^3.10.13",
+    "swiper": "^11.2.0",
+    "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",
+    "@tailwindcss/postcss": "^4.0.14",
     "@types/node": "^20.17.19",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "autoprefixer": "^10.4.21",
     "drizzle-kit": "^0.30.4",
     "eslint": "^9.21.0",
     "eslint-config-next": "15.1.7",
@@ -47,12 +65,19 @@
     "lint-staged": "^15.4.3",
     "postcss": "^8.5.3",
     "prettier": "^3.5.2",
-    "tailwindcss": "3",
+    "tailwindcss": "^4.0.14",
     "typescript": "^5.7.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
     ]
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "printWidth": 120,
+    "trailingComma": "es5",
+    "endOfLine": "lf"
   }
 }

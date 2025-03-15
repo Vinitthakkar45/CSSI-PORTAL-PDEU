@@ -1,7 +1,7 @@
-import RelatedPost from '@/components/Blog/RelatedPost';
-import SharePost from '@/components/Blog/SharePost';
-import TagButton from '@/components/Blog/TagButton';
-import NewsLatterBox from '@/components/Contact/NewsLatterBox';
+import RelatedPost from '@/components/Landing/Blog/RelatedPost';
+import SharePost from '@/components/Landing/Blog/SharePost';
+import TagButton from '@/components/Landing/Blog/TagButton';
+import NewsLatterBox from '@/components/Landing/Contact/NewsLatterBox';
 import Image from 'next/image';
 
 import { Metadata } from 'next';
@@ -89,8 +89,8 @@ const BlogSidebarPage = () => {
                     Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
                     pariatur. Excepteur sint occaecat cupidatat.
                   </p>
-                  <div className="mb-10 w-full overflow-hidden rounded">
-                    <div className="relative aspect-[97/60] w-full sm:aspect-[97/44]">
+                  <div className="mb-10 w-full overflow-hidden rounded-sm">
+                    <div className="relative aspect-97/60 w-full sm:aspect-97/44">
                       <Image
                         src="/images/blog/blog-details-01.jpg"
                         alt="image"
@@ -256,16 +256,16 @@ const BlogSidebarPage = () => {
               </div>
             </div>
             <div className="w-full px-4 lg:w-4/12">
-              <div className="shadow-three dark:bg-gray-dark mb-10 mt-12 rounded-sm bg-white p-6 dark:shadow-none lg:mt-0">
+              <div className="shadow-three dark:bg-gray-dark mb-10 mt-12 rounded-xs bg-white p-6 dark:shadow-none lg:mt-0">
                 <div className="flex items-center justify-between">
                   <input
                     type="text"
                     placeholder="Search here..."
-                    className="border-stroke dark:text-body-color-dark dark:shadow-two mr-4 w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
+                    className="border-stroke dark:text-body-color-dark dark:shadow-two mr-4 w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-hidden transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
                   />
                   <button
                     aria-label="search button"
-                    className="flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-sm bg-primary text-white"
+                    className="flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xs bg-primary text-white"
                   >
                     <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
@@ -276,7 +276,7 @@ const BlogSidebarPage = () => {
                   </button>
                 </div>
               </div>
-              <div className="shadow-three dark:bg-gray-dark mb-10 rounded-sm bg-white dark:shadow-none">
+              <div className="shadow-three dark:bg-gray-dark mb-10 rounded-xs bg-white dark:shadow-none">
                 <h3 className="border-b border-body-color border-opacity-10 px-8 py-4 text-lg font-semibold text-black dark:border-white dark:border-opacity-10 dark:text-white">
                   Related Posts
                 </h3>
@@ -307,7 +307,7 @@ const BlogSidebarPage = () => {
                   </li>
                 </ul>
               </div>
-              <div className="shadow-three dark:bg-gray-dark mb-10 rounded-sm bg-white dark:shadow-none">
+              <div className="shadow-three dark:bg-gray-dark mb-10 rounded-xs bg-white dark:shadow-none">
                 <h3 className="border-b border-body-color border-opacity-10 px-8 py-4 text-lg font-semibold text-black dark:border-white dark:border-opacity-10 dark:text-white">
                   Popular Category
                 </h3>
@@ -339,7 +339,7 @@ const BlogSidebarPage = () => {
                   </li>
                 </ul>
               </div>
-              <div className="shadow-three dark:bg-gray-dark mb-10 rounded-sm bg-white dark:shadow-none">
+              <div className="shadow-three dark:bg-gray-dark mb-10 rounded-xs bg-white dark:shadow-none">
                 <h3 className="border-b border-body-color border-opacity-10 px-8 py-4 text-lg font-semibold text-black dark:border-white dark:border-opacity-10 dark:text-white">
                   Popular Tags
                 </h3>
