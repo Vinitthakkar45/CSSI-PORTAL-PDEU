@@ -20,7 +20,7 @@ export default function Ecommerce() {
 
         <MonthlySalesChart />
       </div>
-      {/*
+
       <div className="col-span-12 xl:col-span-5">
         <MonthlyTarget />
       </div>
@@ -35,7 +35,7 @@ export default function Ecommerce() {
 
       <div className="col-span-12 xl:col-span-7">
         <RecentOrders />
-      </div> */}
+      </div>
     </div>
   );
 }

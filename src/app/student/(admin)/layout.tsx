@@ -14,7 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen xl:flex">
-      {/* Sidebar and Backdrop
+      {/* Sidebar and Backdrop*/}
       <AppSidebar />
       <Backdrop />
       {/* Main Content Area */}

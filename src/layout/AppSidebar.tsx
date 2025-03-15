@@ -4,58 +4,58 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '../context/SidebarContext';
-import {
-  BoxCubeIcon,
-  CalenderIcon,
-  ChevronDownIcon,
-  GridIcon,
-  HorizontaLDots,
-  ListIcon,
-  PageIcon,
-  PieChartIcon,
-  PlugInIcon,
-  TableIcon,
-  UserCircleIcon,
-} from '../icons/index';
+// import {
+//   BoxCubeIcon,
+//   CalenderIcon,
+//   ChevronDownIcon,
+//   GridIcon,
+//   HorizontaLDots,
+//   ListIcon,
+//   PageIcon,
+//   PieChartIcon,
+//   PlugInIcon,
+//   TableIcon,
+//   UserCircleIcon,
+// } from '../icons/index';
 import SidebarWidget from './SidebarWidget';
 
 type NavItem = {
   name: string;
-  icon: React.ReactNode;
+  // icon: React.ReactNode;
   path?: string;
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
 const navItems: NavItem[] = [
   {
-    icon: <GridIcon />,
+    // icon: <GridIcon />,
     name: 'Dashboard',
     subItems: [{ name: 'Ecommerce', path: '/', pro: false }],
   },
   {
-    icon: <CalenderIcon />,
+    // icon: <CalenderIcon />,
     name: 'Calendar',
     path: '/calendar',
   },
   {
-    icon: <UserCircleIcon />,
+    // icon: <UserCircleIcon />,
     name: 'User Profile',
     path: '/profile',
   },
 
   {
     name: 'Forms',
-    icon: <ListIcon />,
+    // icon: <ListIcon />,
     subItems: [{ name: 'Form Elements', path: '/form-elements', pro: false }],
   },
   {
     name: 'Tables',
-    icon: <TableIcon />,
+    // icon: <TableIcon />,
     subItems: [{ name: 'Basic Tables', path: '/basic-tables', pro: false }],
   },
   {
     name: 'Pages',
-    icon: <PageIcon />,
+    // icon: <PageIcon />,
     subItems: [
       { name: 'Blank Page', path: '/blank', pro: false },
       { name: '404 Error', path: '/error-404', pro: false },
@@ -65,7 +65,7 @@ const navItems: NavItem[] = [
 
 const othersItems: NavItem[] = [
   {
-    icon: <PieChartIcon />,
+    // icon: <PieChartIcon />,
     name: 'Charts',
     subItems: [
       { name: 'Line Chart', path: '/line-chart', pro: false },
@@ -73,7 +73,7 @@ const othersItems: NavItem[] = [
     ],
   },
   {
-    icon: <BoxCubeIcon />,
+    // icon: <BoxCubeIcon />,
     name: 'UI Elements',
     subItems: [
       { name: 'Alerts', path: '/alerts', pro: false },
@@ -85,7 +85,7 @@ const othersItems: NavItem[] = [
     ],
   },
   {
-    icon: <PlugInIcon />,
+    // icon: <PlugInIcon />,
     name: 'Authentication',
     subItems: [
       { name: 'Sign In', path: '/signin', pro: false },
@@ -118,15 +118,16 @@ const AppSidebar: React.FC = () => {
                     : 'menu-item-icon-inactive'
                 }`}
               >
-                {nav.icon}
+                {/* {nav.icon} */}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && <span className={`menu-item-text`}>{nav.name}</span>}
               {(isExpanded || isHovered || isMobileOpen) && (
-                <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200  ${
-                    openSubmenu?.type === menuType && openSubmenu?.index === index ? 'rotate-180 text-brand-500' : ''
-                  }`}
-                />
+                // <ChevronDownIcon
+                //   className={`ml-auto w-5 h-5 transition-transform duration-200  ${
+                //     openSubmenu?.type === menuType && openSubmenu?.index === index ? 'rotate-180 text-brand-500' : ''
+                //   }`}
+                // />
+                <div />
               )}
             </button>
           ) : (
@@ -136,7 +137,7 @@ const AppSidebar: React.FC = () => {
                 className={`menu-item group ${isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'}`}
               >
                 <span className={`${isActive(nav.path) ? 'menu-item-icon-active' : 'menu-item-icon-inactive'}`}>
-                  {nav.icon}
+                  {/* {nav.icon} */}
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && <span className={`menu-item-text`}>{nav.name}</span>}
               </Link>
@@ -290,7 +291,7 @@ const AppSidebar: React.FC = () => {
                   !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? 'Menu' : <HorizontaLDots />}
+                {/* {isExpanded || isHovered || isMobileOpen ? 'Menu' : <HorizontaLDots />} */}
               </h2>
               {renderMenuItems(navItems, 'main')}
             </div>
@@ -301,7 +302,7 @@ const AppSidebar: React.FC = () => {
                   !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? 'Others' : <HorizontaLDots />}
+                {/* {isExpanded || isHovered || isMobileOpen ? 'Others' : <HorizontaLDots />} */}
               </h2>
               {renderMenuItems(othersItems, 'others')}
             </div>
