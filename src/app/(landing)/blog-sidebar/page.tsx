@@ -1,7 +1,7 @@
-import RelatedPost from '@/components/Blog/RelatedPost';
-import SharePost from '@/components/Blog/SharePost';
-import TagButton from '@/components/Blog/TagButton';
-import NewsLatterBox from '@/components/Contact/NewsLatterBox';
+import RelatedPost from '@/components/Landing/Blog/RelatedPost';
+import SharePost from '@/components/Landing/Blog/SharePost';
+import TagButton from '@/components/Landing/Blog/TagButton';
+import NewsLatterBox from '@/components/Landing/Contact/NewsLatterBox';
 import Image from 'next/image';
 
 import { Metadata } from 'next';
