@@ -2,10 +2,16 @@
 pnpm-lock.yaml
 package.json
 src/drizzle/migrations/**
-.prettierrc.json
+
+# Ignore ESLint files too
+.eslintrc.*
+eslint.config.mjs
 tsconfig.json
+
+# Ignore public assets
 public/**/*.svg
 public/**/*.png
 public/**/*.jpg
 public/**/*.jpeg
 public/**/*.ico
+.gitignore

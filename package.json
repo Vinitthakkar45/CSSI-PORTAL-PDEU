@@ -72,5 +72,12 @@
     "onlyBuiltDependencies": [
       "esbuild"
     ]
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "printWidth": 120,
+    "trailingComma": "es5",
+    "endOfLine": "lf"
   }
 }

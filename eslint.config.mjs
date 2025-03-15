@@ -18,6 +18,14 @@ const eslintConfig = [
     rules: {
       'prettier/prettier': 'error',
       semi: ['warn', 'always'],
+
+      // Allow unused variables (but keep them for future use)
+      '@typescript-eslint/no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: true }],
+
+      // Allow unused imports (including unused components)
+      'no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'off',
+      'unused-imports/no-unused-vars': 'off'
     },
   },
   prettierConfig,
