@@ -15,3 +15,4 @@ public/**/*.jpg
 public/**/*.jpeg
 public/**/*.ico
 .gitignore
+.hintrc
