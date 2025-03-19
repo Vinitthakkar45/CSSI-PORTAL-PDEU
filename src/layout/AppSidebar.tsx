@@ -42,56 +42,37 @@ const navItems: NavItem[] = [
     name: 'User Profile',
     path: '/home/profile',
   },
-
-  {
-    name: 'Forms',
-    // icon: <ListIcon />,
-    subItems: [{ name: 'Form Elements', path: '/home/form-elements', pro: false }],
-  },
-  {
-    name: 'Tables',
-    // icon: <TableIcon />,
-    subItems: [{ name: 'Basic Tables', path: '/home/basic-tables', pro: false }],
-  },
-  {
-    name: 'Pages',
-    // icon: <PageIcon />,
-    subItems: [
-      { name: 'Blank Page', path: '/home/blank', pro: false },
-      { name: '404 Error', path: '/home/error-404', pro: false },
-    ],
-  },
 ];
 
 const othersItems: NavItem[] = [
-  {
-    // icon: <PieChartIcon />,
-    name: 'Charts',
-    subItems: [
-      { name: 'Line Chart', path: '/home/line-chart', pro: false },
-      { name: 'Bar Chart', path: '/home/bar-chart', pro: false },
-    ],
-  },
-  {
-    // icon: <BoxCubeIcon />,
-    name: 'UI Elements',
-    subItems: [
-      { name: 'Alerts', path: '/home/alerts', pro: false },
-      { name: 'Avatar', path: '/home/avatars', pro: false },
-      { name: 'Badge', path: '/home/badge', pro: false },
-      { name: 'Buttons', path: '/home/buttons', pro: false },
-      { name: 'Images', path: '/home/images', pro: false },
-      { name: 'Videos', path: '/home/videos', pro: false },
-    ],
-  },
-  {
-    // icon: <PlugInIcon />,
-    name: 'Authentication',
-    subItems: [
-      { name: 'Sign In', path: '/home/signin', pro: false },
-      { name: 'Sign Up', path: '/home/signup', pro: false },
-    ],
-  },
+  // {
+  //   // icon: <PieChartIcon />,
+  //   name: 'Charts',
+  //   subItems: [
+  //     { name: 'Line Chart', path: '/home/line-chart', pro: false },
+  //     { name: 'Bar Chart', path: '/home/bar-chart', pro: false },
+  //   ],
+  // },
+  // {
+  //   // icon: <BoxCubeIcon />,
+  //   name: 'UI Elements',
+  //   subItems: [
+  //     { name: 'Alerts', path: '/home/alerts', pro: false },
+  //     { name: 'Avatar', path: '/home/avatars', pro: false },
+  //     { name: 'Badge', path: '/home/badge', pro: false },
+  //     { name: 'Buttons', path: '/home/buttons', pro: false },
+  //     { name: 'Images', path: '/home/images', pro: false },
+  //     { name: 'Videos', path: '/home/videos', pro: false },
+  //   ],
+  // },
+  // {
+  //   // icon: <PlugInIcon />,
+  //   name: 'Authentication',
+  //   subItems: [
+  //     { name: 'Sign In', path: '/home/signin', pro: false },
+  //     { name: 'Sign Up', path: '/home/signup', pro: false },
+  //   ],
+  // },
 ];
 
 const AppSidebar: React.FC = () => {
@@ -308,7 +289,6 @@ const AppSidebar: React.FC = () => {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>
   );
