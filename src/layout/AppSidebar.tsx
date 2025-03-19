@@ -3,6 +3,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '../context/SidebarContext';
+import { Ellipsis, LayoutDashboard, Calendar, CircleUserRound, ReceiptText, Sheet, NonBinary } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+
 // import {
 //   BoxCubeIcon,
 //   CalenderIcon,
@@ -16,11 +19,11 @@ import { useSidebar } from '../context/SidebarContext';
 //   TableIcon,
 //   UserCircleIcon,
 // } from '../icons/index';
-import { useSession } from 'next-auth/react';
 
 type NavItem = {
   name: string;
   path: string;
+  icon: React.ReactElement;
 };
 
 const AppSidebar: React.FC = () => {
@@ -29,27 +32,27 @@ const AppSidebar: React.FC = () => {
     {
       name: 'Dashboard',
       path: '/home',
-      // icon: <></>,
+      icon: <LayoutDashboard size={22} />,
     },
     {
       name: 'Calendar',
       path: '/home/calendar',
-      // icon: <></>,
+      icon: <Calendar size={22} />,
     },
     {
       name: 'User Profile',
       path: '/home/profile',
-      // icon: <></>,
+      icon: <CircleUserRound size={22} />,
     },
     {
       name: 'Forms',
       path: '/home/form-elements',
-      // icon: <></>,
+      icon: <ReceiptText size={22} />,
     },
     {
       name: 'Tables',
       path: '/home/basic-tables',
-      // icon: <></>,
+      icon: <Sheet size={22} />,
     },
   ];
 
@@ -60,19 +63,19 @@ const AppSidebar: React.FC = () => {
       navItems.push({
         name: 'Dummy student',
         path: '/home/dummy',
-        // icon: <></>,
+        icon: <NonBinary size={22} />,
       });
     } else if (role === 'faculty') {
       navItems.push({
         name: 'Dummy Faculty',
         path: '/home/dummy',
-        // icon: <></>,
+        icon: <NonBinary size={22} />,
       });
     } else if (role === 'admin') {
       navItems.push({
         name: 'Dummy Admin',
         path: '/home/dummy',
-        // icon: <></>,
+        icon: <NonBinary size={22} />,
       });
     }
   }
@@ -83,7 +86,7 @@ const AppSidebar: React.FC = () => {
   const isActive = (path: string) => pathname === path;
 
   const renderMenuItems = (navItems: NavItem[]) => (
-    <ul className="flex flex-col gap-3">
+    <ul className="flex flex-col gap-5">
       {navItems.map((nav) => (
         <li key={nav.name}>
           {
@@ -92,7 +95,7 @@ const AppSidebar: React.FC = () => {
               className={`menu-item group ${isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'}`}
             >
               <span className={`${isActive(nav.path) ? 'menu-item-icon-active' : 'menu-item-icon-inactive'}`}>
-                {/* {nav.icon} */}
+                {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && <span className={`menu-item-text`}>{nav.name}</span>}
             </Link>
@@ -132,13 +135,13 @@ const AppSidebar: React.FC = () => {
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div>
-            <h2
+            <h1
               className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
                 !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
               }`}
             >
-              {/* {isExpanded || isHovered || isMobileOpen ? 'Menu' : <HorizontaLDots />} */}
-            </h2>
+              {isExpanded || isHovered || isMobileOpen ? 'Menu' : <Ellipsis />}
+            </h1>
             {renderMenuItems(navItems)}
           </div>
         </nav>

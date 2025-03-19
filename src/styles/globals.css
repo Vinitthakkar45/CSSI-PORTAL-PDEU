@@ -183,7 +183,7 @@
 }
 
 @utility menu-item {
-  @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg;
+  @apply relative flex items-center w-full gap-4 px-3 py-2 font-medium rounded-lg text-sm;
 }
 
 @utility menu-item-active {
