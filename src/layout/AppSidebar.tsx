@@ -16,43 +16,67 @@ import { useSidebar } from '../context/SidebarContext';
 //   TableIcon,
 //   UserCircleIcon,
 // } from '../icons/index';
+import { useSession } from 'next-auth/react';
 
 type NavItem = {
   name: string;
-  // icon: React.ReactNode;
   path: string;
 };
 
-const navItems: NavItem[] = [
-  {
-    // icon: <GridIcon />,
-    name: 'Dashboard',
-    path: '/home',
-  },
-  {
-    // icon: <CalenderIcon />,
-    name: 'Calendar',
-    path: '/home/calendar',
-  },
-  {
-    // icon: <UserCircleIcon />,
-    name: 'User Profile',
-    path: '/home/profile',
-  },
-
-  {
-    name: 'Forms',
-    path: '/home/form-elements',
-    // icon: <ListIcon />,
-  },
-  {
-    name: 'Tables',
-    path: '/home/basic-tables',
-    // icon: <TableIcon />,
-  },
-];
-
 const AppSidebar: React.FC = () => {
+  const { data: session, status } = useSession();
+  const navItems: NavItem[] = [
+    {
+      name: 'Dashboard',
+      path: '/home',
+      // icon: <></>,
+    },
+    {
+      name: 'Calendar',
+      path: '/home/calendar',
+      // icon: <></>,
+    },
+    {
+      name: 'User Profile',
+      path: '/home/profile',
+      // icon: <></>,
+    },
+    {
+      name: 'Forms',
+      path: '/home/form-elements',
+      // icon: <></>,
+    },
+    {
+      name: 'Tables',
+      path: '/home/basic-tables',
+      // icon: <></>,
+    },
+  ];
+
+  if (status === 'authenticated' && session) {
+    const role = session.user.role;
+
+    if (role === 'student') {
+      navItems.push({
+        name: 'Dummy student',
+        path: '/home/dummy',
+        // icon: <></>,
+      });
+    } else if (role === 'faculty') {
+      navItems.push({
+        name: 'Dummy Faculty',
+        path: '/home/dummy',
+        // icon: <></>,
+      });
+    } else if (role === 'admin') {
+      navItems.push({
+        name: 'Dummy Admin',
+        path: '/home/dummy',
+        // icon: <></>,
+      });
+    }
+  }
+
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
 
