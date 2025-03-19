@@ -17,7 +17,6 @@ import { useSidebar } from '../context/SidebarContext';
 //   TableIcon,
 //   UserCircleIcon,
 // } from '../icons/index';
-import SidebarWidget from './SidebarWidget';
 
 type NavItem = {
   name: string;
@@ -30,7 +29,7 @@ const navItems: NavItem[] = [
   {
     // icon: <GridIcon />,
     name: 'Dashboard',
-    subItems: [{ name: 'Ecommerce', path: '/home', pro: false }],
+    path: '/home',
   },
   {
     // icon: <CalenderIcon />,
@@ -45,33 +44,17 @@ const navItems: NavItem[] = [
 
   {
     name: 'Forms',
+    path: '/home/form-elements',
     // icon: <ListIcon />,
-    subItems: [{ name: 'Form Elements', path: '/home/form-elements', pro: false }],
   },
   {
     name: 'Tables',
+    path: '/home/basic-tables',
     // icon: <TableIcon />,
-    subItems: [{ name: 'Basic Tables', path: '/home/basic-tables', pro: false }],
-  },
-  {
-    name: 'Pages',
-    // icon: <PageIcon />,
-    subItems: [
-      { name: 'Blank Page', path: '/home/blank', pro: false },
-      { name: '404 Error', path: '/home/error-404', pro: false },
-    ],
   },
 ];
 
 const othersItems: NavItem[] = [
-  {
-    // icon: <PieChartIcon />,
-    name: 'Charts',
-    subItems: [
-      { name: 'Line Chart', path: '/home/line-chart', pro: false },
-      { name: 'Bar Chart', path: '/home/bar-chart', pro: false },
-    ],
-  },
   {
     // icon: <BoxCubeIcon />,
     name: 'UI Elements',
@@ -82,14 +65,7 @@ const othersItems: NavItem[] = [
       { name: 'Buttons', path: '/home/buttons', pro: false },
       { name: 'Images', path: '/home/images', pro: false },
       { name: 'Videos', path: '/home/videos', pro: false },
-    ],
-  },
-  {
-    // icon: <PlugInIcon />,
-    name: 'Authentication',
-    subItems: [
-      { name: 'Sign In', path: '/home/signin', pro: false },
-      { name: 'Sign Up', path: '/home/signup', pro: false },
+      { name: 'Modals', path: '/home/modals', pro: false },
     ],
   },
 ];
@@ -308,7 +284,6 @@ const AppSidebar: React.FC = () => {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>
   );
