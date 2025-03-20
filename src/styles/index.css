@@ -25,6 +25,7 @@ layer(base);
 
   --color-body-color: #788293;
   --color-body-color-dark: #959cb1;
+  --color-body-color-grey: #4a4a4a;
 
   --color-stroke-stroke: #e3e8ef;
   --color-stroke-dark: #353943;
