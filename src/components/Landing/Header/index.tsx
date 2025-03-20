@@ -28,13 +28,13 @@ const Header = () => {
 
   // submenu handler
   const [openIndex, setOpenIndex] = useState(-1);
-  const handleSubmenu = (index) => {
-    if (openIndex === index) {
-      setOpenIndex(-1);
-    } else {
-      setOpenIndex(index);
-    }
-  };
+  // const handleSubmenu = (index) => {
+  //   if (openIndex === index) {
+  //     setOpenIndex(-1);
+  //   } else {
+  //     setOpenIndex(index);
+  //   }
+  // };
 
   const usePathName = usePathname();
 
@@ -52,18 +52,18 @@ const Header = () => {
             <div className="w-60 max-w-full px-4 xl:mr-12">
               <Link href="/" className={`header-logo block w-full ${sticky ? 'py-5 lg:py-2' : 'py-8'} `}>
                 <Image
-                  src="/images/logo/logo-2.svg"
+                  src="/images/logo/CSSI.svg"
                   alt="logo"
                   width={140}
                   height={30}
-                  className="w-full dark:hidden"
+                  className="w-[140px] dark:hidden"
                 />
                 <Image
-                  src="/images/logo/logo.svg"
+                  src="/images/logo/CSSI_WHITE.svg"
                   alt="logo"
                   width={140}
                   height={30}
-                  className="hidden w-full dark:block"
+                  className="hidden w-[140px] dark:block"
                 />
               </Link>
             </div>
@@ -100,18 +100,18 @@ const Header = () => {
                   <ul className="block lg:flex lg:space-x-12">
                     {menuData.map((menuItem, index) => (
                       <li key={index} className="group relative">
-                        {menuItem.path ? (
-                          <Link
-                            href={menuItem.path}
-                            className={`flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 ${
-                              usePathName === menuItem.path
-                                ? 'text-primary dark:text-white'
-                                : 'text-dark hover:text-primary dark:text-white/70 dark:hover:text-white'
-                            }`}
-                          >
-                            {menuItem.title}
-                          </Link>
-                        ) : (
+                        {/* {menuItem.path ? ( */}
+                        <Link
+                          href={menuItem.path as string}
+                          className={`flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 ${
+                            usePathName === menuItem.path
+                              ? 'text-primary dark:text-white'
+                              : 'text-dark hover:text-primary dark:text-white/70 dark:hover:text-white'
+                          }`}
+                        >
+                          {menuItem.title}
+                        </Link>
+                        {/* ) : (
                           <>
                             <p
                               onClick={() => handleSubmenu(index)}
@@ -145,24 +145,24 @@ const Header = () => {
                               ))}
                             </div>
                           </>
-                        )}
+                        )} */}
                       </li>
                     ))}
                   </ul>
                 </nav>
               </div>
               <div className="flex items-center justify-end pr-16 lg:pr-0">
-                <Link
+                {/* <Link
                   href="/signin"
                   className="hidden px-7 py-3 text-base font-medium text-dark hover:opacity-70 dark:text-white md:block"
                 >
                   Sign In
-                </Link>
+                </Link> */}
                 <Link
-                  href="/signup"
+                  href="/signin"
                   className="ease-in-up shadow-btn hover:shadow-btn-hover hidden rounded-xs bg-primary px-8 py-3 text-base font-medium text-white transition duration-300 hover:bg-opacity-90 md:block md:px-9 lg:px-6 xl:px-9"
                 >
-                  Sign Up
+                  Sign In
                 </Link>
                 <div>
                   <ThemeToggler />
