@@ -8,7 +8,8 @@
     "axe/forms": [
       "default",
       {
-        "label": "off"
+        "label": "off",
+        "select-name": "off"
       }
     ],
     "typescript-config/consistent-casing": "off",

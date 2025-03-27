@@ -2,23 +2,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useSidebar } from '../context/SidebarContext';
-import { Ellipsis, LayoutDashboard, Calendar, CircleUserRound, ReceiptText, Sheet, NonBinary } from 'lucide-react';
+import { useSidebar } from '@/context/SidebarContext';
+import { Ellipsis, LayoutGrid, Calendar, CircleUserRound, ReceiptText, Sheet, NonBinary } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-
-// import {
-//   BoxCubeIcon,
-//   CalenderIcon,
-//   ChevronDownIcon,
-//   GridIcon,
-//   HorizontaLDots,
-//   ListIcon,
-//   PageIcon,
-//   PieChartIcon,
-//   PlugInIcon,
-//   TableIcon,
-//   UserCircleIcon,
-// } from '../icons/index';
 
 type NavItem = {
   name: string;
@@ -32,7 +18,7 @@ const AppSidebar: React.FC = () => {
     {
       name: 'Dashboard',
       path: '/home',
-      icon: <LayoutDashboard size={22} />,
+      icon: <LayoutGrid size={22} />,
     },
     {
       name: 'Calendar',
