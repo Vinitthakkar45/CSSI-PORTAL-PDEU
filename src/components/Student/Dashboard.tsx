@@ -4,21 +4,21 @@ import { redirect } from 'next/navigation';
 import StagesSection from './StagesSection';
 
 const Dashboard = () => {
-  const { data: session, status } = useSession({
+  const { status } = useSession({
     required: true,
     onUnauthenticated() {
       redirect('/signin');
     },
   });
   if (status === 'loading') {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+      </div>
+    );
   }
 
-  return (
-    <div className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
-      <StagesSection />
-    </div>
-  );
+  return <StagesSection />;
 };
 
 export default Dashboard;

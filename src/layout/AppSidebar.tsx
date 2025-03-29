@@ -72,7 +72,7 @@ const AppSidebar: React.FC = () => {
   const isActive = (path: string) => pathname === path;
 
   const renderMenuItems = (navItems: NavItem[]) => (
-    <ul className="flex flex-col gap-5">
+    <ul className="flex flex-col gap-4">
       {navItems.map((nav) => (
         <li key={nav.name}>
           {
@@ -83,7 +83,7 @@ const AppSidebar: React.FC = () => {
               <span className={`${isActive(nav.path) ? 'menu-item-icon-active' : 'menu-item-icon-inactive'}`}>
                 {nav.icon}
               </span>
-              {(isExpanded || isHovered || isMobileOpen) && <span className={`menu-item-text`}>{nav.name}</span>}
+              {(isExpanded || isHovered || isMobileOpen) && <span className={`menu-item-text p-1`}>{nav.name}</span>}
             </Link>
           }
         </li>
