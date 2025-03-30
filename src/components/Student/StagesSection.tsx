@@ -3,6 +3,9 @@ import NGODetailsForm from './NGODetailsForm';
 import StageProgress from './StageProgress';
 import { stages } from './data/stages';
 import { useStages } from './hooks/useStages';
+import InternshipProgress from './InternshipProgress';
+import ReportSubmission from './ReportSubmission';
+import MentorAssignment from './MentorAssignment';
 
 const StagesSection: React.FC = () => {
   const { currentStage, activeForm, getStageStatus, handleStageClick, handleStageComplete, setActiveForm } = useStages({
@@ -13,12 +16,12 @@ const StagesSection: React.FC = () => {
     switch (activeForm) {
       case 1:
         return <NGODetailsForm onComplete={handleStageComplete} />;
-      // case 2:
-      //   return <InternshipProgress onComplete={handleStageComplete} />;
-      // case 3:
-      //   return <ReportSubmission onComplete={handleStageComplete} />;
-      // case 4:
-      //   return <MentorAssignment onComplete={handleStageComplete} />;
+      case 2:
+        return <InternshipProgress onComplete={handleStageComplete} />;
+      case 3:
+        return <ReportSubmission onComplete={handleStageComplete} />;
+      case 4:
+        return <MentorAssignment onComplete={handleStageComplete} />;
       default:
         return null;
     }
