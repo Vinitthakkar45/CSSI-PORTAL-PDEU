@@ -3,12 +3,11 @@ import React from 'react';
 import ComponentCard from '../../common/ComponentCard';
 import { useDropzone } from 'react-dropzone';
 
-const DropzoneComponent: React.FC = () => {
-  const onDrop = (acceptedFiles: File[]) => {
-    console.log('Files dropped:', acceptedFiles);
-    // Handle file uploads here
-  };
+interface DropzoneComponentProps {
+  onDrop: (acceptedFiles: File[]) => void;
+}
 
+const DropzoneComponent: React.FC<DropzoneComponentProps> = ({ onDrop }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
@@ -16,6 +15,9 @@ const DropzoneComponent: React.FC = () => {
       'image/jpeg': [],
       'image/webp': [],
       'image/svg+xml': [],
+      'application/pdf': [],
+      'application/msword': [],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [],
     },
   });
   return (
