@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { boolean } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: serial('id').primaryKey(),
@@ -21,6 +22,7 @@ export const student = pgTable('student', {
   ngoLocation: text('ngo_location'),
   ngoPhone: text('ngo_phone'),
   ngoDescription: text('ngo_description'),
+  ngoChosen: boolean('ngo_chosen').default(false),
 });
 
 export const faculty = pgTable('faculty', {
