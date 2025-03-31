@@ -5,12 +5,11 @@ import { eq } from 'drizzle-orm';
 
 export async function GET() {
   try {
-    // Use a more explicit query method
     const studentList = await db
       .select({
         student: student,
         user: {
-          name: user.name,
+          // name: user.name,
           email: user.email,
           role: user.role,
         },

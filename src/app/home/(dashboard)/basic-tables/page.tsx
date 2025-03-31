@@ -1,3 +1,4 @@
+import StudentTable from '@/components/Admin/StudentTable';
 import ComponentCard from '@/components/Home/common/ComponentCard';
 import PageBreadcrumb from '@/components/Home/common/PageBreadCrumb';
 import BasicTableOne from '@/components/Home/tables/BasicTableOne';
@@ -16,7 +17,8 @@ export default function BasicTables() {
       <PageBreadcrumb pageTitle="Basic Table" />
       <div className="space-y-6">
         <ComponentCard title="Basic Table 1">
-          <BasicTableOne />
+          <StudentTable />
+          {/* <BasicTableOne /> */}
         </ComponentCard>
       </div>
     </div>

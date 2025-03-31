@@ -3,7 +3,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/context/SidebarContext';
-import { Ellipsis, LayoutGrid, Calendar, CircleUserRound, ReceiptText, Sheet, NonBinary } from 'lucide-react';
+import {
+  Ellipsis,
+  LayoutGrid,
+  Calendar,
+  CircleUserRound,
+  ReceiptText,
+  Sheet,
+  NonBinary,
+  GraduationCap,
+  Book,
+} from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 type NavItem = {
@@ -58,11 +68,19 @@ const AppSidebar: React.FC = () => {
         icon: <NonBinary size={22} />,
       });
     } else if (role === 'admin') {
-      navItems.push({
-        name: 'Dummy Admin',
-        path: '/home/dummy',
-        icon: <NonBinary size={22} />,
-      });
+      // navItems = navItems.filter(item => item.name!=="Tables")
+      navItems.push(
+        {
+          name: 'Student',
+          path: '/home/admin/studentTable',
+          icon: <GraduationCap size={22} />,
+        },
+        {
+          name: 'Faculty',
+          path: '/home/admin/facultyTable',
+          icon: <Book size={22} />,
+        }
+      );
     }
   }
 
