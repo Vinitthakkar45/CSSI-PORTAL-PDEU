@@ -49,7 +49,7 @@ const StageProgress: React.FC<StageProgressProps> = ({ currentStage, totalStages
                           ? 'bg-success-500 text-white dark:bg-success-500'
                           : isCurrent
                             ? 'bg-brand-500 text-white dark:bg-brand-500'
-                            : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                            : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed'
                       )}
                     >
                       {isCompleted ? (

@@ -4,7 +4,6 @@ import { boolean } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: serial('id').primaryKey(),
-  name: text('name'),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
   role: text('role').notNull(),
@@ -17,12 +16,16 @@ export const student = pgTable('student', {
     .unique()
     .references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
   rollNumber: text('roll_number').notNull(),
+  name: text('name'),
   department: text('department'),
   ngoName: text('ngo_name'),
   ngoLocation: text('ngo_location'),
   ngoPhone: text('ngo_phone'),
   ngoDescription: text('ngo_description'),
   ngoChosen: boolean('ngo_chosen').default(false),
+  stage: integer('stage').default(0),
+  internal_evaluation_marks: integer('internal_evaluation_marks'),
+  final_evaluation_marks: integer('final_evaluation_marks'),
 });
 
 export const faculty = pgTable('faculty', {
@@ -31,6 +34,7 @@ export const faculty = pgTable('faculty', {
     .notNull()
     .unique()
     .references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
+  name: text('name'),
   department: text('department'),
   sitting: text('sitting'),
   freeTimeSlots: text('free_time_slots')
