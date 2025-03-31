@@ -2,23 +2,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useSidebar } from '../context/SidebarContext';
-import { Ellipsis, LayoutDashboard, Calendar, CircleUserRound, ReceiptText, Sheet, NonBinary } from 'lucide-react';
+import { useSidebar } from '@/context/SidebarContext';
+import { Ellipsis, LayoutGrid, Calendar, CircleUserRound, ReceiptText, Sheet, NonBinary } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-
-// import {
-//   BoxCubeIcon,
-//   CalenderIcon,
-//   ChevronDownIcon,
-//   GridIcon,
-//   HorizontaLDots,
-//   ListIcon,
-//   PageIcon,
-//   PieChartIcon,
-//   PlugInIcon,
-//   TableIcon,
-//   UserCircleIcon,
-// } from '../icons/index';
 
 type NavItem = {
   name: string;
@@ -32,7 +18,7 @@ const AppSidebar: React.FC = () => {
     {
       name: 'Dashboard',
       path: '/home',
-      icon: <LayoutDashboard size={22} />,
+      icon: <LayoutGrid size={22} />,
     },
     {
       name: 'Calendar',
@@ -86,7 +72,7 @@ const AppSidebar: React.FC = () => {
   const isActive = (path: string) => pathname === path;
 
   const renderMenuItems = (navItems: NavItem[]) => (
-    <ul className="flex flex-col gap-5">
+    <ul className="flex flex-col gap-4">
       {navItems.map((nav) => (
         <li key={nav.name}>
           {
@@ -97,7 +83,7 @@ const AppSidebar: React.FC = () => {
               <span className={`${isActive(nav.path) ? 'menu-item-icon-active' : 'menu-item-icon-inactive'}`}>
                 {nav.icon}
               </span>
-              {(isExpanded || isHovered || isMobileOpen) && <span className={`menu-item-text`}>{nav.name}</span>}
+              {(isExpanded || isHovered || isMobileOpen) && <span className={`menu-item-text p-1`}>{nav.name}</span>}
             </Link>
           }
         </li>

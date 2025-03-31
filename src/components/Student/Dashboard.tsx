@@ -1,27 +1,24 @@
 'use client';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import StagesSection from './StagesSection';
 
 const Dashboard = () => {
-  const { data: session, status } = useSession({
+  const { status } = useSession({
     required: true,
     onUnauthenticated() {
       redirect('/signin');
     },
   });
   if (status === 'loading') {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+      </div>
+    );
   }
 
-  return (
-    <div className="text-amber-100">
-      <p>STUDENT DASHBOARD</p>
-      <p>Welcome, {session?.user?.role}!</p>
-      <p>Welcome, {session?.user?.email}!</p>
-      <p>Welcome, {session?.user?.name}!</p>
-      <p>Welcome, {session?.user?.id}!</p>
-    </div>
-  );
+  return <StagesSection />;
 };
 
 export default Dashboard;
