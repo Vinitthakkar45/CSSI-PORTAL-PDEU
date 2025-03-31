@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { mentorAssignment } from '../../../../utils/mentorassign';
+import { mentorAssignment } from '../../../../../utils/mentorassign';
 
 export async function POST() {
   try {
