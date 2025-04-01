@@ -32,12 +32,27 @@ export default function TableList({
   option: 'mentor' | 'evaluator';
 }) {
   const { isOpen, openModal, closeModal } = useModal();
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null); // State to store the selected student
+  const [selectedStudent, setSelectedStudent] = useState<Student>({
+    id: 0,
+    rollNumber: '',
+    department: '',
+    ngoName: '',
+    ngoLocation: '',
+    ngoPhone: '',
+    ngoDescription: '',
+    name: '',
+    email: '',
+    ngoStatus: '',
+    image: '',
+    mentorMarks: 0,
+    evaluatorMarks: 0,
+  }); // State to store the selected student
   const [marks, setMarks] = useState<number | 0>(0); // State to store marks
 
-  const handleOpenModal = (student: Student) => {
+  const handleOpenModal = (student: Student, option: 'mentor' | 'evaluator') => {
     setSelectedStudent(student); // Set the selected student
-    setMarks(0); // Reset marks field
+    //  console.log('Selected Student:', student);
+    setMarks(option === 'mentor' ? student.mentorMarks : student.evaluatorMarks); // set marks field
     openModal(); // Open the modal
   };
 
@@ -47,9 +62,9 @@ export default function TableList({
       return;
     }
 
-    const typeofmarks = type === 'mentor' ? 'internal' : 'final';
-    const studentid = selectedStudent.id;
-    console.log('Saving marks:', { studentid, typeofmarks, marks });
+    const typeofmarks = (await type) === 'mentor' ? 'internal' : 'final';
+    const studentid = await selectedStudent.id;
+    // console.log('Saving marks:', { studentid, typeofmarks, marks });
     try {
       const response = await fetch('/api/faculty', {
         method: 'POST',
@@ -59,7 +74,7 @@ export default function TableList({
         body: JSON.stringify({ studentid, typeofmarks, marks }),
       });
 
-      console.log('Response:', response);
+      // console.log('Response:', response);
 
       const result = await response.json();
 
@@ -67,7 +82,7 @@ export default function TableList({
         throw new Error(result.error || 'Something went wrong');
       }
 
-      alert('Marks saved successfully!');
+      console.log('Marks saved successfully!');
       // closeModal(); // Close modal on successful submission
     } catch (error) {
       console.error(error);
@@ -78,6 +93,15 @@ export default function TableList({
       }
     }
   };
+
+  function savemarks() {
+    if (option === 'mentor') {
+      handleSave('mentor');
+    } else {
+      handleSave('evaluator');
+    }
+    closeModal();
+  }
 
   return (
     <>
@@ -124,7 +148,11 @@ export default function TableList({
               {/* Table Body */}
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {students.map((student) => (
-                  <TableRow key={student.id} onClick={() => handleOpenModal(student)}>
+                  <TableRow
+                    className="hover:cursor-pointer"
+                    key={student.id}
+                    onClick={() => handleOpenModal(student, option)}
+                  >
                     <TableCell className="px-5 py-4 sm:px-6 text-start">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 overflow-hidden rounded-full">
@@ -180,11 +208,11 @@ export default function TableList({
               <div className="flex flex-col justify-center">
                 <div className="mb-4">
                   <Label>Name</Label>
-                  <Input type="text" defaultValue={selectedStudent.name} disabled />
+                  <Input type="text" value={selectedStudent.name || ''} disabled />
                 </div>
                 <div className="mb-4">
                   <Label>Roll Number</Label>
-                  <Input type="text" defaultValue={selectedStudent.rollNumber} disabled />
+                  <Input type="text" value={selectedStudent.rollNumber || ''} disabled />
                 </div>
               </div>
             </div>
@@ -192,13 +220,13 @@ export default function TableList({
             {/* Student Dept */}
             <div className="mb-3">
               <Label>Department</Label>
-              <Input type="text" defaultValue={selectedStudent.department} disabled />
+              <Input type="text" value={selectedStudent.department || ''} disabled />
             </div>
 
             {/* Student Email */}
             <div className="mb-4">
               <Label>Email</Label>
-              <Input type="text" defaultValue={selectedStudent.email} disabled />
+              <Input type="text" value={selectedStudent.email || ''} disabled />
             </div>
             <br />
             {/* NGO Details */}
@@ -206,57 +234,57 @@ export default function TableList({
             <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
                 <Label>NGO Name</Label>
-                <Input type="text" defaultValue={selectedStudent.ngoName || 'N/A'} disabled />
+                <Input type="text" value={selectedStudent.ngoName || 'N/A'} disabled />
               </div>
               <div>
                 <Label>NGO Location</Label>
-                <Input type="text" defaultValue={selectedStudent.ngoLocation || 'N/A'} disabled />
+                <Input type="text" value={selectedStudent.ngoLocation || 'N/A'} disabled />
               </div>
             </div>
             <div className="mb-4">
               <Label>NGO Description</Label>
-              <Input type="text" defaultValue={selectedStudent.ngoDescription || 'N/A'} disabled />
+              <Input type="text" value={selectedStudent.ngoDescription || 'N/A'} disabled />
             </div>
             <div className="mb-6">
               <Label>NGO Phone Number</Label>
-              <Input type="text" defaultValue={selectedStudent.ngoPhone || 'N/A'} disabled />
+              <Input type="text" value={selectedStudent.ngoPhone || 'N/A'} disabled />
             </div>
 
             <br />
             {/* Evaluation Section */}
             <h5 className="mb-4 text-md font-medium text-gray-800 dark:text-white/90">Evaluation</h5>
-            <div className="mb-6">
-              <Label>{'Internal Marks'}</Label>
-              <Input
-                type="number"
-                defaultValue={selectedStudent.mentorMarks ? selectedStudent.mentorMarks : ''}
-                onChange={(e) => setMarks(Number(e.target.value) || 0)}
-                placeholder={`${option === 'mentor' ? 'Enter the internal marks' : 'To be entered by the Mentor'}`}
-                disabled={option === 'mentor' ? false : true} // Disable if not active for mentor
-              />
-            </div>
 
-            <div className="mb-6">
-              <Label>{'Final Marks'}</Label>
-              <Input
-                type="number"
-                defaultValue={selectedStudent.evaluatorMarks ? selectedStudent.evaluatorMarks : ''}
-                onChange={(e) => setMarks(Number(e.target.value) || 0)}
-                placeholder={`${option === 'mentor' ? 'To be entered by Evaluator' : 'Enter the final marks'}`}
-                disabled={option === 'mentor' ? true : false}
-              />
-            </div>
+            {option === 'mentor' ? (
+              <div className="mb-6">
+                <Label>{'Internal Marks'}</Label>
+                <Input
+                  type="number"
+                  value={marks || ''} // Use empty string as fallback for null or undefined
+                  onChange={(e) => setMarks(Number(e.target.value) || 0)}
+                  placeholder={`${option === 'mentor' ? 'Enter the internal marks' : 'To be entered by the Mentor'}`}
+                  disabled={selectedStudent.ngoStatus === 'active' ? false : true}
+                />
+              </div>
+            ) : null}
+
+            {option === 'mentor' ? null : (
+              <div className="mb-6">
+                <Label>{'Final Marks'}</Label>
+                <Input
+                  type="number"
+                  value={marks || ''} // Use empty string as fallback for null or undefined
+                  onChange={(e) => setMarks(Number(e.target.value) || 0)}
+                  placeholder={'Enter the final marks'}
+                  disabled={false}
+                />
+              </div>
+            )}
 
             <div className="flex items-center justify-end w-full gap-3 mt-6">
               <Button size="sm" variant="outline" onClick={closeModal}>
                 Close
               </Button>
-              <Button
-                size="sm"
-                onClick={async () => {
-                  await handleSave(option);
-                }}
-              >
+              <Button size="sm" onClick={savemarks}>
                 Save Changes
               </Button>
             </div>
