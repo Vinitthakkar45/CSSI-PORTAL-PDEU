@@ -59,8 +59,6 @@ export async function getUserDetails(userId: number): Promise<UserDetails | null
 
 export async function getUserByID(request: Request) {
   try {
-    console.log('dffffffff');
-
     const url = new URL(request.url);
     const userIdParam = url.searchParams.get('userId');
 
@@ -100,6 +98,5 @@ export async function getUserByID(request: Request) {
 }
 
 export async function GET(request: Request) {
-  console.log('dffffffff');
   return await getUserByID(request);
 }

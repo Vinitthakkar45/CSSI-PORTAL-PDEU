@@ -1,3 +1,4 @@
+import React from 'react';
 import StageCard from './StageCard';
 import NGODetailsForm from './NGODetailsForm';
 import StageProgress from './StageProgress';
@@ -8,9 +9,10 @@ import ReportSubmission from './ReportSubmission';
 import MentorAssignment from './MentorAssignment';
 
 const StagesSection: React.FC = () => {
-  const { currentStage, activeForm, getStageStatus, handleStageClick, handleStageComplete, setActiveForm } = useStages({
-    stages,
-  });
+  const { currentStage, activeForm, getStageStatus, handleStageClick, handleStageComplete, setActiveForm, isLoading } =
+    useStages({
+      stages,
+    });
 
   const renderActiveForm = () => {
     switch (activeForm) {
@@ -26,6 +28,16 @@ const StagesSection: React.FC = () => {
         return null;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="container pb-4 mx-auto">
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-pulse">Loading your internship progress...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container pb-4 mx-auto">

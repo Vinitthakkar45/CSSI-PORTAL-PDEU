@@ -25,9 +25,21 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
 
   useEffect(() => {
     if (userId) {
-      const fetchUserData = async () => {
+      const fetchData = async () => {
         try {
           setIsLoading(true);
+
+          const localStorageKey = `ngoDetails_${userId}`;
+          const storedData = localStorage.getItem(localStorageKey);
+
+          if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            setFormData(parsedData);
+            console.log('Data loaded from localStorage');
+            setIsLoading(false);
+            return;
+          }
+
           const response = await fetch(`/api/user/getUserById?userId=${userId}`);
 
           if (!response.ok) {
@@ -39,14 +51,19 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
           if (userData && userData.profileData && userData.role === 'student') {
             const profile = userData.profileData;
 
-            setFormData({
+            const newFormData = {
               name: profile.name || '',
               ngoName: profile.ngoName || '',
               ngoLocation: profile.ngoLocation || '',
               ngoPhone: profile.ngoPhone || '',
               ngoDescription: profile.ngoDescription || '',
               ngoChosen: profile.ngoChosen || false,
-            });
+            };
+
+            setFormData(newFormData);
+
+            localStorage.setItem(localStorageKey, JSON.stringify(newFormData));
+            console.log('Data fetched from API and saved to localStorage');
           }
         } catch (err) {
           console.error('Error fetching user data:', err);
@@ -55,7 +72,7 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
         }
       };
 
-      fetchUserData();
+      fetchData();
     } else {
       setIsLoading(false);
     }
@@ -63,10 +80,18 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [name]: value,
+      };
+
+      if (userId) {
+        localStorage.setItem(`ngoDetails_${userId}`, JSON.stringify(newData));
+      }
+
+      return newData;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,6 +130,10 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
 
       const data = await response.json();
       console.log('Submission successful:', data);
+
+      if (userId) {
+        localStorage.setItem(`ngoDetails_${userId}`, JSON.stringify(formData));
+      }
 
       onComplete();
     } catch (err) {
