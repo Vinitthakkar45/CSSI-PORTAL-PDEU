@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import Button from '@/components/Home/ui/button/Button';
 import DropzoneComponent from '@/components/Home/form/form-elements/DropZone';
@@ -8,13 +9,42 @@ interface ReportSubmissionProps {
 
 const ReportSubmission: React.FC<ReportSubmissionProps> = ({ onComplete }) => {
   const [reportUploaded, setReportUploaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [certificateUploaded, setCertificateUploaded] = useState(false);
   const [posterUploaded, setPosterUploaded] = useState(false);
 
-  const handleReportDrop = (files: File[]) => {
+  const handleReportDrop = async (files: File[]) => {
     console.log('Report files:', files);
-    setReportUploaded(true);
-    // toast.success("Report uploaded successfully!");
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('report', files[0]);
+
+      const sessionResponse = await fetch('/api/auth/session');
+      const sessionData = await sessionResponse.json();
+      const userId = sessionData.user.id;
+      formData.append('userId', userId);
+
+      const response = await fetch('/api/student/upload-report', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `API responded with status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Submission successful:', data);
+      setReportUploaded(true);
+      // toast.success("Report uploaded successfully!");
+      // onComplete();
+    } catch (err) {
+      console.error('Submission error:', err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    }
   };
 
   const handleCertificateDrop = (files: File[]) => {
@@ -51,6 +81,7 @@ const ReportSubmission: React.FC<ReportSubmissionProps> = ({ onComplete }) => {
             <DropzoneComponent onDrop={handleReportDrop} />
           </div>
           {reportUploaded && <p className="text-sm text-success-500 font-medium">Report uploaded successfully!</p>}
+          {error && <p className="text-sm text-error-500 font-medium">{error}</p>}
         </div>
 
         <div className="space-y-2">

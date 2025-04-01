@@ -46,11 +46,21 @@ const Dashboard = () => {
     console.log('open');
   };
 
-  const handleModalClose = () => {
-    setShowModal(false);
-    if (currentStage < 4) {
-      setCurrentStage((prev) => prev + 1);
+  const handleModalClose = async () => {
+    const response = await fetch('/api/admin/mail', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ stage: currentStage }),
+    });
+
+    if (response.status === 200) {
+      if (currentStage < 4) {
+        setCurrentStage((prev) => prev + 1);
+      }
     }
+    setShowModal(false);
   };
   const handleModalCross = () => {
     setShowModal(false);

@@ -26,6 +26,9 @@ export const student = pgTable('student', {
   stage: integer('stage').default(0),
   internal_evaluation_marks: integer('internal_evaluation_marks'),
   final_evaluation_marks: integer('final_evaluation_marks'),
+  report: text('report'),
+  certificate: text('certificate'),
+  poster: text('poster'),
 });
 
 export const faculty = pgTable('faculty', {
@@ -62,6 +65,12 @@ export const evaluatorStudent = pgTable('evaluator_student', {
     .references(() => student.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
 });
 
+export const stage = pgTable('stage', {
+  id: serial('id').primaryKey(),
+  year: integer('year').notNull(),
+  stage: integer('stage').notNull(),
+});
+
 export type InsertUser = typeof user.$inferInsert;
 export type SelectUser = typeof user.$inferSelect;
 export type InsertStudent = typeof student.$inferInsert;
@@ -72,3 +81,5 @@ export type InsertMentorStudent = typeof mentorStudent.$inferInsert;
 export type SelectMentorStudent = typeof mentorStudent.$inferSelect;
 export type InsertEvaluatorStudent = typeof evaluatorStudent.$inferInsert;
 export type SelectEvaluatorStudent = typeof evaluatorStudent.$inferSelect;
+export type InsertStage = typeof stage.$inferInsert;
+export type SelectStage = typeof stage.$inferSelect;
