@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import TableList from './Table/TableList';
 
 const Dashboard = () => {
-  const { data: session, status } = useSession({
+  const { status } = useSession({
     required: true,
     onUnauthenticated() {
       redirect('/signin');
@@ -54,14 +54,12 @@ const Dashboard = () => {
       </div>
       <br />
 
-      {/* Toggler */}
-
       <div className="flex justify-center mb-4">
         <button
           className={`px-4 py-2 rounded-l-lg shadow-md transition-colors duration-300 border border-gray-500 ${
             selectedToggle === 'mentor'
-              ? 'bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400' // Dark Navy Blue with Light Steel Blue text
-              : 'text-gray-700 hover:bg-gray-100 group-hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300' // Darker background with muted white
+              ? 'bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400'
+              : 'text-gray-700 hover:bg-gray-100 group-hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300'
           }`}
           onClick={() => setSelectedToggle('mentor')}
         >
@@ -79,7 +77,6 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* Pass the appropriate prop to TableList */}
       <TableList
         students={selectedToggle === 'mentor' ? mentoredStudents : evaluatedStudents}
         option={selectedToggle}
