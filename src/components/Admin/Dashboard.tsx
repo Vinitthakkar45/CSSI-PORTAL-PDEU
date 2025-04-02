@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import StageProgress from './StageProgress';
@@ -18,8 +18,18 @@ const Dashboard = () => {
     },
   });
 
-  const [currentStage, setCurrentStage] = useState<number>(1);
+  const [currentStage, setCurrentStage] = useState<number>(0);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const fetchstage = async () => {
+      const res = await fetch('/api/stage', { method: 'GET' });
+      const data = await res.json();
+      const stage = data.stage[0].stage;
+      setCurrentStage(stage);
+    };
+    fetchstage();
+  }, []);
 
   const handleAssignMentors = async () => {
     try {
@@ -43,24 +53,37 @@ const Dashboard = () => {
 
   const handleUnlockStage = () => {
     setShowModal(true);
-    console.log('open');
   };
 
   const handleModalClose = async () => {
-    const response = await fetch('/api/admin/mail', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ stage: currentStage }),
-    });
+    try {
+      const response = await fetch('/api/admin/mail', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ stage: currentStage }),
+      });
 
-    if (response.status === 200) {
-      if (currentStage < 4) {
-        setCurrentStage((prev) => prev + 1);
+      if (response.status === 200) {
+        if (currentStage < 4) {
+          const res = await fetch('api/stage', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ currentStage: Number(currentStage) }),
+          });
+          if (res.status === 200) {
+            setCurrentStage((prev) => prev + 1);
+          }
+        }
       }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setShowModal(false);
     }
-    setShowModal(false);
   };
   const handleModalCross = () => {
     setShowModal(false);

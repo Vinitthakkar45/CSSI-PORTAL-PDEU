@@ -18,15 +18,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const date = new Date();
     const year = date.getFullYear();
-    const { changedStage } = await req.json();
-
-    const response = await db.update(stage).set({ stage: changedStage }).where(eq(stage.year, year));
+    const { currentStage } = await req.json();
+    const newStage = currentStage + 1;
+    const response = await db.update(stage).set({ stage: newStage }).where(eq(stage.year, year));
     if (response.rowCount > 0) {
       return NextResponse.json({ message: 'Update successful', affectedRows: response.rowCount }, { status: 200 });
     } else {
       return NextResponse.json({ message: 'No rows updated. Record not found.' }, { status: 404 });
     }
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: error }, { status: 500 });
   }
 }
