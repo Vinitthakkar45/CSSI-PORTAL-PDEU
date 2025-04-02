@@ -1,7 +1,7 @@
 import SingleBlog from '@/components/Landing/Blog/SingleBlog';
 import blogData from '@/components/Landing/Blog/blogData';
 import Breadcrumb from '@/components/Landing/Common/Breadcrumb';
-
+import PdfViewer from '@/components/PdfViewer';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -21,7 +21,7 @@ const Blog = () => {
       <section className="pb-[120px] pt-[120px]">
         <div className="container">
           <div className="-mx-4 flex flex-wrap justify-center">
-            {blogData.map((blog) => (
+            {/* {blogData.map((blog) => (
               <div key={blog.id} className="w-full px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
                 <SingleBlog blog={blog} />
               </div>
@@ -85,7 +85,8 @@ const Blog = () => {
                   </a>
                 </li>
               </ul>
-            </div>
+            </div> */}
+            <PdfViewer fileUrl="/pdfs/2017_Simmermacher_AM.pdf" height={800} width={1000} />
           </div>
         </div>
       </section>
