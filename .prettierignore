@@ -14,5 +14,6 @@ public/**/*.png
 public/**/*.jpg
 public/**/*.jpeg
 public/**/*.ico
+public/**/*.pdf
 .gitignore
 .hintrc

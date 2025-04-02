@@ -15,7 +15,7 @@
     }
   },
   "lint-staged": {
-    "!(*pnpm-lock.yaml|package.json|src/drizzle/migrations/**|.prettierignore|tsconfig.json|*.css|*.scss)": [
+    "!(*pnpm-lock.yaml|package.json|src/drizzle/migrations/**|.prettierignore|tsconfig.json|*.css|*.scss|*.pdf)": [
       "prettier --write"
     ],
     "**/*.{js,jsx,ts,tsx}": [

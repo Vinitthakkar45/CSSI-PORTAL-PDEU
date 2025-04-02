@@ -15,7 +15,7 @@ const Blog = () => {
     <>
       <Breadcrumb
         pageName="Blog Grid"
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. In varius eros eget sapien consectetur ultrices. Ut quis dapibus libero."
+        description="Following pdf contains the guidelines for the CSSI internship as provided by Pandit Deendayal Energy University (PDEU), 2025."
       />
 
       <section className="pb-[120px] pt-[120px]">
