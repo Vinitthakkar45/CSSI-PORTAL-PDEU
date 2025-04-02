@@ -37,6 +37,22 @@ const Dashboard = () => {
     }
   };
 
+  const handleAssignEvaluators = async () => {
+    try {
+      const response = await fetch('/api/admin/assignevaluator', { method: 'POST' });
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Evaluator Assignment Successful!');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error calling API:', error);
+      alert('Something went wrong.');
+    }
+  };
+
   if (status === 'loading') {
     return <p>Loading...</p>;
   }
@@ -94,8 +110,8 @@ const Dashboard = () => {
         <Button size="md" variant="primary" className="mr-4" onClick={handleAssignMentors}>
           Assign Mentor
         </Button>
-        <Button size="md" variant="primary">
-          Assign Faculty
+        <Button size="md" variant="primary" onClick={handleAssignEvaluators}>
+          Assign Evaluator
         </Button>
       </div>
     </>
