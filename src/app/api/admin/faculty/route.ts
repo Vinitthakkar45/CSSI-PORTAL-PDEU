@@ -16,7 +16,7 @@ export async function GET() {
       .from(faculty)
       .innerJoin(user, eq(faculty.userId, user.id))
       .where(eq(faculty.userId, user.id));
-
+    console.log(facultyList);
     return NextResponse.json(facultyList);
   } catch (error) {
     console.error('Error fetching student:', error);

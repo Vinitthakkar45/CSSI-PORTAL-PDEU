@@ -15,7 +15,7 @@
     }
   },
   "lint-staged": {
-    "!(*pnpm-lock.yaml|package.json|src/drizzle/migrations/**|.prettierignore|tsconfig.json|*.css|*.scss)": [
+    "!(*pnpm-lock.yaml|package.json|src/drizzle/migrations/**|.prettierignore|tsconfig.json|*.css|*.scss|*.pdf)": [
       "prettier --write"
     ],
     "**/*.{js,jsx,ts,tsx}": [
@@ -33,6 +33,8 @@
     "@neondatabase/serverless": "^0.10.4",
     "@react-jvectormap/core": "^1.0.4",
     "@react-jvectormap/world": "^1.1.2",
+    "@react-pdf-viewer/core": "3.12.0",
+    "@react-pdf-viewer/default-layout": "3.12.0",
     "@tailwindcss/forms": "^0.5.9",
     "apexcharts": "^4.3.0",
     "autoprefixer": "^10.4.20",
@@ -45,6 +47,7 @@
     "next-cloudinary": "^6.16.0",
     "next-themes": "^0.4.4",
     "nodemailer": "^6.10.0",
+    "pdfjs-dist": "3.4.120",
     "react": "^19.0.0",
     "react-apexcharts": "^1.7.0",
     "react-dnd": "^16.0.1",
@@ -62,6 +65,7 @@
     "@types/nodemailer": "^6.4.17",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "canvas": "^2.9.0",
     "drizzle-kit": "^0.30.5",
     "drizzle-orm": "^0.40.0",
     "eslint": "^9.21.0",

@@ -8,7 +8,7 @@ import { InferSelectModel } from 'drizzle-orm';
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
   user: {
-    name: string | null;
+    // name: string | null;
     email: string | null;
     role: string | null;
   };
@@ -100,7 +100,7 @@ const FacultyTable = () => {
                 <TableCell className="py-3">
                   <div className="flex items-center gap-3">
                     <div>
-                      <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">{item.user.name}</p>
+                      <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">{item.faculty.name}</p>
                     </div>
                   </div>
                 </TableCell>
@@ -129,5 +129,8 @@ const FacultyTable = () => {
     </div>
   );
 };
+
+// It's very important to note that the worker version and the `pdfjs` package
+// (mentioned in the Install pdfjs library section of Getting started) have to be the same.
 
 export default FacultyTable;

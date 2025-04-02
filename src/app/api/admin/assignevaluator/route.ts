@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { mentorAssignment } from '@/components/Admin/utils/mentorassign';
+import { evaluatorAssignment } from '@/components/Admin/utils/evaluatorassign';
 
 export async function POST() {
   try {
-    await mentorAssignment();
+    await evaluatorAssignment();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Mentor Assignment Failed:', error);
