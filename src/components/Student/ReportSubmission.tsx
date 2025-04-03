@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@/components/Home/ui/button/Button';
 import DropzoneComponent from '@/components/Home/form/form-elements/DropZone';
 
@@ -8,25 +8,44 @@ interface ReportSubmissionProps {
 }
 
 const ReportSubmission: React.FC<ReportSubmissionProps> = ({ onComplete }) => {
-  const [reportUploaded, setReportUploaded] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionResponse = await fetch('/api/auth/session');
+      const sessionData = await sessionResponse.json();
+      setUserId(sessionData.user.id.toString());
+    };
+
+    fetchSession();
+  }, []);
+
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({
+    Report: false,
+    Certificate: false,
+    Poster: false,
+  });
+  const [reportUploaded, setReportUploaded] = useState(false);
   const [certificateUploaded, setCertificateUploaded] = useState(false);
   const [posterUploaded, setPosterUploaded] = useState(false);
 
-  const handleReportDrop = async (files: File[]) => {
-    console.log('Report files:', files);
+  const handleFileUpload = async (
+    folderName: string,
+    file: File,
+    setUploaded: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
+    console.log('User ID:', userId);
+    console.log('File:', file);
     setError(null);
+    setIsLoading({ ...isLoading, [folderName]: true });
 
     try {
       const formData = new FormData();
-      formData.append('report', files[0]);
+      formData.append('file', file);
+      formData.append('userId', userId!);
+      formData.append('folderName', folderName);
 
-      const sessionResponse = await fetch('/api/auth/session');
-      const sessionData = await sessionResponse.json();
-      const userId = sessionData.user.id;
-      formData.append('userId', userId);
-
-      const response = await fetch('/api/student/upload-report', {
+      const response = await fetch(`/api/student/upload-file`, {
         method: 'POST',
         body: formData,
       });
@@ -37,26 +56,27 @@ const ReportSubmission: React.FC<ReportSubmissionProps> = ({ onComplete }) => {
       }
 
       const data = await response.json();
-      console.log('Submission successful:', data);
-      setReportUploaded(true);
-      // toast.success("Report uploaded successfully!");
-      // onComplete();
+      console.log(`${folderName} upload successful:`, data);
+      setUploaded(true);
+      // toast.success(`${folderName} uploaded successfully!`);
     } catch (err) {
-      console.error('Submission error:', err);
+      console.error(`${folderName} upload error:`, err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
+      setIsLoading({ ...isLoading, [folderName]: false });
     }
   };
 
+  const handleReportDrop = (files: File[]) => {
+    handleFileUpload('Report', files[0], setReportUploaded);
+  };
+
   const handleCertificateDrop = (files: File[]) => {
-    console.log('Certificate files:', files);
-    setCertificateUploaded(true);
-    // toast.success("Certificate uploaded successfully!");
+    handleFileUpload('Certificate', files[0], setCertificateUploaded);
   };
 
   const handlePosterDrop = (files: File[]) => {
-    console.log('Poster files:', files);
-    setPosterUploaded(true);
-    // toast.success("Poster uploaded successfully!");
+    handleFileUpload('Poster', files[0], setPosterUploaded);
   };
 
   const handleSubmit = () => {
@@ -78,7 +98,7 @@ const ReportSubmission: React.FC<ReportSubmissionProps> = ({ onComplete }) => {
             Upload Report <span className="text-error-500">*</span>
           </h4>
           <div className={reportUploaded ? 'border-2 border-success-500 rounded-xl p-1' : ''}>
-            <DropzoneComponent onDrop={handleReportDrop} />
+            <DropzoneComponent onDrop={handleReportDrop} isLoading={isLoading.Report} />
           </div>
           {reportUploaded && <p className="text-sm text-success-500 font-medium">Report uploaded successfully!</p>}
           {error && <p className="text-sm text-error-500 font-medium">{error}</p>}
@@ -89,7 +109,7 @@ const ReportSubmission: React.FC<ReportSubmissionProps> = ({ onComplete }) => {
             Upload NGO Certificate <span className="text-error-500">*</span>
           </h4>
           <div className={certificateUploaded ? 'border-2 border-success-500 rounded-xl p-1' : ''}>
-            <DropzoneComponent onDrop={handleCertificateDrop} />
+            <DropzoneComponent onDrop={handleCertificateDrop} isLoading={isLoading.Certificate} />
           </div>
           {certificateUploaded && (
             <p className="text-sm text-success-500 font-medium">Certificate uploaded successfully!</p>
@@ -101,7 +121,7 @@ const ReportSubmission: React.FC<ReportSubmissionProps> = ({ onComplete }) => {
             Upload Poster <span className="text-error-500">*</span>
           </h4>
           <div className={posterUploaded ? 'border-2 border-success-500 rounded-xl p-1' : ''}>
-            <DropzoneComponent onDrop={handlePosterDrop} />
+            <DropzoneComponent onDrop={handlePosterDrop} isLoading={isLoading.Poster} />
           </div>
           {posterUploaded && <p className="text-sm text-success-500 font-medium">Poster uploaded successfully!</p>}
         </div>
