@@ -17,15 +17,14 @@ interface CloudinaryUploadResponse {
 }
 
 export async function POST(req: NextRequest) {
-  console.log('Upload Report');
-
   if (req.method !== 'POST') {
     return NextResponse.json({ error: 'Method Not Allowed' }, { status: 405 });
   }
 
   try {
     const formData = await req.formData();
-    const file = formData.get('report') as File;
+    const file = formData.get('file') as File;
+    const folderName = formData.get('folderName') as string;
     const userId = formData.get('userId') as string;
 
     if (!userId) {
@@ -43,12 +42,13 @@ export async function POST(req: NextRequest) {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           resource_type: 'raw',
-          folder: 'Report',
+          folder: folderName,
           format: 'pdf',
           pages: true,
           use_filename: true,
-          unique_filename: true,
+          unique_filename: false,
           overwrite: true,
+          public_id: userId,
         },
         (error, result) => {
           if (error) reject(error);
@@ -60,11 +60,14 @@ export async function POST(req: NextRequest) {
 
     const userIdNum = parseInt(userId, 10);
 
-    await db.update(student).set({ report: result.public_id }).where(eq(student.userId, userIdNum));
+    await db
+      .update(student)
+      .set({ [folderName.toLowerCase()]: result.public_id })
+      .where(eq(student.userId, userIdNum));
 
     return NextResponse.json({ publicId: result.public_id }, { status: 200 });
   } catch (error) {
-    console.log('Upload Report failed  ', error);
+    console.log('Upload failed  ', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
