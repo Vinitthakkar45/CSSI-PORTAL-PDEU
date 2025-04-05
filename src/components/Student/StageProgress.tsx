@@ -1,31 +1,44 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Check, Lock } from 'lucide-react';
+import { Check, Lock, CircleAlert } from 'lucide-react';
 
 interface StageProgressProps {
   currentStage: number;
   totalStages: number;
   handleStageClick: (stageNumber: number) => void;
+  maxStageUnlocked?: number;
 }
 
-const StageProgress: React.FC<StageProgressProps> = ({ currentStage, totalStages, handleStageClick }) => {
+const StageProgress: React.FC<StageProgressProps> = ({
+  currentStage,
+  totalStages,
+  handleStageClick,
+  maxStageUnlocked = currentStage,
+}) => {
   const stageLabels = ['Select', 'Internship', 'Uploads', 'Grade'];
 
   return (
     <div className="w-full lg:mb-4 mx-auto">
-      <div className="flex items-cente justify-between gap-20">
-        <div className="w-full flex flex-col ">
+      <div className="flex items-center justify-between gap-20">
+        <div className="w-full flex flex-col">
           <div className="flex justify-between items-center">
             <h3 className="text-theme-xl font-normal text-gray-800 dark:text-white/90">Internship Progress</h3>
-            <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-400">
-              Stage {currentStage} of {totalStages}
-            </span>
+            <div className="flex gap-2">
+              <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-500">
+                Stage {currentStage} of {totalStages}
+              </span>
+              {maxStageUnlocked < totalStages && (
+                <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-500 dark:bg-amber-500/20 dark:text-amber-600">
+                  {maxStageUnlocked} Unlocked
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="mt-2 md:mt-6 relative">
             <div className="absolute top-5 left-1 right-1 h-1 bg-gray-200 dark:bg-gray-700 z-0">
               <div
-                className="h-full bg-brand-500 dark:bg-brand-400 transition-all duration-500 ease-in-out"
+                className="h-full bg-brand-500 dark:bg-brand-500 transition-all duration-600 ease-in-out"
                 style={{ width: `${((currentStage - 1) / (totalStages - 1)) * 100}%` }}
               />
             </div>
@@ -35,12 +48,14 @@ const StageProgress: React.FC<StageProgressProps> = ({ currentStage, totalStages
                 const stageNumber = index + 1;
                 const isCompleted = stageNumber < currentStage;
                 const isCurrent = stageNumber === currentStage;
-                const isLocked = stageNumber > currentStage;
+                const isUnlocked = !isCompleted && !isCurrent && stageNumber <= maxStageUnlocked;
+                const isLocked = stageNumber > maxStageUnlocked;
+
                 return (
                   <div
                     key={stageNumber}
-                    onClick={() => handleStageClick(stageNumber)}
-                    className="flex flex-col items-center hover:cursor-pointer"
+                    onClick={() => (isLocked ? null : handleStageClick(stageNumber))}
+                    className={cn('flex flex-col items-center', !isLocked && 'hover:cursor-pointer')}
                   >
                     <div
                       className={cn(
@@ -49,13 +64,17 @@ const StageProgress: React.FC<StageProgressProps> = ({ currentStage, totalStages
                           ? 'bg-success-500 text-white dark:bg-success-500'
                           : isCurrent
                             ? 'bg-brand-500 text-white dark:bg-brand-500'
-                            : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed'
+                            : isUnlocked
+                              ? 'bg-amber-500 text-white dark:bg-amber-600'
+                              : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed'
                       )}
                     >
                       {isCompleted ? (
                         <Check size={20} />
                       ) : isLocked ? (
                         <Lock size={18} />
+                      ) : isUnlocked ? (
+                        <CircleAlert size={18} />
                       ) : (
                         <span className="text-base font-semibold">{stageNumber}</span>
                       )}
@@ -66,11 +85,14 @@ const StageProgress: React.FC<StageProgressProps> = ({ currentStage, totalStages
                         isCompleted
                           ? 'text-success-700 dark:text-success-400'
                           : isCurrent
-                            ? 'text-brand-700 font-medium dark:text-brand-400'
-                            : 'text-gray-500 dark:text-gray-400'
+                            ? 'text-brand-700 font-medium dark:text-brand-500'
+                            : isUnlocked
+                              ? 'text-amber-700 dark:text-amber-600'
+                              : 'text-gray-500 dark:text-gray-400'
                       )}
                     >
                       {label}
+                      {isUnlocked && <span className="block text-xs">Available</span>}
                     </span>
                   </div>
                 );

@@ -18,10 +18,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Student not found' }, { status: 404 });
     }
 
-    return NextResponse.json({
-      message: 'Stage updated successfully',
-      data: { stage, student: updatedStudent[0] },
-    });
+    return NextResponse.json(
+      {
+        message: 'Stage updated successfully',
+        data: { stage, student: updatedStudent[0] },
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error updating stage:', error);
     return NextResponse.json(
