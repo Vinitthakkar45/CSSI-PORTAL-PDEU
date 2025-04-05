@@ -38,7 +38,6 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
 
           if (storedData) {
             const parsedData = JSON.parse(storedData);
-            console.log(parsedData);
             setReportUploaded(parsedData.reportUploaded);
             setCertificateUploaded(parsedData.certificateUploaded);
             setPosterUploaded(parsedData.posterUploaded);
@@ -79,8 +78,6 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
     file: File,
     setUploaded: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    console.log('User ID:', userId);
-    console.log('File:', file);
     setError(null);
     setIsLoading({ ...isLoading, [folderName]: true });
 
@@ -99,9 +96,6 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
         const errorData = await response.json();
         throw new Error(errorData.message || `API responded with status: ${response.status}`);
       }
-
-      const data = await response.json();
-      console.log(`${folderName} upload successful:`, data);
       setUploaded(true);
       // toast.success(`${folderName} uploaded successfully!`);
     } catch (err) {

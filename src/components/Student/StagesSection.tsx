@@ -9,21 +9,29 @@ import ReportSubmission from './UploadDocs';
 import MentorAssignment from './MentorAssignment';
 
 const StagesSection: React.FC = () => {
-  const { currentStage, activeForm, getStageStatus, handleStageClick, handleStageComplete, setActiveForm, isLoading } =
-    useStages({
-      stages,
-    });
+  const {
+    currentStage,
+    maxStageUnlocked,
+    activeForm,
+    getStageStatus,
+    handleStageClick,
+    handleStageComplete,
+    setActiveForm,
+    isLoading,
+  } = useStages({
+    stages,
+  });
 
   const renderActiveForm = () => {
     switch (activeForm) {
       case 1:
-        return <NGODetailsForm onComplete={handleStageComplete} />;
+        return <NGODetailsForm onComplete={() => handleStageComplete(1)} />;
       case 2:
-        return <InternshipProgress onComplete={handleStageComplete} />;
+        return <InternshipProgress onComplete={() => handleStageComplete(2)} />;
       case 3:
-        return <ReportSubmission onComplete={handleStageComplete} />;
+        return <ReportSubmission onComplete={() => handleStageComplete(3)} />;
       case 4:
-        return <MentorAssignment onComplete={handleStageComplete} />;
+        return <MentorAssignment onComplete={() => handleStageComplete(4)} />;
       default:
         return null;
     }
@@ -41,7 +49,12 @@ const StagesSection: React.FC = () => {
 
   return (
     <div className="container pb-4 mx-auto">
-      <StageProgress currentStage={currentStage} totalStages={stages.length} handleStageClick={handleStageClick} />
+      <StageProgress
+        currentStage={currentStage}
+        totalStages={stages.length}
+        handleStageClick={handleStageClick}
+        maxStageUnlocked={maxStageUnlocked}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stages.map((stage) => (
@@ -64,14 +77,20 @@ const StagesSection: React.FC = () => {
             Continue Your Internship Journey
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            Click on the current stage card above to continue your internship process.
+            {currentStage <= maxStageUnlocked ? (
+              <>You are currently at stage {currentStage}. Click below to continue.</>
+            ) : (
+              <>You have completed stage {currentStage - 1}. The next stage will be available soon.</>
+            )}
           </p>
-          <button
-            onClick={() => setActiveForm(currentStage)}
-            className="px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors"
-          >
-            Continue to Stage {currentStage}
-          </button>
+          {currentStage <= maxStageUnlocked && (
+            <button
+              onClick={() => setActiveForm(currentStage)}
+              className="px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors"
+            >
+              {currentStage === 1 ? 'Start' : 'Continue to'} Stage {currentStage}
+            </button>
+          )}
         </div>
       )}
 
