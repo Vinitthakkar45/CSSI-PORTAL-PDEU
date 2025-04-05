@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import Button from '@/components/Home/ui/button/Button';
 import DropzoneComponent from '@/components/Home/form/form-elements/DropZone';
 
-interface ReportSubmissionProps {
+interface UploadDocsProps {
   onComplete: () => void;
 }
 
-const ReportSubmission: React.FC<ReportSubmissionProps> = ({ onComplete }) => {
+const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
   const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
     const fetchSession = async () => {
@@ -28,6 +28,51 @@ const ReportSubmission: React.FC<ReportSubmissionProps> = ({ onComplete }) => {
   const [reportUploaded, setReportUploaded] = useState(false);
   const [certificateUploaded, setCertificateUploaded] = useState(false);
   const [posterUploaded, setPosterUploaded] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      const fetchStatusLocalStorage = () => {
+        try {
+          const localStorageKey = `docsStatus_${userId}`;
+          const storedData = localStorage.getItem(localStorageKey);
+
+          if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            console.log(parsedData);
+            setReportUploaded(parsedData.reportUploaded);
+            setCertificateUploaded(parsedData.certificateUploaded);
+            setPosterUploaded(parsedData.posterUploaded);
+            return true;
+          }
+          return false;
+        } catch (err) {
+          console.error('Error fetching uploaded status from local Storage:', err);
+          return false;
+        }
+      };
+      const fetchUploadedStatus = async () => {
+        try {
+          const response = await fetch(`/api/student/uploaded-status?userId=${userId}`);
+          const data = await response.json();
+          setReportUploaded(data.data.reportUploaded);
+          setCertificateUploaded(data.data.certificateUploaded);
+          setPosterUploaded(data.data.posterUploaded);
+          localStorage.setItem(
+            `docsStatus_${userId}`,
+            JSON.stringify({
+              reportUploaded: data.data.reportUploaded,
+              certificateUploaded: data.data.certificateUploaded,
+              posterUploaded: data.data.posterUploaded,
+            })
+          );
+        } catch (err) {
+          console.error('Error fetching uploaded status:', err);
+        }
+      };
+      if (fetchStatusLocalStorage()) return;
+      fetchUploadedStatus();
+    }
+  }, [userId]);
 
   const handleFileUpload = async (
     folderName: string,
@@ -140,4 +185,4 @@ const ReportSubmission: React.FC<ReportSubmissionProps> = ({ onComplete }) => {
   );
 };
 
-export default ReportSubmission;
+export default UploadDocs;

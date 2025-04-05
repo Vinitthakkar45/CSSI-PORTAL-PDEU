@@ -5,7 +5,7 @@ import StageProgress from './StageProgress';
 import { stages } from './data/stages';
 import { useStages } from './hooks/useStages';
 import InternshipProgress from './InternshipProgress';
-import ReportSubmission from './ReportSubmission';
+import ReportSubmission from './UploadDocs';
 import MentorAssignment from './MentorAssignment';
 
 const StagesSection: React.FC = () => {
