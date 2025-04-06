@@ -47,10 +47,12 @@ const StagesSection: React.FC = () => {
     );
   }
 
+  const hasCompletedAvailableStages = currentStage > maxStageUnlocked;
+
   return (
     <div className="container pb-4 mx-auto">
       <StageProgress
-        currentStage={currentStage}
+        currentStage={hasCompletedAvailableStages ? maxStageUnlocked + 1 : currentStage}
         totalStages={stages.length}
         handleStageClick={handleStageClick}
         maxStageUnlocked={maxStageUnlocked}
@@ -74,16 +76,18 @@ const StagesSection: React.FC = () => {
       {!activeForm && currentStage < 5 && (
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center dark:bg-gray-900 dark:border-gray-800">
           <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white/90">
-            Continue Your Internship Journey
+            {hasCompletedAvailableStages ? 'Waiting for Next Stage' : 'Continue Your Internship Journey'}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            {currentStage <= maxStageUnlocked ? (
+            {hasCompletedAvailableStages ? (
+              <>You have completed all available stages. The next stage will be unlocked soon.</>
+            ) : currentStage <= maxStageUnlocked ? (
               <>You are currently at stage {currentStage}. Click below to continue.</>
             ) : (
               <>You have completed stage {currentStage - 1}. The next stage will be available soon.</>
             )}
           </p>
-          {currentStage <= maxStageUnlocked && (
+          {currentStage <= maxStageUnlocked && !hasCompletedAvailableStages && (
             <button
               onClick={() => setActiveForm(currentStage)}
               className="px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors"

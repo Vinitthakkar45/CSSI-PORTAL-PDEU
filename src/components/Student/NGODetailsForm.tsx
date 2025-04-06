@@ -104,7 +104,6 @@ export default function NGODetailsForm({ onComplete }: { onComplete: () => void 
       ngoPhone: formData.ngoPhone,
       ngoDescription: formData.ngoDescription,
       ngoChosen: true,
-      stage: 1,
     };
 
     try {

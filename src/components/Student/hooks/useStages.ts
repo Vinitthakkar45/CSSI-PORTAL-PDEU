@@ -41,14 +41,18 @@ export const useStages = ({ stages }: UseStagesProps) => {
         const userData = await response.json();
 
         if (userData && userData.profileData && userData.role === 'student') {
-          const userStage = userData.profileData.stage || 0;
+          const userStage = userData.profileData.stage || 1;
 
-          setCurrentStage(Math.min(userStage, systemMaxStage));
+          if (userStage > systemMaxStage) {
+            setCurrentStage(userStage);
+          } else {
+            setCurrentStage(Math.min(userStage, systemMaxStage));
+          }
 
           localStorage.setItem(
             `studentStage_${userId}`,
             JSON.stringify({
-              stage: Math.min(userStage, systemMaxStage),
+              stage: userStage,
               maxStageUnlocked: systemMaxStage,
             })
           );
@@ -83,13 +87,15 @@ export const useStages = ({ stages }: UseStagesProps) => {
 
   const getStageStatus = (stageNumber: number): StageStatus => {
     if (stageNumber < currentStage) return 'completed';
-    if (stageNumber === currentStage) return 'current';
+    if (stageNumber === currentStage && stageNumber <= maxStageUnlocked) return 'current';
     if (stageNumber <= maxStageUnlocked) return 'unlocked';
     return 'locked';
   };
 
   const handleStageClick = (stageNumber: number) => {
-    if (stageNumber <= maxStageUnlocked) {
+    if (stageNumber <= maxStageUnlocked && stageNumber < currentStage) {
+      setActiveForm(stageNumber);
+    } else if (stageNumber <= maxStageUnlocked) {
       setActiveForm(stageNumber);
     }
   };
@@ -100,41 +106,37 @@ export const useStages = ({ stages }: UseStagesProps) => {
       return;
     }
 
-    if (stage <= maxStageUnlocked && stage < stages.length) {
-      const newStage = stage + 1;
+    const newStage = stage + 1;
 
-      try {
-        const response = await fetch('/api/student/update-stage', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId,
-            stage: newStage,
-          }),
-        });
+    try {
+      const response = await fetch('/api/student/update-stage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          stage: newStage,
+        }),
+      });
 
-        if (!response.ok) {
-          throw new Error('Error updating stage');
-        }
-
-        setCurrentStage(newStage);
-
-        if (userId) {
-          localStorage.setItem(
-            `studentStage_${userId}`,
-            JSON.stringify({
-              stage: newStage,
-              maxStageUnlocked,
-            })
-          );
-        }
-      } catch (err) {
-        console.error('Error updating stage:', err);
+      if (!response.ok) {
+        throw new Error('Error updating stage');
       }
-    } else {
-      setCurrentStage(5);
+
+      setCurrentStage(newStage);
+
+      if (userId) {
+        localStorage.setItem(
+          `studentStage_${userId}`,
+          JSON.stringify({
+            stage: newStage,
+            maxStageUnlocked,
+          })
+        );
+      }
+    } catch (err) {
+      console.error('Error updating stage:', err);
     }
 
     setActiveForm(null);
