@@ -8,14 +8,16 @@ interface UseStagesProps {
 }
 
 export const useStages = ({ stages }: UseStagesProps) => {
+  const [maxStageUnlocked, setMaxStageUnlocked] = useState(1);
   const [currentStage, setCurrentStage] = useState(1);
   const [activeForm, setActiveForm] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
   const userId = session?.user?.id;
+  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
-    const fetchCurrentStage = async () => {
+    const fetchStageData = async () => {
       if (!userId) {
         setIsLoading(false);
         return;
@@ -24,64 +26,82 @@ export const useStages = ({ stages }: UseStagesProps) => {
       try {
         setIsLoading(true);
 
+        const stageResponse = await fetch(`/api/stage`);
+        if (!stageResponse.ok) {
+          throw new Error('Failed to fetch current allowed stage');
+        }
+        const stageData = await stageResponse.json();
+        const systemMaxStage = stageData.stage[0].stage || 1;
+        setMaxStageUnlocked(systemMaxStage);
+
+        const response = await fetch(`/api/user/getUserById?userId=${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        const userData = await response.json();
+
+        if (userData && userData.profileData && userData.role === 'student') {
+          const userStage = userData.profileData.stage || 0;
+
+          setCurrentStage(Math.min(userStage, systemMaxStage));
+
+          localStorage.setItem(
+            `studentStage_${userId}`,
+            JSON.stringify({
+              stage: Math.min(userStage, systemMaxStage),
+              maxStageUnlocked: systemMaxStage,
+            })
+          );
+        }
+      } catch (err) {
+        console.error('Error fetching stage data:', err);
+
         const localStorageKey = `studentStage_${userId}`;
         const storedStage = localStorage.getItem(localStorageKey);
 
         if (storedStage) {
-          const parsedStage = JSON.parse(storedStage);
-          setCurrentStage(parsedStage.stage);
-          console.log('Stage loaded from localStorage:', parsedStage.stage);
-          setIsLoading(false);
-          return;
+          try {
+            const parsedStage = JSON.parse(storedStage);
+            setCurrentStage(parsedStage.stage);
+            setMaxStageUnlocked(parsedStage.maxStageUnlocked || 1);
+          } catch (e) {
+            console.error('Error parsing stage data from local storage:', e);
+            setCurrentStage(1);
+            setMaxStageUnlocked(1);
+          }
+        } else {
+          setCurrentStage(1);
+          setMaxStageUnlocked(1);
         }
-
-        const response = await fetch(`/api/user/getUserById?userId=${userId}`);
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-
-        const userData = await response.json();
-
-        if (userData && userData.profileData && userData.role === 'student') {
-          const userStage = userData.profileData.stage || 1;
-          setCurrentStage(userStage);
-
-          localStorage.setItem(localStorageKey, JSON.stringify({ stage: userStage }));
-          console.log('Stage fetched from API and saved to localStorage:', userStage);
-        }
-      } catch (err) {
-        console.error('Error fetching current stage:', err);
-        setCurrentStage(1);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchCurrentStage();
-  }, [userId]);
+    fetchStageData();
+  }, [userId, currentYear]);
 
   const getStageStatus = (stageNumber: number): StageStatus => {
     if (stageNumber < currentStage) return 'completed';
     if (stageNumber === currentStage) return 'current';
+    if (stageNumber <= maxStageUnlocked) return 'unlocked';
     return 'locked';
   };
 
   const handleStageClick = (stageNumber: number) => {
-    if (stageNumber <= currentStage) {
+    if (stageNumber <= maxStageUnlocked) {
       setActiveForm(stageNumber);
     }
   };
 
-  const handleStageComplete = async () => {
-    if (currentStage < stages.length) {
-      const newStage = currentStage + 1;
+  const handleStageComplete = async (stage: number) => {
+    if (stage !== currentStage) {
+      setActiveForm(null);
+      return;
+    }
 
-      setCurrentStage(newStage);
-
-      if (userId) {
-        localStorage.setItem(`studentStage_${userId}`, JSON.stringify({ stage: newStage }));
-      }
+    if (stage <= maxStageUnlocked && stage < stages.length) {
+      const newStage = stage + 1;
 
       try {
         const response = await fetch('/api/student/update-stage', {
@@ -96,19 +116,33 @@ export const useStages = ({ stages }: UseStagesProps) => {
         });
 
         if (!response.ok) {
-          console.error('Failed to update stage in database');
-        } else {
-          console.log('Stage updated successfully in database');
+          throw new Error('Error updating stage');
+        }
+
+        setCurrentStage(newStage);
+
+        if (userId) {
+          localStorage.setItem(
+            `studentStage_${userId}`,
+            JSON.stringify({
+              stage: newStage,
+              maxStageUnlocked,
+            })
+          );
         }
       } catch (err) {
         console.error('Error updating stage:', err);
       }
+    } else {
+      setCurrentStage(5);
     }
+
     setActiveForm(null);
   };
 
   return {
     currentStage,
+    maxStageUnlocked,
     activeForm,
     getStageStatus,
     handleStageClick,

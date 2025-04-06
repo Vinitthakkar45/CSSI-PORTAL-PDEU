@@ -8,7 +8,7 @@ import Button from '@/components/Home/ui/button/Button';
 import { useSession } from 'next-auth/react';
 import LORPdfDownload from '@/components/Student/LorGenerator';
 
-export default function BasicForm({ onComplete }: { onComplete: () => void }) {
+export default function NGODetailsForm({ onComplete }: { onComplete: () => void }) {
   const [formData, setFormData] = useState({
     name: '',
     ngoName: '',
@@ -36,7 +36,6 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
           if (storedData) {
             const parsedData = JSON.parse(storedData);
             setFormData(parsedData);
-            console.log('Data loaded from localStorage');
             setIsLoading(false);
             return;
           }
@@ -64,7 +63,6 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
             setFormData(newFormData);
 
             localStorage.setItem(localStorageKey, JSON.stringify(newFormData));
-            console.log('Data fetched from API and saved to localStorage');
           }
         } catch (err) {
           console.error('Error fetching user data:', err);
@@ -110,8 +108,6 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
       stage: 1,
     };
 
-    console.log('Submitting data:', studentData);
-
     try {
       const response = await fetch('/api/student/update-ngo', {
         method: 'POST',
@@ -129,8 +125,7 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
         throw new Error(errorData.message || `API responded with status: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log('Submission successful:', data);
+      await response.json();
 
       if (userId) {
         localStorage.setItem(`ngoDetails_${userId}`, JSON.stringify(formData));
