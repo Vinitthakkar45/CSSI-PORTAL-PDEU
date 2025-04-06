@@ -17,7 +17,7 @@ const StageCard: React.FC<StageCardProps> = ({ number, title, description, statu
     <div
       onClick={status !== 'locked' ? onClick : undefined}
       className={cn(
-        'relative flex flex-col rounded-xl border p-6 transition-all',
+        'hidden relative md:flex flex-col rounded-xl border p-6 transition-all',
         status === 'locked'
           ? 'border-gray-200 bg-gray-50 opacity-70 cursor-not-allowed dark:border-gray-800 dark:bg-gray-900'
           : status === 'unlocked'

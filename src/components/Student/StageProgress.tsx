@@ -25,7 +25,7 @@ const StageProgress: React.FC<StageProgressProps> = ({
             <h3 className="text-theme-xl font-normal text-gray-800 dark:text-white/90">Internship Progress</h3>
             <div className="flex gap-2">
               <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-500">
-                Stage {currentStage} of {totalStages}
+                {currentStage < 5 ? `Stage ${currentStage} of ${totalStages}` : 'Completed'}
               </span>
               {maxStageUnlocked < totalStages && (
                 <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-500 dark:bg-amber-500/20 dark:text-amber-600">
@@ -39,7 +39,9 @@ const StageProgress: React.FC<StageProgressProps> = ({
             <div className="absolute top-5 left-1 right-1 h-1 bg-gray-200 dark:bg-gray-700 z-0">
               <div
                 className="h-full bg-brand-500 dark:bg-brand-500 transition-all duration-600 ease-in-out"
-                style={{ width: `${((currentStage - 1) / (totalStages - 1)) * 100}%` }}
+                style={{
+                  width: `${Math.min(((currentStage - 1) / (totalStages - 1)) * 100, 100)}%`,
+                }}
               />
             </div>
 

@@ -133,6 +133,8 @@ export const useStages = ({ stages }: UseStagesProps) => {
       } catch (err) {
         console.error('Error updating stage:', err);
       }
+    } else {
+      setCurrentStage(5);
     }
 
     setActiveForm(null);

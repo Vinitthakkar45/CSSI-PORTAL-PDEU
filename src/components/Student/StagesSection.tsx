@@ -71,7 +71,7 @@ const StagesSection: React.FC = () => {
 
       {activeForm && <div className="mt-8">{renderActiveForm()}</div>}
 
-      {!activeForm && currentStage <= stages.length && (
+      {!activeForm && currentStage < 5 && (
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center dark:bg-gray-900 dark:border-gray-800">
           <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white/90">
             Continue Your Internship Journey
@@ -94,7 +94,7 @@ const StagesSection: React.FC = () => {
         </div>
       )}
 
-      {currentStage > stages.length && (
+      {currentStage === 5 && (
         <div className="bg-success-50 rounded-xl p-6 border border-success-200 text-center dark:bg-success-500/10 dark:border-success-500/30">
           <h3 className="text-xl font-semibold mb-2 text-success-700 dark:text-success-400">Congratulations!</h3>
           <p className="text-sm text-success-600 dark:text-success-300 mb-4">
