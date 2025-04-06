@@ -41,7 +41,6 @@ export default function NGODetailsForm({ onComplete }: { onComplete: () => void 
           }
 
           const response = await fetch(`/api/user/getUserById?userId=${userId}`);
-
           if (!response.ok) {
             throw new Error('Failed to fetch user data');
           }
@@ -210,8 +209,8 @@ export default function NGODetailsForm({ onComplete }: { onComplete: () => void 
             </div>
           </Form>
         )}
+        <LORPdfDownload userId={session?.user?.id || ''} />
       </ComponentCard>
-      <LORPdfDownload userId={session?.user?.id || ''} />
     </>
   );
 }
