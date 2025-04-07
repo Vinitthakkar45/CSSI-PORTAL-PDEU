@@ -9,13 +9,7 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
     }
-    if (
-      !studentData.ngoName ||
-      !studentData.ngoLocation ||
-      !studentData.ngoPhone ||
-      !studentData.ngoDescription ||
-      !studentData.name
-    ) {
+    if (!studentData.ngoName || !studentData.ngoPhone || !studentData.name) {
       return NextResponse.json({ message: 'NGO details are required' }, { status: 400 });
     }
 
@@ -24,9 +18,7 @@ export async function POST(request: NextRequest) {
       .set({
         name: studentData.name,
         ngoName: studentData.ngoName,
-        ngoLocation: studentData.ngoLocation,
         ngoPhone: studentData.ngoPhone,
-        ngoDescription: studentData.ngoDescription,
         ngoChosen: true,
         stage: studentData.stage,
       })
