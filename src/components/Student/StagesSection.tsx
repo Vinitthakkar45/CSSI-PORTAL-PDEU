@@ -18,9 +18,7 @@ const StagesSection: React.FC = () => {
     handleStageComplete,
     setActiveForm,
     isLoading,
-  } = useStages({
-    stages,
-  });
+  } = useStages();
 
   const renderActiveForm = () => {
     switch (activeForm) {

@@ -7,6 +7,7 @@ export async function GET() {
   try {
     const date = new Date();
     const year = date.getFullYear();
+
     const currentStage = await db.select({ stage: stage.stage }).from(stage).where(eq(stage.year, year));
     return NextResponse.json({ stage: currentStage }, { status: 200 });
   } catch (error) {
