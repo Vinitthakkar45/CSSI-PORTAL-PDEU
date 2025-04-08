@@ -64,7 +64,6 @@ const Dashboard = () => {
       <div className="container pb-4 mx-auto">
         <StageProgress totalStages={stages.length} />
 
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stages.map((stage) => (
             <StageCard

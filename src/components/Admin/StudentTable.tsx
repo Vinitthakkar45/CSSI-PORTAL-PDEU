@@ -2,11 +2,11 @@
 import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
-import { student, user } from '@/drizzle/schema';
+import { SelectStudent, student, user } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 
 type StudentWithUser = {
-  student: InferSelectModel<typeof student>;
+  student: SelectStudent;
   user: {
     name: string | null;
     email: string | null;
@@ -132,7 +132,7 @@ const StudentTable = () => {
                   {item.student.ngoPhone}
                 </TableCell>
                 <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  {item.student.ngoLocation}
+                  {item.student.ngoCity}
                 </TableCell>
                 <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                   <Badge
