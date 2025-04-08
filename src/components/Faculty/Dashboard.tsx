@@ -3,6 +3,11 @@ import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import TableList from './Table/TableList';
+import StageProgress from './Stages/StageProgress';
+import StageCard from './Stages/StageCard';
+import { stages, Stage } from './utils/stages';
+
+type StageStatus = 'locked' | 'current' | 'completed';
 
 const Dashboard = () => {
   const { status } = useSession({
@@ -11,6 +16,7 @@ const Dashboard = () => {
       redirect('/signin');
     },
   });
+  const [currentStage, setCurrentStage] = useState<number>(1);
 
   const [mentoredStudents, setMentoredStudents] = useState([]);
   const [evaluatedStudents, setEvaluatedStudents] = useState([]);
@@ -47,14 +53,32 @@ const Dashboard = () => {
     return <p className="text-red-500">{error}</p>;
   }
 
+  const getStageStatus = (stageNumber: number): StageStatus => {
+    // if (stageNumber < currentStage) return 'completed';
+    // if (stageNumber === currentStage) return 'current';
+    return 'current';
+  };
+
   return (
     <>
-      <div className="text-amber-100">
-        <h2 className="text-2xl font-bold mb-2">FACULTY DASHBOARD</h2>
-      </div>
-      <br />
+      <div className="container pb-4 mx-auto">
+        <StageProgress totalStages={stages.length} />
 
-      <div className="flex justify-center mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stages.map((stage) => (
+            <StageCard
+              key={stage.number}
+              number={stage.number}
+              title={stage.title}
+              description={stage.description}
+              long_description={stage.long_description}
+              status={getStageStatus(stage.number)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="flex mb-2">
         <button
           className={`px-4 py-2 rounded-l-lg shadow-md transition-colors duration-300 border border-gray-500 ${
             selectedToggle === 'mentor'

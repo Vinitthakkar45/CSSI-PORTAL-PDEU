@@ -27,14 +27,15 @@ export const getMentoredStudents = async (facultyId: number) => {
       rollNumber: student.rollNumber,
       department: student.department,
       ngoName: student.ngoName,
-      ngoLocation: student.ngoLocation,
+      ngoLocation: student.ngoAddress,
       ngoPhone: student.ngoPhone,
-      ngoDescription: student.ngoDescription,
+      ngoDescription: student.ngoNatureOfWork,
       name: student.name,
       email: user.email,
       mentorMarks: student.internal_evaluation_marks,
       evaluatorMarks: student.final_evaluation_marks,
       ngoChosen: student.ngoChosen,
+      stage: student.stage,
     })
     .from(student)
     .innerJoin(user, eq(student.userId, user.id))
@@ -49,12 +50,13 @@ export const getMentoredStudents = async (facultyId: number) => {
     name: string | null;
     email: string;
     ngoChosen: boolean;
+    stage: number;
     image?: string;
     ngoStatus?: string;
   }>;
 
   students_data.forEach((student) => {
-    student.image = '/images/user/user-16.jpg'; // Static image path
+    student.image = '/images/user/user-16.jpg';
     student.ngoStatus = student.ngoChosen ? 'active' : 'pending';
   });
 
@@ -71,7 +73,6 @@ export const getEvaluatedStudents = async (facultyId: number) => {
 
   const fac_id = fac_id_result[0].id;
 
-  // Fetch the student IDs evaluated by the faculty
   const stu_ids = await db
     .select({ id: evaluatorStudent.studentId })
     .from(evaluatorStudent)
@@ -79,16 +80,15 @@ export const getEvaluatedStudents = async (facultyId: number) => {
 
   const ids = stu_ids.map((stud) => stud.id);
 
-  // Fetch the student details
   const students_data = (await db
     .select({
       id: student.id,
       rollNumber: student.rollNumber,
       department: student.department,
       ngoName: student.ngoName,
-      ngoLocation: student.ngoLocation,
+      ngoLocation: student.ngoAddress,
       ngoPhone: student.ngoPhone,
-      ngoDescription: student.ngoDescription,
+      ngoDescription: student.ngoNatureOfWork,
       name: student.name,
       email: user.email,
       mentorMarks: student.internal_evaluation_marks,
@@ -113,8 +113,8 @@ export const getEvaluatedStudents = async (facultyId: number) => {
   }>;
 
   students_data.forEach((student) => {
-    student.image = '/images/user/user-17.jpg'; // Static image path
-    student.ngoStatus = student.ngoChosen ? 'active' : 'pending'; // NGO status
+    student.image = '/images/user/user-17.jpg';
+    student.ngoStatus = student.ngoChosen ? 'active' : 'pending';
   });
   return students_data;
 };

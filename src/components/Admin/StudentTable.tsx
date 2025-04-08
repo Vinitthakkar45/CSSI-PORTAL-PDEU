@@ -1,12 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../Home/ui/table';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
-import { student, user } from '@/drizzle/schema';
+import { SelectStudent, student, user } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 
 type StudentWithUser = {
-  student: InferSelectModel<typeof student>;
+  student: SelectStudent;
   user: {
     name: string | null;
     email: string | null;
@@ -34,6 +34,10 @@ const StudentTable = () => {
 
     fetchStudents();
   }, []);
+
+  const handleCellClick = (item: StudentWithUser) => {
+    console.log(item.student);
+  };
 
   if (loading) {
     return <div className="p-4 text-center">Loading student data...</div>;
@@ -101,7 +105,13 @@ const StudentTable = () => {
           </TableHeader>
           <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
             {students.map((item) => (
-              <TableRow key={item.student.id} className="">
+              <TableRow
+                key={item.student.id}
+                className=""
+                onClick={() => {
+                  handleCellClick(item);
+                }}
+              >
                 <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">{item.student.id}</TableCell>
                 <TableCell className="py-3">
                   <div className="flex items-center gap-3">
@@ -122,7 +132,7 @@ const StudentTable = () => {
                   {item.student.ngoPhone}
                 </TableCell>
                 <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  {item.student.ngoLocation}
+                  {item.student.ngoCity}
                 </TableCell>
                 <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                   <Badge

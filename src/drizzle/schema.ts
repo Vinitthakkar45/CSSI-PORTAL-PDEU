@@ -15,13 +15,33 @@ export const student = pgTable('student', {
     .notNull()
     .unique()
     .references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
-  rollNumber: text('roll_number').notNull(),
+
+  //personal details
+  rollNumber: text('roll_number'),
   name: text('name'),
   department: text('department'),
+  division: text('division'),
+  groupNumber: text('group_number'),
+  email: text('email'),
+  contactNumber: text('contact_number'),
+  profileImage: text('profile_image'),
+
+  //ngo details
   ngoName: text('ngo_name'),
-  ngoLocation: text('ngo_location'),
+  ngoCity: text('ngo_city'),
+  ngoDistrict: text('ngo_district'),
+  ngoState: text('ngo_state'),
+  ngoCountry: text('ngo_country'),
+  ngoAddress: text('ngo_address'),
+  ngoNatureOfWork: text('ngo_nature_of_work'),
+  ngoEmail: text('ngo_email'),
   ngoPhone: text('ngo_phone'),
-  ngoDescription: text('ngo_description'),
+
+  // Project Details
+  problemDefinition: text('problem_definition'),
+  proposedSolution: text('proposed_solution'),
+
+  // Status Fields
   ngoChosen: boolean('ngo_chosen').default(false),
   stage: integer('stage').default(0),
   internal_evaluation_marks: integer('internal_evaluation_marks'),
@@ -29,6 +49,7 @@ export const student = pgTable('student', {
   report: text('report'),
   certificate: text('certificate'),
   poster: text('poster'),
+  offerLetter: text('offer_letter'),
 });
 
 export const faculty = pgTable('faculty', {

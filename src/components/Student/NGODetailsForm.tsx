@@ -6,8 +6,9 @@ import Input from '@/components/Home/form/input/InputField';
 import TextArea from '@/components/Home/form/input/TextArea';
 import Button from '@/components/Home/ui/button/Button';
 import { useSession } from 'next-auth/react';
+import LORPdfDownload from '@/components/Student/LorGenerator';
 
-export default function BasicForm({ onComplete }: { onComplete: () => void }) {
+export default function NGODetailsForm({ onComplete }: { onComplete: () => void }) {
   const [formData, setFormData] = useState({
     name: '',
     ngoName: '',
@@ -35,13 +36,11 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
           if (storedData) {
             const parsedData = JSON.parse(storedData);
             setFormData(parsedData);
-            console.log('Data loaded from localStorage');
             setIsLoading(false);
             return;
           }
 
           const response = await fetch(`/api/user/getUserById?userId=${userId}`);
-
           if (!response.ok) {
             throw new Error('Failed to fetch user data');
           }
@@ -63,7 +62,6 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
             setFormData(newFormData);
 
             localStorage.setItem(localStorageKey, JSON.stringify(newFormData));
-            console.log('Data fetched from API and saved to localStorage');
           }
         } catch (err) {
           console.error('Error fetching user data:', err);
@@ -106,10 +104,7 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
       ngoPhone: formData.ngoPhone,
       ngoDescription: formData.ngoDescription,
       ngoChosen: true,
-      stage: 1,
     };
-
-    console.log('Submitting data:', studentData);
 
     try {
       const response = await fetch('/api/student/update-ngo', {
@@ -128,8 +123,7 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
         throw new Error(errorData.message || `API responded with status: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log('Submission successful:', data);
+      await response.json();
 
       if (userId) {
         localStorage.setItem(`ngoDetails_${userId}`, JSON.stringify(formData));
@@ -145,74 +139,77 @@ export default function BasicForm({ onComplete }: { onComplete: () => void }) {
   };
 
   return (
-    <ComponentCard title="Internship Details">
-      {isLoading ? (
-        <div className="flex justify-center items-center py-6">
-          <div className="animate-pulse">Loading form data...</div>
-        </div>
-      ) : (
-        <Form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div>
-              <Input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Your Name"
-                required
-              />
-            </div>
-            <div>
-              <Input
-                type="text"
-                name="ngoName"
-                value={formData.ngoName}
-                onChange={handleChange}
-                placeholder="NGO Name"
-                required
-              />
-            </div>
-            <div>
-              <Input
-                type="text"
-                name="ngoLocation"
-                value={formData.ngoLocation}
-                onChange={handleChange}
-                placeholder="NGO Location"
-                required
-              />
-            </div>
-            <div>
-              <Input
-                type="tel"
-                name="ngoPhone"
-                value={formData.ngoPhone}
-                onChange={handleChange}
-                placeholder="NGO Phone"
-                required
-              />
-            </div>
-            <div className="col-span-full">
-              <TextArea
-                name="ngoDescription"
-                value={formData.ngoDescription}
-                onChange={handleChange}
-                placeholder="NGO Description"
-                required
-              />
-            </div>
-
-            {error && <div className="col-span-full text-red-500 text-sm">{error}</div>}
-
-            <div className="col-span-full">
-              <Button className="w-full" size="sm" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Submit'}
-              </Button>
-            </div>
+    <>
+      <ComponentCard title="Internship Details">
+        {isLoading ? (
+          <div className="flex justify-center items-center py-6">
+            <div className="animate-pulse">Loading form data...</div>
           </div>
-        </Form>
-      )}
-    </ComponentCard>
+        ) : (
+          <Form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <Input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Your Name"
+                  required
+                />
+              </div>
+              <div>
+                <Input
+                  type="text"
+                  name="ngoName"
+                  value={formData.ngoName}
+                  onChange={handleChange}
+                  placeholder="NGO Name"
+                  required
+                />
+              </div>
+              <div>
+                <Input
+                  type="text"
+                  name="ngoLocation"
+                  value={formData.ngoLocation}
+                  onChange={handleChange}
+                  placeholder="NGO Location"
+                  required
+                />
+              </div>
+              <div>
+                <Input
+                  type="tel"
+                  name="ngoPhone"
+                  value={formData.ngoPhone}
+                  onChange={handleChange}
+                  placeholder="NGO Phone"
+                  required
+                />
+              </div>
+              <div className="col-span-full">
+                <TextArea
+                  name="ngoDescription"
+                  value={formData.ngoDescription}
+                  onChange={handleChange}
+                  placeholder="NGO Description"
+                  required
+                />
+              </div>
+
+              {error && <div className="col-span-full text-red-500 text-sm">{error}</div>}
+
+              <div className="col-span-full">
+                <Button className="w-full" size="sm" disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Submit'}
+                </Button>
+              </div>
+            </div>
+          </Form>
+        )}
+        <LORPdfDownload userId={session?.user?.id || ''} />
+      </ComponentCard>
+    </>
   );
 }

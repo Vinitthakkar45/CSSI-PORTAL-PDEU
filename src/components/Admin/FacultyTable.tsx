@@ -2,21 +2,31 @@
 import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../Home/ui/table';
 import Badge from '../Home/ui/badge/Badge';
-import { faculty, user } from '@/drizzle/schema';
+import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
+import { countEvaluators, countMentors } from './utils/countrecords';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
   user: {
-    // name: string | null;
     email: string | null;
     role: string | null;
   };
 };
 
+type AssignmentItem = {
+  facultyId: number;
+  assignedMentor: number;
+  evaluatorAssigned: number;
+};
+
 const FacultyTable = () => {
   const [faculties, setFaculties] = useState<FacultyWithUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
+  const [hasMentors, setHasMentors] = useState(false);
+  const [hasEvaluators, setHasEvaluators] = useState(false);
+  const [assignmentsLoaded, setAssignmentsLoaded] = useState(false);
 
   useEffect(() => {
     async function fetchFaculties() {
@@ -35,6 +45,55 @@ const FacultyTable = () => {
     fetchFaculties();
   }, []);
 
+  useEffect(() => {
+    async function checkRecordsAndFetchAssignments() {
+      try {
+        const res = await fetch('/api/admin/countrecords');
+        const data = await res.json();
+
+        const mentorCount = data.mentors;
+        const evaluatorCount = data.evaluators;
+
+        setHasMentors(mentorCount > 0);
+        setHasEvaluators(evaluatorCount > 0);
+
+        if (mentorCount > 0 || evaluatorCount > 0) {
+          const res = await fetch('/api/admin/checkassignment');
+          const data = await res.json();
+          console.log(data);
+          setAssignments(data);
+        }
+
+        setAssignmentsLoaded(true);
+      } catch (error) {
+        console.error('Error checking records or fetching assignment data:', error);
+        setAssignmentsLoaded(true);
+      }
+    }
+
+    checkRecordsAndFetchAssignments();
+  }, []);
+
+  const getMentorStatus = (facultyId: number) => {
+    if (!assignmentsLoaded) return 'Loading...';
+
+    // If no mentors exist yet, everything is pending
+    if (!hasMentors) return 'Pending';
+
+    const assignment = assignments.find((item) => item.facultyId === facultyId);
+    return assignment && assignment.assignedMentor === 1 ? 'Assigned' : 'Pending';
+  };
+
+  const getEvaluatorStatus = (facultyId: number) => {
+    if (!assignmentsLoaded) return 'Loading...';
+
+    // If no evaluators exist yet, everything is pending
+    if (!hasEvaluators) return 'Pending';
+
+    const assignment = assignments.find((item) => item.facultyId === facultyId);
+    return assignment && assignment.evaluatorAssigned === 1 ? 'Assigned' : 'Pending';
+  };
+
   if (loading) {
     return <div className="p-4 text-center">Loading faculty data...</div>;
   }
@@ -45,11 +104,6 @@ const FacultyTable = () => {
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Faculty Details</h3>
         </div>
-        {/* <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
-            See all
-          </button>
-        </div> */}
       </div>
       <div className="max-w-full overflow-x-auto">
         <Table>
@@ -85,11 +139,23 @@ const FacultyTable = () => {
               >
                 Available Time Slots
               </TableCell>
+              {/* <TableCell
+                isHeader
+                className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+              >
+                Role
+              </TableCell> */}
               <TableCell
                 isHeader
                 className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
               >
-                Mentor
+                Mentor Status
+              </TableCell>
+              <TableCell
+                isHeader
+                className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+              >
+                Evaluator Status
               </TableCell>
             </TableRow>
           </TableHeader>
@@ -116,9 +182,19 @@ const FacultyTable = () => {
                     ? item.faculty.freeTimeSlots.join(', ')
                     : 'No time slots available'}
                 </TableCell>
-                <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                {/* <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                   <Badge size="sm" color={item.user.role === 'admin' ? 'success' : 'warning'}>
                     {item.user.role === 'admin' ? 'Admin' : 'Faculty'}
+                  </Badge>
+                </TableCell> */}
+                <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <Badge size="sm" color={getMentorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}>
+                    {getMentorStatus(item.faculty.id)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <Badge size="sm" color={getEvaluatorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}>
+                    {getEvaluatorStatus(item.faculty.id)}
                   </Badge>
                 </TableCell>
               </TableRow>
@@ -129,8 +205,5 @@ const FacultyTable = () => {
     </div>
   );
 };
-
-// It's very important to note that the worker version and the `pdfjs` package
-// (mentioned in the Install pdfjs library section of Getting started) have to be the same.
 
 export default FacultyTable;

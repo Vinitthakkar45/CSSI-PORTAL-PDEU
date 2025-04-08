@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/drizzle/db';
 import { student } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { userId, studentData } = await request.json();
     if (!userId) {
@@ -32,10 +32,12 @@ export async function POST(request: Request) {
       })
       .where(eq(student.userId, userId));
 
-    return NextResponse.json({
-      message: 'NGO information updated successfully',
-      success: true,
-    });
+    return NextResponse.json(
+      {
+        message: 'NGO information updated successfully',
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error updating student NGO information:', error);
     return NextResponse.json({ message: 'Failed to update NGO information' }, { status: 500 });
