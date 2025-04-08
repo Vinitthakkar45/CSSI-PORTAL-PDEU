@@ -7,19 +7,42 @@ import Button from '@/components/Home/ui/button/Button';
 import { Modal } from '@/components/Home/ui/modal';
 import Label from '@/components/Home/form/Label';
 import Input from '@/components/Home/form/input/InputField';
+import PdfViewer from '@/components/PdfViewer';
+import { co } from '@fullcalendar/core/internal-common';
 
 interface Student {
   id: number;
   rollNumber: string;
   department: string;
-  ngoName: string;
-  ngoLocation: string;
-  ngoPhone: string;
-  ngoDescription: string;
   name: string;
   email: string;
-  ngoStatus: string;
+  divison: string;
+  groupNumber: string;
   image: string;
+  contactNumber: string;
+
+  // NGO details
+  ngoName: string | null;
+  ngoCity: string | null;
+  ngoDistrict: string | null;
+  ngoState: string | null;
+  ngoCountry: string | null;
+  ngoAddress: string | null;
+  ngoNatureOfWork: string | null;
+  ngoEmail: string | null;
+  ngoPhone: string | null;
+
+  //Project Details
+  problemDefinition: string | null;
+  proposedSolution: string | null;
+
+  // Status Fields
+  ngoChosen: boolean;
+  stage: number;
+  report: string;
+  certificate: string;
+  poster: string;
+  offerLetter: string;
   mentorMarks: number;
   evaluatorMarks: number;
 }
@@ -36,24 +59,64 @@ export default function TableList({
     id: 0,
     rollNumber: '',
     department: '',
-    ngoName: '',
-    ngoLocation: '',
-    ngoPhone: '',
-    ngoDescription: '',
     name: '',
     email: '',
-    ngoStatus: '',
+    divison: '',
+    groupNumber: '',
     image: '',
+    contactNumber: '',
+
+    // NGO details
+    ngoName: '',
+    ngoCity: '',
+    ngoDistrict: '',
+    ngoState: '',
+    ngoCountry: '',
+    ngoAddress: '',
+    ngoNatureOfWork: '',
+    ngoEmail: '',
+    ngoPhone: '',
+
+    //Project Details
+    problemDefinition: '',
+    proposedSolution: '',
+
+    // Status Fields
+    ngoChosen: false,
+    stage: 0,
+    report: '',
+    certificate: '',
+    poster: '',
+    offerLetter: '',
     mentorMarks: 0,
     evaluatorMarks: 0,
   }); // State to store the selected student
   const [marks, setMarks] = useState<number | 0>(0); // State to store marks
-
-  const handleOpenModal = (student: Student, option: 'mentor' | 'evaluator') => {
+  const [reportUrl, setReportUrl] = useState<string>(''); // State to store report URL
+  const [certificateUrl, setCertificateUrl] = useState<string>(''); // State to store certificate URL
+  const [posterUrl, setPosterUrl] = useState<string>(''); // State to store poster URL
+  const [offerLetterUrl, setOfferLetterUrl] = useState<string>(''); // State to store offer letter URL
+  const handleOpenModal = async (student: Student, option: 'mentor' | 'evaluator') => {
     setSelectedStudent(student); // Set the selected student
-    //  console.log('Selected Student:', student);
-    setMarks(option === 'mentor' ? student.mentorMarks : student.evaluatorMarks); // set marks field
-    openModal(); // Open the modal
+    setMarks(option === 'mentor' ? student.mentorMarks : student.evaluatorMarks); // Set marks field
+
+    try {
+      const response = await fetch(`/api/faculty/get-pdf?filePath=${encodeURIComponent(student.report)}`, {
+        method: 'GET',
+      });
+
+      const result = await response.json();
+      console.log('Result:', result);
+      if (!response.ok) {
+        throw new Error(result.error || 'Something went wrong');
+      }
+
+      setReportUrl(result.signedUrl); // Set the signed URL for the report
+      openModal(); // Open the modal
+    } catch (error) {
+      console.error('Error fetching signed URL:', error);
+      alert('Failed to fetch the document. Please try again.');
+    }
   };
 
   const handleSave = async (type: string) => {
@@ -134,7 +197,7 @@ export default function TableList({
                     isHeader
                     className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
-                    NGO Selected
+                    NGO Selection
                   </TableCell>
                   <TableCell
                     isHeader
@@ -175,14 +238,10 @@ export default function TableList({
                       <Badge
                         size="sm"
                         color={
-                          student.ngoStatus === 'active'
-                            ? 'success'
-                            : student.ngoStatus === 'pending'
-                              ? 'warning'
-                              : 'error'
+                          student.ngoChosen === true ? 'success' : student.ngoChosen === false ? 'warning' : 'error'
                         }
                       >
-                        {student.ngoStatus}
+                        {student.ngoChosen === true ? 'Completed' : 'Pending'}
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
@@ -224,10 +283,28 @@ export default function TableList({
             </div>
 
             {/* Student Email */}
-            <div className="mb-4">
-              <Label>Email</Label>
-              <Input type="text" value={selectedStudent.email || ''} disabled />
+
+            <div className="grid grid-cols-2 gap-6 mb-4">
+              <div>
+                <Label>Division</Label>
+                <Input type="text" value={selectedStudent.divison || 'N/A'} disabled />
+              </div>
+              <div>
+                <Label>Group</Label>
+                <Input type="text" value={selectedStudent.groupNumber || 'N/A'} disabled />
+              </div>
             </div>
+            <div className="grid grid-cols-2 gap-6 mb-4">
+              <div className="mb-4">
+                <Label>Email</Label>
+                <Input type="text" value={selectedStudent.email || ''} disabled />
+              </div>
+              <div>
+                <Label>Phone Number</Label>
+                <Input type="text" value={selectedStudent.contactNumber || 'N/A'} disabled />
+              </div>
+            </div>
+
             <br />
             {/* NGO Details */}
             <h5 className="mb-4 text-md font-medium text-gray-800 dark:text-white/90">NGO Details</h5>
@@ -237,17 +314,96 @@ export default function TableList({
                 <Input type="text" value={selectedStudent.ngoName || 'N/A'} disabled />
               </div>
               <div>
-                <Label>NGO Location</Label>
-                <Input type="text" value={selectedStudent.ngoLocation || 'N/A'} disabled />
+                <Label>City</Label>
+                <Input type="text" value={selectedStudent.ngoCity || 'N/A'} disabled />
               </div>
             </div>
             <div className="mb-4">
-              <Label>NGO Description</Label>
-              <Input type="text" value={selectedStudent.ngoDescription || 'N/A'} disabled />
+              <Label>Field of Work</Label>
+              <Input type="text" value={selectedStudent.ngoNatureOfWork || 'N/A'} disabled />
             </div>
+            <div className="mb-4">
+              <Label>Address</Label>
+              <Input type="text" value={selectedStudent.ngoName || 'N/A'} disabled />
+            </div>
+            <div className="grid grid-cols-3 gap-6 mb-4">
+              <div>
+                <Label>District</Label>
+                <Input type="text" value={selectedStudent.ngoDistrict || 'N/A'} disabled />
+              </div>
+              <div>
+                <Label>State</Label>
+                <Input type="text" value={selectedStudent.ngoDistrict || 'N/A'} disabled />
+              </div>
+              <div>
+                <Label>Country</Label>
+                <Input type="text" value={selectedStudent.ngoCountry || 'N/A'} disabled />
+              </div>
+            </div>
+
             <div className="mb-6">
               <Label>NGO Phone Number</Label>
               <Input type="text" value={selectedStudent.ngoPhone || 'N/A'} disabled />
+            </div>
+
+            <br />
+            {/* Project Details */}
+            <h5 className="mb-4 text-md font-medium text-gray-800 dark:text-white/90">Project Details</h5>
+
+            <div className="mb-4">
+              <Label>Problem Statement</Label>
+              <Input type="text" value={selectedStudent.problemDefinition || 'N/A'} disabled />
+            </div>
+            <div className="mb-6">
+              <Label>Approach of Solving Problem</Label>
+              <Input type="text" value={selectedStudent.proposedSolution || 'N/A'} disabled />
+            </div>
+
+            <br />
+            {/* Documents */}
+            <h5 className="mb-4 text-md font-medium text-gray-800 dark:text-white/90">Documents and Proof of Work</h5>
+
+            <div className="mb-4">
+              <Label>Report</Label>
+              {/* {selectedStudent.report ?
+              <PdfViewer
+              fileUrl={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${selectedStudent.report}`}
+              height={500}
+              width={600}
+              />
+              :  */}
+              <p>{selectedStudent.report} </p>
+            </div>
+
+            <div className="mb-4">
+              <Label>Certificate</Label>
+              {
+                /* {selectedStudent.certificate ?
+              <PdfViewer fileUrl={selectedStudent.certificate} height={500} width={600} />
+              :} */
+                // <Input type="text" value={selectedStudent.certificate} disabled />}
+              }
+              <p>{selectedStudent.certificate} </p>
+            </div>
+
+            <div className="mb-4">
+              <Label>Poster</Label>
+              {/*{ {selectedStudent.poster ?
+              <PdfViewer fileUrl={selectedStudent.poster} height={500} width={600} />
+              : }*/}
+              {/* <Input type="text" value={selectedStudent.poster} disabled /> */}
+              <p>{selectedStudent.poster} </p>
+            </div>
+
+            <div className="mb-4">
+              <Label>Offer Letter</Label>
+              {
+                /* {selectedStudent.poster ?
+              <PdfViewer fileUrl={selectedStudent.offerLetter} height={500} width={600} />
+              : }*/
+                // <Input type="text" value= {selectedStudent.offerLetter} disabled />
+              }
+              <p>{selectedStudent.offerLetter} </p>
             </div>
 
             <br />
@@ -262,7 +418,6 @@ export default function TableList({
                   value={marks || ''} // Use empty string as fallback for null or undefined
                   onChange={(e) => setMarks(Number(e.target.value) || 0)}
                   placeholder={`${option === 'mentor' ? 'Enter the internal marks' : 'To be entered by the Mentor'}`}
-                  disabled={selectedStudent.ngoStatus === 'active' ? false : true}
                 />
               </div>
             ) : null}
@@ -275,7 +430,7 @@ export default function TableList({
                   value={marks || ''} // Use empty string as fallback for null or undefined
                   onChange={(e) => setMarks(Number(e.target.value) || 0)}
                   placeholder={'Enter the final marks'}
-                  disabled={false}
+                  // disabled={false}
                 />
               </div>
             )}
