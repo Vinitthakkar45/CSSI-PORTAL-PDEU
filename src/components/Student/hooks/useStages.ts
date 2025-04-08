@@ -1,13 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Stage } from '../data/stages';
 import { StageStatus } from '../StageCard';
 import { useSession } from 'next-auth/react';
 
-interface UseStagesProps {
-  stages: Stage[];
-}
-
-export const useStages = ({ stages }: UseStagesProps) => {
+export const useStages = () => {
   const [maxStageUnlocked, setMaxStageUnlocked] = useState(1);
   const [currentStage, setCurrentStage] = useState(1);
   const [activeForm, setActiveForm] = useState<number | null>(null);
@@ -93,10 +88,10 @@ export const useStages = ({ stages }: UseStagesProps) => {
   };
 
   const handleStageClick = (stageNumber: number) => {
-    if (stageNumber <= maxStageUnlocked && stageNumber < currentStage) {
+    if (stageNumber <= maxStageUnlocked && stageNumber <= currentStage) {
       setActiveForm(stageNumber);
-    } else if (stageNumber <= maxStageUnlocked) {
-      setActiveForm(stageNumber);
+    } else {
+      setActiveForm(currentStage);
     }
   };
 

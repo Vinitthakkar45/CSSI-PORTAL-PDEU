@@ -115,7 +115,6 @@ export const getEvaluatedStudents = async (facultyId: number) => {
 
   const fac_id = fac_id_result[0].id;
 
-  // Fetch the student IDs evaluated by the faculty
   const stu_ids = await db
     .select({ id: evaluatorStudent.studentId })
     .from(evaluatorStudent)
@@ -123,7 +122,6 @@ export const getEvaluatedStudents = async (facultyId: number) => {
 
   const ids = stu_ids.map((stud) => stud.id);
 
-  // Fetch the student details
   const students_data = (await db
     .select({
       id: student.id,

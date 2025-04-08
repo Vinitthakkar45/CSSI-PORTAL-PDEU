@@ -3,17 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/context/SidebarContext';
-import {
-  Ellipsis,
-  LayoutGrid,
-  Calendar,
-  CircleUserRound,
-  ReceiptText,
-  Sheet,
-  NonBinary,
-  GraduationCap,
-  Book,
-} from 'lucide-react';
+import { Ellipsis, LayoutGrid, Calendar, CircleUserRound, GraduationCap, BookOpen } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 type NavItem = {
@@ -40,35 +30,12 @@ const AppSidebar: React.FC = () => {
       path: '/home/profile',
       icon: <CircleUserRound size={22} />,
     },
-    {
-      name: 'Forms',
-      path: '/home/form-elements',
-      icon: <ReceiptText size={22} />,
-    },
-    {
-      name: 'Tables',
-      path: '/home/basic-tables',
-      icon: <Sheet size={22} />,
-    },
   ];
 
   if (status === 'authenticated' && session) {
     const role = session.user.role;
 
-    if (role === 'student') {
-      navItems.push({
-        name: 'Dummy student',
-        path: '/home/dummy',
-        icon: <NonBinary size={22} />,
-      });
-    } else if (role === 'faculty') {
-      navItems.push({
-        name: 'Dummy Faculty',
-        path: '/home/dummy',
-        icon: <NonBinary size={22} />,
-      });
-    } else if (role === 'admin') {
-      // navItems = navItems.filter(item => item.name!=="Tables")
+    if (role === 'admin') {
       navItems.push(
         {
           name: 'Student',
@@ -78,7 +45,7 @@ const AppSidebar: React.FC = () => {
         {
           name: 'Faculty',
           path: '/home/admin/facultyTable',
-          icon: <Book size={22} />,
+          icon: <BookOpen size={22} />,
         }
       );
     }
