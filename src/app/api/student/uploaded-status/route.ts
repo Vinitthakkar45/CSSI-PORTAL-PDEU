@@ -20,11 +20,12 @@ export async function GET(req: NextRequest) {
         report: student.report,
         certificate: student.certificate,
         poster: student.poster,
+        offerLetter: student.offerLetter,
       })
       .from(student)
       .where(eq(student.userId, Number(userId)));
 
-    const { report, certificate, poster } = data[0];
+    const { report, certificate, poster, offerLetter } = data[0];
 
     return NextResponse.json(
       {
@@ -32,6 +33,7 @@ export async function GET(req: NextRequest) {
           reportUploaded: report !== null,
           certificateUploaded: certificate !== null,
           posterUploaded: poster !== null,
+          offerLetterUploaded: offerLetter !== null,
         },
       },
       { status: 200 }

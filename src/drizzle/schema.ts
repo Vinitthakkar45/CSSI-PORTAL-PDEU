@@ -49,7 +49,7 @@ export const student = pgTable('student', {
   report: text('report'),
   certificate: text('certificate'),
   poster: text('poster'),
-  offerLetter: text('offer_letter'),
+  offerLetter: text('offerletter'),
 });
 
 export const faculty = pgTable('faculty', {

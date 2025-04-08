@@ -6,6 +6,7 @@ import Input from '@/components/Home/form/input/InputField';
 import Button from '@/components/Home/ui/button/Button';
 import { useSession } from 'next-auth/react';
 import { SelectStudent } from '@/drizzle/schema';
+// import { toast } from 'sonner';
 
 type UserDetails = {
   id: number;
@@ -37,45 +38,37 @@ export default function PersonalDetailsForm({
   const userId = session?.user?.id;
 
   useEffect(() => {
-    if (userId) {
-      const fetchData = async () => {
-        try {
-          setIsLoading(true);
+    if (!userId || !userData) {
+      setIsLoading(false);
+      return;
+    }
 
-          const localStorageKey = `personalDetails_${userId}`;
-          const storedData = localStorage.getItem(localStorageKey);
+    try {
+      setIsLoading(true);
+      const localStorageKey = `personalDetails_${userId}`;
+      const storedData = localStorage.getItem(localStorageKey);
 
-          if (storedData) {
-            const parsedData = JSON.parse(storedData);
-            setFormData(parsedData);
-            setIsLoading(false);
-            return;
-          }
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        setFormData(parsedData);
+      } else if (userData.profileData) {
+        // Only use profile data if no localStorage data exists
+        const profile = userData.profileData;
+        const newFormData = {
+          rollNumber: profile.rollNumber || '',
+          name: profile.name || '',
+          department: profile.department || '',
+          division: profile.division || '',
+          groupNumber: profile.groupNumber || '',
+          contactNumber: profile.contactNumber || '',
+        };
 
-          if (userData && userData.profileData) {
-            const profile = userData.profileData;
-
-            const newFormData = {
-              rollNumber: profile.rollNumber || '',
-              name: profile.name || '',
-              department: profile.department || '',
-              division: profile.division || '',
-              groupNumber: profile.groupNumber || '',
-              contactNumber: profile.contactNumber || '',
-            };
-
-            setFormData(newFormData);
-            localStorage.setItem(localStorageKey, JSON.stringify(newFormData));
-          }
-        } catch (err) {
-          console.error('Error fetching user data:', err);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      fetchData();
-    } else {
+        setFormData(newFormData);
+        localStorage.setItem(localStorageKey, JSON.stringify(newFormData));
+      }
+    } catch (err) {
+      console.error('Error loading form data:', err);
+    } finally {
       setIsLoading(false);
     }
   }, [userId, userData]);
@@ -83,10 +76,12 @@ export default function PersonalDetailsForm({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => {
-      const newData = {
-        ...prev,
-        [name]: value,
-      };
+      const newData = { ...prev, [name]: value };
+
+      // Update localStorage as user types
+      if (userId) {
+        localStorage.setItem(`personalDetails_${userId}`, JSON.stringify(newData));
+      }
 
       return newData;
     });
@@ -124,15 +119,13 @@ export default function PersonalDetailsForm({
       }
 
       await response.json();
-
-      if (userId) {
-        localStorage.setItem(`personalDetails_${userId}`, JSON.stringify(formData));
-      }
+      // toast.success("Personal details saved successfully");
 
       onComplete();
     } catch (err) {
       console.error('Submission error:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      // toast.error("Failed to save personal details");
     } finally {
       setIsSubmitting(false);
     }
