@@ -55,7 +55,7 @@ const StudentTable = () => {
     <>
       {showModal && selectedStudent && (
         <TableModal
-          student={selectedStudent.student}
+          selectedStudent={selectedStudent.student}
           isOpen={showModal}
           onClose={handleModalclose}
           onCloseCross={handleModalclose}
