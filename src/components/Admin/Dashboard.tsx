@@ -6,7 +6,7 @@ import StageProgress from './StageProgress';
 import StageCard from './StageCard';
 import { stages, Stage } from './utils/stages';
 import Button from '../Home/ui/button/Button';
-import { InfoModal } from './AdminModals';
+import { InfoModal } from './ConfirmationModals';
 
 type StageStatus = 'locked' | 'current' | 'completed';
 
