@@ -15,7 +15,7 @@ type UserDetails = {
   profileData: SelectStudent | null;
 };
 
-export default function NGODetailsForm({
+export default function PersonalDetailsForm({
   onComplete,
   userData,
 }: {
@@ -23,15 +23,12 @@ export default function NGODetailsForm({
   userData: UserDetails | null;
 }) {
   const [formData, setFormData] = useState({
-    ngoName: '',
-    ngoCity: '',
-    ngoDistrict: '',
-    ngoState: '',
-    ngoCountry: '',
-    ngoAddress: '',
-    ngoNatureOfWork: '',
-    ngoEmail: '',
-    ngoPhone: '',
+    rollNumber: '',
+    name: '',
+    department: '',
+    division: '',
+    groupNumber: '',
+    contactNumber: '',
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +45,7 @@ export default function NGODetailsForm({
 
     try {
       setIsLoading(true);
-      const localStorageKey = `ngoDetails_${userId}`;
+      const localStorageKey = `personalDetails_${userId}`;
       const storedData = localStorage.getItem(localStorageKey);
 
       if (storedData) {
@@ -58,15 +55,12 @@ export default function NGODetailsForm({
         // Only use profile data if no localStorage data exists
         const profile = userData.profileData;
         const newFormData = {
-          ngoName: profile.ngoName || '',
-          ngoCity: profile.ngoCity || '',
-          ngoDistrict: profile.ngoDistrict || '',
-          ngoState: profile.ngoState || '',
-          ngoCountry: profile.ngoCountry || '',
-          ngoAddress: profile.ngoAddress || '',
-          ngoNatureOfWork: profile.ngoNatureOfWork || '',
-          ngoEmail: profile.ngoEmail || '',
-          ngoPhone: profile.ngoPhone || '',
+          rollNumber: profile.rollNumber || '',
+          name: profile.name || '',
+          department: profile.department || '',
+          division: profile.division || '',
+          groupNumber: profile.groupNumber || '',
+          contactNumber: profile.contactNumber || '',
         };
 
         setFormData(newFormData);
@@ -79,14 +73,14 @@ export default function NGODetailsForm({
     }
   }, [userId, userData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => {
       const newData = { ...prev, [name]: value };
 
       // Update localStorage as user types
       if (userId) {
-        localStorage.setItem(`ngoDetails_${userId}`, JSON.stringify(newData));
+        localStorage.setItem(`personalDetails_${userId}`, JSON.stringify(newData));
       }
 
       return newData;
@@ -98,27 +92,24 @@ export default function NGODetailsForm({
     setIsSubmitting(true);
     setError('');
 
-    const ngoData = {
-      ngoName: formData.ngoName,
-      ngoCity: formData.ngoCity,
-      ngoDistrict: formData.ngoDistrict,
-      ngoState: formData.ngoState,
-      ngoCountry: formData.ngoCountry,
-      ngoAddress: formData.ngoAddress,
-      ngoNatureOfWork: formData.ngoNatureOfWork,
-      ngoEmail: formData.ngoEmail,
-      ngoPhone: formData.ngoPhone,
+    const studentData = {
+      rollNumber: formData.rollNumber,
+      name: formData.name,
+      department: formData.department,
+      division: formData.division,
+      groupNumber: formData.groupNumber,
+      contactNumber: formData.contactNumber,
     };
 
     try {
-      const response = await fetch('/api/student/update-ngo', {
+      const response = await fetch('/api/student/update-personal-details', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
-          ngoData,
+          studentData,
         }),
       });
 
@@ -128,121 +119,91 @@ export default function NGODetailsForm({
       }
 
       await response.json();
-      // toast.success("NGO details saved successfully");
+      // toast.success("Personal details saved successfully");
 
       onComplete();
     } catch (err) {
       console.error('Submission error:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      // toast.error("Failed to save NGO details");
+      // toast.error("Failed to save personal details");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <ComponentCard title="NGO Details">
+    <ComponentCard title="Personal Details">
       {isLoading ? (
         <div className="flex justify-center items-center py-6">
           <div className="animate-pulse">Loading form data...</div>
         </div>
       ) : (
         <Form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
-            <div className="w-full">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
               <Input
                 type="text"
-                name="ngoName"
-                value={formData.ngoName}
+                name="rollNumber"
+                value={formData.rollNumber}
                 onChange={handleChange}
-                placeholder="Enter NGO name"
+                placeholder="Enter your roll number"
                 required
               />
             </div>
-            <div className="w-full">
+            <div>
               <Input
                 type="text"
-                name="ngoCity"
-                value={formData.ngoCity}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
-                placeholder="Enter city"
+                placeholder="Enter your full name"
                 required
               />
             </div>
-            <div className="w-full">
+            <div>
               <Input
                 type="text"
-                name="ngoDistrict"
-                value={formData.ngoDistrict}
+                name="department"
+                value={formData.department}
                 onChange={handleChange}
-                placeholder="Enter district"
+                placeholder="Enter your department"
                 required
               />
             </div>
-            <div className="w-full">
+            <div>
               <Input
                 type="text"
-                name="ngoState"
-                value={formData.ngoState}
+                name="division"
+                value={formData.division}
                 onChange={handleChange}
-                placeholder="Enter state"
+                placeholder="Enter your division"
                 required
               />
             </div>
-            <div className="w-full">
+            <div>
               <Input
                 type="text"
-                name="ngoCountry"
-                value={formData.ngoCountry}
+                name="groupNumber"
+                value={formData.groupNumber}
                 onChange={handleChange}
-                placeholder="Enter country"
+                placeholder="Enter your group number"
                 required
               />
             </div>
-            <div className="w-full">
-              <Input
-                type="text"
-                name="ngoNatureOfWork"
-                value={formData.ngoNatureOfWork}
-                onChange={handleChange}
-                placeholder="Describe nature of work"
-                required
-              />
-            </div>
-            <div className="w-full">
-              <Input
-                type="email"
-                name="ngoEmail"
-                value={formData.ngoEmail}
-                onChange={handleChange}
-                placeholder="Enter NGO email"
-                required
-              />
-            </div>
-            <div className="w-full">
+            <div>
               <Input
                 type="tel"
-                name="ngoPhone"
-                value={formData.ngoPhone}
+                name="contactNumber"
+                value={formData.contactNumber}
                 onChange={handleChange}
-                placeholder="Enter NGO phone"
-                required
-              />
-            </div>
-            <div className="w-full md:col-span-2">
-              <Input
-                type="text"
-                name="ngoAddress"
-                value={formData.ngoAddress}
-                onChange={handleChange}
-                placeholder="Enter complete address"
+                placeholder="Enter your contact number"
                 required
               />
             </div>
 
-            {error && <div className="col-span-1 md:col-span-2 text-red-500 text-sm">{error}</div>}
+            {error && <div className="col-span-full text-red-500 text-sm">{error}</div>}
 
-            <div className="col-span-1 md:col-span-2">
+            <div className="col-span-full">
               <Button className="w-full" size="sm" disabled={isSubmitting}>
                 {isSubmitting ? 'Submitting...' : 'Save & Continue'}
               </Button>

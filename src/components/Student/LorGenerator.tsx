@@ -1,7 +1,9 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Document, Page, Text, StyleSheet, pdf, Image } from '@react-pdf/renderer';
-import Button from '../Home/ui/button/Button';
+import Button from '@/components/Home/ui/button/Button';
+import ComponentCard from '@/components/Home/common/ComponentCard';
+// import { toast } from 'sonner';
 
 const styles = StyleSheet.create({
   page: {
@@ -64,32 +66,102 @@ const MyPDF = ({ name, branch }: { name: string; branch: string }) => {
   );
 };
 
-const LORPdfDownload = ({ userId }: { userId: string }) => {
+const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: string }) => {
   const [name, setName] = useState('');
   const [branch, setBranch] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    const user = Number(userId);
     const fetchDetails = async () => {
-      const response = await fetch(`api/user/getUserById/?userId=${user}`);
-      const student = await response.json();
-      setName(student.profileData.name);
-      setBranch(student.profileData.department);
+      try {
+        setIsLoading(true);
+
+        // Try to get from localStorage first
+        const localStorageKey = `lorData_${userId}`;
+        const storedData = localStorage.getItem(localStorageKey);
+
+        if (storedData) {
+          const { name, branch } = JSON.parse(storedData);
+          setName(name);
+          setBranch(branch);
+          setIsLoading(false);
+          return;
+        }
+
+        // If not in localStorage, fetch from API
+        const response = await fetch(`/api/user/getUserById/?userId=${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data for LOR');
+        }
+
+        const student = await response.json();
+        if (student?.profileData) {
+          setName(student.profileData.name);
+          setBranch(student.profileData.department);
+
+          // Save to localStorage
+          localStorage.setItem(
+            localStorageKey,
+            JSON.stringify({ name: student.profileData.name, branch: student.profileData.department })
+          );
+        }
+      } catch (err) {
+        console.error('Error fetching LOR data:', err);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchDetails();
+
+    if (userId) {
+      fetchDetails();
+    }
   }, [userId]);
+
   const handleDownload = async () => {
-    const blob = await pdf(<MyPDF name={name} branch={branch} />).toBlob();
-    const url = URL.createObjectURL(blob);
+    try {
+      const blob = await pdf(<MyPDF name={name} branch={branch} />).toBlob();
+      const url = URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${name}_lor.pdf`;
-    link.click();
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${name}_lor.pdf`;
+      link.click();
 
-    URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);
+
+      // toast.success("LOR generated successfully");
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      // toast.error("Failed to generate LOR");
+    }
   };
 
-  return <Button onClick={handleDownload}>Download LOR PDF</Button>;
+  return (
+    <ComponentCard title="Letter of Recommendation">
+      {isLoading ? (
+        <div className="flex justify-center items-center py-6">
+          <div className="animate-pulse">Loading LOR data...</div>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className=" p-4 rounded-lg ">
+            <h3 className="font-medium text-blue-800 mb-2">LOR Information</h3>
+            <p className="text-sm text-blue-700 mb-1">Student Name: {name}</p>
+            <p className="text-sm text-blue-700">Department: {branch}</p>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-4 justify-between">
+            <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90">
+              Download LOR PDF
+            </Button>
+            <Button onClick={onComplete} variant="outline">
+              Continue to Next Step
+            </Button>
+          </div>
+        </div>
+      )}
+    </ComponentCard>
+  );
 };
 
-export default LORPdfDownload;
+export default LORGenerator;

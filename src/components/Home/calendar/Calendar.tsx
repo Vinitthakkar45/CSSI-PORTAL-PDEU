@@ -50,7 +50,7 @@ const Calendar: React.FC = () => {
         id: '3',
         title: 'Workshop',
         start: new Date(Date.now() + 172800000).toISOString().split('T')[0],
-        end: new Date(Date.now() + 259200000).toISOString().split('T')[0],
+        end: new Date(Date.now() + 345600000).toISOString().split('T')[0],
         extendedProps: { calendar: 'Primary' },
       },
     ]);

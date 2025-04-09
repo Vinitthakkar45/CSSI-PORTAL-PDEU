@@ -1,6 +1,7 @@
 import React from 'react';
 import StageCard from './StageCard';
-import NGODetailsForm from './NGODetailsForm';
+// import NGODetailsForm from './NGODetailsForm';
+import MultiStepForm from './MultiStepForm';
 import StageProgress from './StageProgress';
 import { stages } from './data/stages';
 import { useStages } from './hooks/useStages';
@@ -23,7 +24,7 @@ const StagesSection: React.FC = () => {
   const renderActiveForm = () => {
     switch (activeForm) {
       case 1:
-        return <NGODetailsForm onComplete={() => handleStageComplete(1)} />;
+        return <MultiStepForm onComplete={() => handleStageComplete(1)} />;
       case 2:
         return <InternshipProgress onComplete={() => handleStageComplete(2)} />;
       case 3:

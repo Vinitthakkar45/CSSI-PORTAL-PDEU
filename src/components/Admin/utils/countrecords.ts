@@ -1,5 +1,5 @@
 import { db } from '@/drizzle/db';
-import { student, faculty, mentorStudent } from '@/drizzle/schema';
+import { student, faculty, mentorStudent, evaluatorStudent } from '@/drizzle/schema';
 import { count } from 'drizzle-orm';
 
 export async function countStudents() {
@@ -14,5 +14,10 @@ export async function countFaculty() {
 
 export async function countMentors() {
   const result = await db.select({ total: count() }).from(mentorStudent);
+  return result[0]?.total ?? 0;
+}
+
+export async function countEvaluators() {
+  const result = await db.select({ total: count() }).from(evaluatorStudent);
   return result[0]?.total ?? 0;
 }

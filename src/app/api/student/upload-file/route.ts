@@ -60,14 +60,32 @@ export async function POST(req: NextRequest) {
 
     const userIdNum = parseInt(userId, 10);
 
+    let columnName = '';
+    switch (folderName.toLowerCase()) {
+      case 'offerletter':
+        columnName = 'offerLetter';
+        break;
+      case 'report':
+        columnName = 'report';
+        break;
+      case 'certificate':
+        columnName = 'certificate';
+        break;
+      case 'poster':
+        columnName = 'poster';
+        break;
+      default:
+        throw new Error('Invalid folder name');
+    }
+
     await db
       .update(student)
-      .set({ [folderName.toLowerCase()]: result.public_id })
+      .set({ [columnName]: result.public_id })
       .where(eq(student.userId, userIdNum));
 
     return NextResponse.json({ publicId: result.public_id }, { status: 200 });
   } catch (error) {
-    console.log('Upload failed  ', error);
+    console.error('Upload failed:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

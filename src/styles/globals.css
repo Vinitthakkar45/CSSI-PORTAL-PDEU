@@ -577,3 +577,33 @@
   opacity: 0.8;
   cursor: grabbing; /* Changes the cursor to indicate dragging */
 }
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideRight {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-left {
+  animation: slideLeft 0.3s ease-out forwards;
+}
+
+.slide-right {
+  animation: slideRight 0.3s ease-out forwards;
+}
