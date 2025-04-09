@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { InferSelectModel } from 'drizzle-orm';
 import { Modal } from '../Home/ui/modal';
 import Button from '../Home/ui/button/Button';
@@ -16,6 +16,26 @@ type TableModalProps = {
 };
 
 export default function TableModal({ selectedStudent, isOpen, onClose, onCloseCross }: TableModalProps) {
+  const [reportUrl, setReportUrl] = useState();
+  const [certiUrl, setCertiUrl] = useState();
+  const [posterUrl, setPosterUrl] = useState();
+  const [offerUrl, setOfferUrl] = useState();
+
+  useEffect(() => {
+    async function fetchPdfUrls() {
+      const userId = selectedStudent.userId;
+      const response = await fetch(`/api/pdf-fetch/?userId=${userId}`);
+      const data = await response.json();
+      setReportUrl(data.urls.report);
+      setCertiUrl(data.urls.certificate);
+      setPosterUrl(data.urls.poster);
+      setOfferUrl(data.urls.offerLetter);
+      // console.log(data);
+    }
+
+    fetchPdfUrls();
+  }, []);
+
   return (
     <div>
       <Modal isOpen={isOpen} onClose={onClose} className="max-w-[600px] p-5 lg:p-10">
@@ -134,23 +154,39 @@ export default function TableModal({ selectedStudent, isOpen, onClose, onCloseCr
           <div className="mb-4">
             <Label>Report</Label>
 
-            <p>{selectedStudent.report} </p>
+            <p>
+              <a href={reportUrl} target="_blank" rel="noopener noreferrer">
+                Report
+              </a>
+            </p>
           </div>
 
           <div className="mb-4">
             <Label>Certificate</Label>
 
-            <p>{selectedStudent.certificate} </p>
+            <p>
+              <a href={certiUrl} target="_blank" rel="noopener noreferrer">
+                Certificate
+              </a>
+            </p>
           </div>
 
           <div className="mb-4">
             <Label>Poster</Label>
-            <p>{selectedStudent.poster} </p>
+            <p>
+              <a href={posterUrl} target="_blank" rel="noopener noreferrer">
+                Poster
+              </a>
+            </p>
           </div>
 
           <div className="mb-4">
             <Label>Offer Letter</Label>
-            <p>{selectedStudent.offerLetter} </p>
+            <p>
+              <a href={offerUrl} target="_blank" rel="noopener noreferrer">
+                Offer Letter
+              </a>
+            </p>
           </div>
 
           <br />
