@@ -18,13 +18,14 @@ interface CountData {
 }
 
 const Dashboard = () => {
-  const { data: session, status } = useSession({
+  const { data: _session, status: _status } = useSession({
     required: true,
     onUnauthenticated() {
       redirect('/signin');
     },
   });
 
+  const [isLoading, setIsLoading] = useState(true);
   const [currentStage, setCurrentStage] = useState<number>(0);
   const [showModal, setShowModal] = useState(false);
   const [showMentorModal, setShowMentorModal] = useState(false);
@@ -48,6 +49,8 @@ const Dashboard = () => {
         await fetchCounts();
       } catch (error) {
         console.error('Error fetching initial data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -166,15 +169,17 @@ const Dashboard = () => {
     }
   };
 
-  if (status === 'loading') {
-    return <p>Loading...</p>;
-  }
+  // if (status === 'loading') {
+  //   return <p>Loading...</p>;
+  // }
 
   const handleUnlockStage = () => {
     setShowModal(true);
   };
 
   const handleModalClose = async () => {
+    setShowModal(false);
+    setIsLoading(true);
     try {
       const response = await fetch('/api/admin/mail', {
         method: 'POST',
@@ -202,6 +207,7 @@ const Dashboard = () => {
       console.error(error);
     } finally {
       setShowModal(false);
+      setIsLoading(false);
     }
   };
 
@@ -225,6 +231,7 @@ const Dashboard = () => {
 
   return (
     <>
+      {isLoading && <LoadingOverlay />}
       {showModal && (
         <InfoModal
           isOpen={showModal}
@@ -282,6 +289,14 @@ const Dashboard = () => {
         </Button>
       </div>
     </>
+  );
+};
+
+const LoadingOverlay = () => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="text-white text-lg font-semibold animate-pulse">Loading...</div>
+    </div>
   );
 };
 
