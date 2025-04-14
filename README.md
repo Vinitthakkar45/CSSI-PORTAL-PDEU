@@ -1,36 +1,126 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CSSI Portal - PDEU
+
+<div>
+  <img src="/public/images/logo/CSSI_WHITE.svg" alt="CSSI Logo" width="300"/>
+  <p>A comprehensive platform for managing Civic & Social Service Internships at PDEU</p>
+</div>
+
+## Overview
+
+The CSSI Portal is a web-based platform designed to streamline the Civic & Social Service Internship process at Pandit Deendayal Energy University (PDEU). It provides a centralized system for students, faculty, and administrators to manage internship documentation, tracking, and evaluation.
+
+## Features
+
+- **Authentication & Authorization**
+  - Secure login system for students, faculty, and administrators
+  - Role-based access control
+
+- **Student Dashboard**
+  - Profile management
+  - Document upload system (Offer Letter, Report, Certificate, Poster)
+  - Internship progress tracking
+  - Schedule viewing
+
+- **Faculty Interface**
+  - Student supervision
+  - Document verification
+  - Performance evaluation
+
+- **Admin Panel**
+  - User management
+  - Student and faculty data administration
+  - System monitoring
+
+- **Dark Mode Support**
+  - Fully responsive dark/light theme
+  - System preference detection
+
+## Technology Stack
+
+- **Frontend**
+  - Next.js 14 (App Router)
+  - TypeScript
+  - Tailwind CSS
+  - Next-themes
+  - Lucide Icons
+
+- **Backend**
+  - Next.js API Routes
+  - DrizzleORM
+  - PostgreSQL (Neon)
+
+- **Authentication**
+  - NextAuth.js
+
+- **File Storage**
+  - Cloudinary
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18.17 or later
+- pnpm (recommended) or npm
+- PostgreSQL database
+
+### Installation
+
+1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+git clone https://github.com/your-username/cssi-portal.git
+cd cssi-portal
+```
+
+2. Install dependencies
+```bash
+pnpm install
+```
+
+3. Set up environment variables
+```bash
+cp .env.example .env.local
+```
+Fill in your environment variables in `.env.local`
+
+4. Run the development server
+```bash
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+cssi-portal/
+├── src/
+│   ├── app/                 # Next.js app router pages
+│   ├── components/          # Reusable components
+│   ├── context/            # React context providers
+│   ├── drizzle/            # Database schema and configurations
+│   ├── layout/             # Layout components
+│   └── styles/             # Global styles and Tailwind config
+├── public/                 # Static assets
+└── package.json           # Project dependencies and scripts
+```
 
-## Learn More
+## Contributing
 
-To learn more about Next.js, take a look at the following resources:
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Acknowledgments
 
-## Deploy on Vercel
+- PDEU for supporting the CSSI initiative
+- All contributors who have helped shape this project
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contact
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For any queries regarding the CSSI Portal, please contact:
+- Project Coordinator - [Dr. Himanshu Gajera](mailto:himanshugajera.ce@gmail.com)
+- Technical Support - [Vinit Thakkar](mailto:vinit.tce22@sot.pdpu.ac.in)
+
