@@ -26,16 +26,37 @@ export const getMentoredStudents = async (facultyId: number) => {
       id: student.id,
       rollNumber: student.rollNumber,
       department: student.department,
-      ngoName: student.ngoName,
-      ngoLocation: student.ngoAddress,
-      ngoPhone: student.ngoPhone,
-      ngoDescription: student.ngoNatureOfWork,
       name: student.name,
-      email: user.email,
-      mentorMarks: student.internal_evaluation_marks,
-      evaluatorMarks: student.final_evaluation_marks,
+      email: student.email,
+      divison: student.division,
+      groupNumber: student.groupNumber,
+      image: student.profileImage,
+      contactNumber: student.contactNumber,
+
+      // NGO details
+      ngoName: student.ngoName,
+      ngoCity: student.ngoCity,
+      ngoDistrict: student.ngoDistrict,
+      ngoState: student.ngoState,
+      ngoCountry: student.ngoCountry,
+      ngoAddress: student.ngoAddress,
+      ngoNatureOfWork: student.ngoNatureOfWork,
+      ngoEmail: student.ngoEmail,
+      ngoPhone: student.ngoPhone,
+
+      //Project Details
+      problemDefinition: student.problemDefinition,
+      proposedSolution: student.proposedSolution,
+
+      // Status Fields
       ngoChosen: student.ngoChosen,
       stage: student.stage,
+      report: student.report,
+      certificate: student.certificate,
+      poster: student.poster,
+      offerLetter: student.offerLetter,
+      mentorMarks: student.internal_evaluation_marks,
+      evaluatorMarks: student.final_evaluation_marks,
     })
     .from(student)
     .innerJoin(user, eq(student.userId, user.id))
@@ -43,22 +64,43 @@ export const getMentoredStudents = async (facultyId: number) => {
     id: number;
     rollNumber: string;
     department: string | null;
-    ngoName: string | null;
-    ngoLocation: string | null;
-    ngoPhone: string | null;
-    ngoDescription: string | null;
     name: string | null;
     email: string;
+    divison: string | null;
+    groupNumber: string | null;
+    image: string | null;
+    contactNumber: string;
+
+    // NGO details
+    ngoName: string | null;
+    ngoCity: string | null;
+    ngoDistrict: string | null;
+    ngoState: string | null;
+    ngoCountry: string | null;
+    ngoAddress: string | null;
+    ngoNatureOfWork: string | null;
+    ngoEmail: string | null;
+    ngoPhone: string | null;
+
+    //Project Details
+    problemDefinition: string | null;
+    proposedSolution: string | null;
+
+    // Status Fields
     ngoChosen: boolean;
     stage: number;
-    image?: string;
-    ngoStatus?: string;
+    report: string | null;
+    certificate: string | null;
+    poster: string | null;
+    offerLetter: string | null;
+    mentorMarks: number | null;
+    evaluatorMarks: number | null;
   }>;
 
-  students_data.forEach((student) => {
-    student.image = '/images/user/user-16.jpg';
-    student.ngoStatus = student.ngoChosen ? 'active' : 'pending';
-  });
+  // students_data.forEach((student) => {
+  //   student.image = '/images/user/user-16.jpg'; // Static image path
+  //   student.ngoStatus = student.ngoChosen ? 'active' : 'pending';
+  // });
 
   return students_data;
 };
@@ -85,15 +127,37 @@ export const getEvaluatedStudents = async (facultyId: number) => {
       id: student.id,
       rollNumber: student.rollNumber,
       department: student.department,
-      ngoName: student.ngoName,
-      ngoLocation: student.ngoAddress,
-      ngoPhone: student.ngoPhone,
-      ngoDescription: student.ngoNatureOfWork,
       name: student.name,
-      email: user.email,
+      email: student.email,
+      divison: student.division,
+      groupNumber: student.groupNumber,
+      image: student.profileImage,
+      contactNumber: student.contactNumber,
+
+      // NGO details
+      ngoName: student.ngoName,
+      ngoCity: student.ngoCity,
+      ngoDistrict: student.ngoDistrict,
+      ngoState: student.ngoState,
+      ngoCountry: student.ngoCountry,
+      ngoAddress: student.ngoAddress,
+      ngoNatureOfWork: student.ngoNatureOfWork,
+      ngoEmail: student.ngoEmail,
+      ngoPhone: student.ngoPhone,
+
+      //Project Details
+      problemDefinition: student.problemDefinition,
+      proposedSolution: student.proposedSolution,
+
+      // Status Fields
+      ngoChosen: student.ngoChosen,
+      stage: student.stage,
+      report: student.report,
+      certificate: student.certificate,
+      poster: student.poster,
+      offerLetter: student.offerLetter,
       mentorMarks: student.internal_evaluation_marks,
       evaluatorMarks: student.final_evaluation_marks,
-      ngoChosen: student.ngoChosen,
     })
     .from(student)
     .innerJoin(user, eq(student.userId, user.id))
@@ -101,21 +165,43 @@ export const getEvaluatedStudents = async (facultyId: number) => {
     id: number;
     rollNumber: string;
     department: string | null;
-    ngoName: string | null;
-    ngoLocation: string | null;
-    ngoPhone: string | null;
-    ngoDescription: string | null;
     name: string | null;
     email: string;
-    image?: string;
-    ngoStatus?: string;
+    divison: string | null;
+    groupNumber: string | null;
+    image: string | null;
+    contactNumber: string;
+
+    // NGO details
+    ngoName: string | null;
+    ngoCity: string | null;
+    ngoDistrict: string | null;
+    ngoState: string | null;
+    ngoCountry: string | null;
+    ngoAddress: string | null;
+    ngoNatureOfWork: string | null;
+    ngoEmail: string | null;
+    ngoPhone: string | null;
+
+    //Project Details
+    problemDefinition: string | null;
+    proposedSolution: string | null;
+
+    // Status Fields
     ngoChosen: boolean;
+    stage: number;
+    report: string | null;
+    certificate: string | null;
+    poster: string | null;
+    offerLetter: string | null;
+    mentorMarks: number | null;
+    evaluatorMarks: number | null;
   }>;
 
-  students_data.forEach((student) => {
-    student.image = '/images/user/user-17.jpg';
-    student.ngoStatus = student.ngoChosen ? 'active' : 'pending';
-  });
+  // students_data.forEach((student) => {
+  //   student.image = '/images/user/user-17.jpg'; // Static image path
+  //   student.ngoStatus = student.ngoChosen ? 'active' : 'pending'; // NGO status
+  // });
   return students_data;
 };
 

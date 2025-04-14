@@ -7,19 +7,43 @@ import Button from '@/components/Home/ui/button/Button';
 import { Modal } from '@/components/Home/ui/modal';
 import Label from '@/components/Home/form/Label';
 import Input from '@/components/Home/form/input/InputField';
+import PdfViewer from '@/components/PdfViewer';
+import { co } from '@fullcalendar/core/internal-common';
+import { student } from '@/drizzle/schema';
 
 interface Student {
   id: number;
   rollNumber: string;
   department: string;
-  ngoName: string;
-  ngoLocation: string;
-  ngoPhone: string;
-  ngoDescription: string;
   name: string;
   email: string;
-  ngoStatus: string;
+  divison: string;
+  groupNumber: string;
   image: string;
+  contactNumber: string;
+
+  // NGO details
+  ngoName: string | null;
+  ngoCity: string | null;
+  ngoDistrict: string | null;
+  ngoState: string | null;
+  ngoCountry: string | null;
+  ngoAddress: string | null;
+  ngoNatureOfWork: string | null;
+  ngoEmail: string | null;
+  ngoPhone: string | null;
+
+  //Project Details
+  problemDefinition: string | null;
+  proposedSolution: string | null;
+
+  // Status Fields
+  ngoChosen: boolean;
+  stage: number;
+  report: string;
+  certificate: string;
+  poster: string;
+  offerLetter: string;
   mentorMarks: number;
   evaluatorMarks: number;
 }
@@ -27,36 +51,99 @@ interface Student {
 export default function TableList({
   students,
   option, // Prop to determine if the list is for mentoring or evaluating
+  setMarksToggle, // Function to update marksToggle state
+  marksToggle, // Boolean state to toggle marks
+  setStudents,
+  // setLoading,
 }: {
   students: Student[];
   option: 'mentor' | 'evaluator';
+  setMarksToggle: React.Dispatch<React.SetStateAction<boolean>>;
+  marksToggle: boolean;
+  setStudents: React.Dispatch<React.SetStateAction<Student[]>>;
+  // setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedStudent, setSelectedStudent] = useState<Student>({
     id: 0,
     rollNumber: '',
     department: '',
-    ngoName: '',
-    ngoLocation: '',
-    ngoPhone: '',
-    ngoDescription: '',
     name: '',
     email: '',
-    ngoStatus: '',
+    divison: '',
+    groupNumber: '',
     image: '',
+    contactNumber: '',
+
+    // NGO details
+    ngoName: '',
+    ngoCity: '',
+    ngoDistrict: '',
+    ngoState: '',
+    ngoCountry: '',
+    ngoAddress: '',
+    ngoNatureOfWork: '',
+    ngoEmail: '',
+    ngoPhone: '',
+
+    //Project Details
+    problemDefinition: '',
+    proposedSolution: '',
+
+    // Status Fields
+    ngoChosen: false,
+    stage: 0,
+    report: '',
+    certificate: '',
+    poster: '',
+    offerLetter: '',
     mentorMarks: 0,
     evaluatorMarks: 0,
   }); // State to store the selected student
   const [marks, setMarks] = useState<number | 0>(0); // State to store marks
+  const [reportUrl, setReportUrl] = useState<string>(''); // State to store report URL
+  const [certificateUrl, setCertificateUrl] = useState<string>(''); // State to store certificate URL
+  const [posterUrl, setPosterUrl] = useState<string>(''); // State to store poster URL
+  const [offerLetterUrl, setOfferLetterUrl] = useState<string>(''); // State to store offer letter URL
+  const [activeTab, setActiveTab] = useState<string>('personal'); // State for active tab
 
-  const handleOpenModal = (student: Student, option: 'mentor' | 'evaluator') => {
+  const tabs = ['personal', 'ngo', 'project', 'documents', 'evaluation'];
+
+  const handlePrevTab = () => {
+    const currentIndex = tabs.indexOf(activeTab);
+    if (currentIndex > 0) {
+      setActiveTab(tabs[currentIndex - 1]);
+    }
+  };
+
+  const handleNextTab = () => {
+    const currentIndex = tabs.indexOf(activeTab);
+    if (currentIndex < tabs.length - 1) {
+      setActiveTab(tabs[currentIndex + 1]);
+    }
+  };
+
+  const handleOpenModal = async (student: Student, option: 'mentor' | 'evaluator') => {
     setSelectedStudent(student); // Set the selected student
-    //  console.log('Selected Student:', student);
-    setMarks(option === 'mentor' ? student.mentorMarks : student.evaluatorMarks); // set marks field
-    openModal(); // Open the modal
+    setMarks(option === 'mentor' ? student.mentorMarks : student.evaluatorMarks); // Set marks field
+    setCertificateUrl(
+      `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${student.certificate}`
+    ); // Set certificate URL
+    console.log(certificateUrl);
+    setOfferLetterUrl(
+      `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${student.offerLetter}`
+    );
+    setPosterUrl(
+      `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${student.poster}`
+    );
+    setReportUrl(
+      `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${student.report}`
+    );
+    openModal();
   };
 
   const handleSave = async (type: string) => {
+    // setLoading(true);
     if (!selectedStudent || marks === 0) {
       alert('Please enter marks before saving.');
       return;
@@ -82,6 +169,19 @@ export default function TableList({
         throw new Error(result.error || 'Something went wrong');
       }
 
+      students.forEach((student) => {
+        if (student == selectedStudent) {
+          if (typeofmarks === 'internal') {
+            student.mentorMarks = marks;
+          } else {
+            student.evaluatorMarks = marks;
+          }
+        }
+      });
+
+      setStudents(students);
+      // setLoading(false);
+
       console.log('Marks saved successfully!');
       // closeModal(); // Close modal on successful submission
     } catch (error) {
@@ -100,6 +200,7 @@ export default function TableList({
     } else {
       handleSave('evaluator');
     }
+    setMarksToggle(!marksToggle);
     closeModal();
   }
 
@@ -134,7 +235,7 @@ export default function TableList({
                     isHeader
                     className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
-                    NGO Selected
+                    NGO Selection
                   </TableCell>
                   <TableCell
                     isHeader
@@ -175,14 +276,10 @@ export default function TableList({
                       <Badge
                         size="sm"
                         color={
-                          student.ngoStatus === 'active'
-                            ? 'success'
-                            : student.ngoStatus === 'pending'
-                              ? 'warning'
-                              : 'error'
+                          student.ngoChosen === true ? 'success' : student.ngoChosen === false ? 'warning' : 'error'
                         }
                       >
-                        {student.ngoStatus}
+                        {student.ngoChosen === true ? 'Completed' : 'Pending'}
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
@@ -197,98 +294,231 @@ export default function TableList({
       </div>
       <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] p-5 lg:p-10">
         {selectedStudent && (
-          <form className="overflow-y-auto max-h-[80vh] no-scrollbar">
+          <div className="overflow-y-auto max-h-[80vh] no-scrollbar">
             <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">Student Details</h4>
-            <br />
-            {/* Student Image and Basic Details */}
-            <div className="flex justify-center gap-20 mb-5">
-              <div className="w-40 h-40 overflow-hidden rounded-full">
-                <Image width={160} height={160} src={selectedStudent.image} alt={selectedStudent.name} />
-              </div>
-              <div className="flex flex-col justify-center">
-                <div className="mb-4">
-                  <Label>Name</Label>
-                  <Input type="text" value={selectedStudent.name || ''} disabled />
-                </div>
-                <div className="mb-4">
-                  <Label>Roll Number</Label>
-                  <Input type="text" value={selectedStudent.rollNumber || ''} disabled />
-                </div>
+
+            {/* Tabs */}
+            <div className="flex  justify-between">
+              <button
+                className="px-4 py-2 text-sm font-medium text-gray-500"
+                onClick={handlePrevTab}
+                disabled={tabs.indexOf(activeTab) === 0}
+              >
+                &lt; Prev
+              </button>
+              <button
+                className="px-4 py-2 text-sm font-medium text-gray-500"
+                onClick={handleNextTab}
+                disabled={tabs.indexOf(activeTab) === tabs.length - 1}
+              >
+                Next &gt;
+              </button>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:border-b mb-7">
+              <div className="hidden sm:flex">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab}
+                    className={`px-4 py-2 text-sm font-medium ${
+                      activeTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'
+                    }`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab === 'personal'
+                      ? 'Personal Details'
+                      : tab === 'ngo'
+                        ? 'NGO Details'
+                        : tab === 'project'
+                          ? 'Project Details'
+                          : tab === 'documents'
+                            ? 'Documents and Proof of Work'
+                            : 'Evaluation'}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Student Dept */}
-            <div className="mb-3">
-              <Label>Department</Label>
-              <Input type="text" value={selectedStudent.department || ''} disabled />
-            </div>
-
-            {/* Student Email */}
-            <div className="mb-4">
-              <Label>Email</Label>
-              <Input type="text" value={selectedStudent.email || ''} disabled />
-            </div>
-            <br />
-            {/* NGO Details */}
-            <h5 className="mb-4 text-md font-medium text-gray-800 dark:text-white/90">NGO Details</h5>
-            <div className="grid grid-cols-2 gap-6 mb-4">
+            {/* Tab Content */}
+            {activeTab === 'personal' && (
               <div>
-                <Label>NGO Name</Label>
-                <Input type="text" value={selectedStudent.ngoName || 'N/A'} disabled />
-              </div>
-              <div>
-                <Label>NGO Location</Label>
-                <Input type="text" value={selectedStudent.ngoLocation || 'N/A'} disabled />
-              </div>
-            </div>
-            <div className="mb-4">
-              <Label>NGO Description</Label>
-              <Input type="text" value={selectedStudent.ngoDescription || 'N/A'} disabled />
-            </div>
-            <div className="mb-6">
-              <Label>NGO Phone Number</Label>
-              <Input type="text" value={selectedStudent.ngoPhone || 'N/A'} disabled />
-            </div>
-
-            <br />
-            {/* Evaluation Section */}
-            <h5 className="mb-4 text-md font-medium text-gray-800 dark:text-white/90">Evaluation</h5>
-
-            {option === 'mentor' ? (
-              <div className="mb-6">
-                <Label>{'Internal Marks'}</Label>
-                <Input
-                  type="number"
-                  value={marks || ''} // Use empty string as fallback for null or undefined
-                  onChange={(e) => setMarks(Number(e.target.value) || 0)}
-                  placeholder={`${option === 'mentor' ? 'Enter the internal marks' : 'To be entered by the Mentor'}`}
-                  disabled={selectedStudent.ngoStatus === 'active' ? false : true}
-                />
-              </div>
-            ) : null}
-
-            {option === 'mentor' ? null : (
-              <div className="mb-6">
-                <Label>{'Final Marks'}</Label>
-                <Input
-                  type="number"
-                  value={marks || ''} // Use empty string as fallback for null or undefined
-                  onChange={(e) => setMarks(Number(e.target.value) || 0)}
-                  placeholder={'Enter the final marks'}
-                  disabled={false}
-                />
+                {/* Personal Details */}
+                <div className="flex justify-center gap-20 mb-5">
+                  <div className="w-40 h-40 overflow-hidden rounded-full">
+                    <Image width={160} height={160} src={selectedStudent.image} alt={selectedStudent.name} />
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <div className="mb-4">
+                      <Label>Name</Label>
+                      <Input type="text" value={selectedStudent.name || ''} disabled />
+                    </div>
+                    <div className="mb-4">
+                      <Label>Roll Number</Label>
+                      <Input type="text" value={selectedStudent.rollNumber || ''} disabled />
+                    </div>
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <Label>Department</Label>
+                  <Input type="text" value={selectedStudent.department || ''} disabled />
+                </div>
+                <div className="grid grid-cols-2 gap-6 mb-4">
+                  <div>
+                    <Label>Division</Label>
+                    <Input type="text" value={selectedStudent.divison || 'N/A'} disabled />
+                  </div>
+                  <div>
+                    <Label>Group</Label>
+                    <Input type="text" value={selectedStudent.groupNumber || 'N/A'} disabled />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-6 mb-4">
+                  <div>
+                    <Label>Email</Label>
+                    <Input type="text" value={selectedStudent.email || ''} disabled />
+                  </div>
+                  <div>
+                    <Label>Phone Number</Label>
+                    <Input type="text" value={selectedStudent.contactNumber || 'N/A'} disabled />
+                  </div>
+                </div>
               </div>
             )}
 
-            <div className="flex items-center justify-end w-full gap-3 mt-6">
-              <Button size="sm" variant="outline" onClick={closeModal}>
-                Close
-              </Button>
-              <Button size="sm" onClick={savemarks}>
-                Save Changes
-              </Button>
-            </div>
-          </form>
+            {activeTab === 'ngo' && (
+              <div>
+                {/* NGO Details */}
+                <div className="grid grid-cols-2 gap-6 mb-4">
+                  <div>
+                    <Label>NGO Name</Label>
+                    <Input type="text" value={selectedStudent.ngoName || 'N/A'} disabled />
+                  </div>
+                  <div>
+                    <Label>City</Label>
+                    <Input type="text" value={selectedStudent.ngoCity || 'N/A'} disabled />
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <Label>Field of Work</Label>
+                  <Input type="text" value={selectedStudent.ngoNatureOfWork || 'N/A'} disabled />
+                </div>
+                <div className="mb-4">
+                  <Label>Address</Label>
+                  <Input type="text" value={selectedStudent.ngoAddress || 'N/A'} disabled />
+                </div>
+                <div className="grid grid-cols-3 gap-6 mb-4">
+                  <div>
+                    <Label>District</Label>
+                    <Input type="text" value={selectedStudent.ngoDistrict || 'N/A'} disabled />
+                  </div>
+                  <div>
+                    <Label>State</Label>
+                    <Input type="text" value={selectedStudent.ngoState || 'N/A'} disabled />
+                  </div>
+                  <div>
+                    <Label>Country</Label>
+                    <Input type="text" value={selectedStudent.ngoCountry || 'N/A'} disabled />
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <Label>NGO Phone Number</Label>
+                  <Input type="text" value={selectedStudent.ngoPhone || 'N/A'} disabled />
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'project' && (
+              <div>
+                {/* Project Details */}
+                <div className="mb-4">
+                  <Label>Problem Statement</Label>
+                  <Input type="text" value={selectedStudent.problemDefinition || 'N/A'} disabled />
+                </div>
+                <div className="mb-6">
+                  <Label>Approach of Solving Problem</Label>
+                  <Input type="text" value={selectedStudent.proposedSolution || 'N/A'} disabled />
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'documents' && (
+              <div>
+                {/* Documents */}
+                <div className="mb-4">
+                  {/* <Label>Report</Label> */}
+                  <p>
+                    <a href={reportUrl}> Report </a>
+                  </p>
+                </div>
+                <div className="mb-4">
+                  {/* <Label>Certificate</Label> */}
+                  <p>
+                    <a href={certificateUrl}> Certificate </a>
+                  </p>
+                </div>
+                <div className="mb-4">
+                  {/* <Label>Poster</Label> */}
+                  {/* <p>{selectedStudent.poster || 'No Poster Uploaded'}</p> */}
+                  <p>
+                    <a href={posterUrl}> Poster </a>
+                  </p>
+                </div>
+                <div className="mb-4">
+                  {/* <Label><a href={offerLetterUrl}> Offer Letter </a></Label> */}
+                  <p>
+                    <a href={offerLetterUrl}> Offer Letter </a>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'evaluation' && (
+              <div>
+                {/* Evaluation */}
+                {option === 'mentor' ? (
+                  <div>
+                    <div className="mb-6">
+                      <Label>{'Internal Marks'}</Label>
+                      <Input
+                        type="number"
+                        value={marks || ''}
+                        onChange={(e) => setMarks(Number(e.target.value) || 0)}
+                        placeholder="Enter the internal marks"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-end w-full gap-3 mt-6">
+                      <Button size="sm" variant="outline" onClick={closeModal}>
+                        Close
+                      </Button>
+                      <Button size="sm" onClick={savemarks}>
+                        Save Changes
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="mb-6">
+                      <Label>{'Final Marks'}</Label>
+                      <Input
+                        type="number"
+                        value={marks || ''}
+                        onChange={(e) => setMarks(Number(e.target.value) || 0)}
+                        placeholder="Enter the final marks"
+                      />
+                    </div>
+                    <div className="flex items-center justify-end w-full gap-3 mt-6">
+                      <Button size="sm" variant="outline" onClick={closeModal}>
+                        Close
+                      </Button>
+                      <Button size="sm" onClick={savemarks}>
+                        Save Changes
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </Modal>
     </>
