@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
-import { SelectStudent, student, user } from '@/drizzle/schema';
-import { InferSelectModel } from 'drizzle-orm';
+import { SelectStudent } from '@/drizzle/schema';
 import TableModal from './tableModal';
 
 type StudentWithUser = {
