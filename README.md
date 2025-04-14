@@ -112,9 +112,6 @@ cssi-portal/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
@@ -124,7 +121,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contact
 
 For any queries regarding the CSSI Portal, please contact:
-- Project Coordinator - [coordinator@pdeu.ac.in](mailto:coordinator@pdeu.ac.in)
-- Technical Support - [support@pdeu.ac.in](mailto:support@pdeu.ac.in)
-
+- Project Coordinator - [Dr. Himanshu Gajera](mailto:himanshugajera.ce@gmail.com)
+- Technical Support - [Vinit Thakkar](mailto:vinit.tce22@sot.pdpu.ac.in)
 
