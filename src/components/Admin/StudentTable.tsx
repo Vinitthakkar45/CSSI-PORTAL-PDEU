@@ -73,48 +73,54 @@ const StudentTable = () => {
           </div> */}
         </div>
         <div className="max-w-full overflow-x-auto">
-          <Table>
+          <Table className="min-w-full table-fixed">
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
-                <TableCell isHeader className="py-3 text-gray-500 text-start text-theme-base dark:text-gray-400">
+                <TableCell
+                  isHeader
+                  className="py-3 px-4 w-16 md:w-20 text-gray-500 text-start text-theme-base dark:text-gray-400"
+                >
                   ID
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                  className="py-3 px-4 w-32 md:w-40  whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
                   Roll Number
                 </TableCell>
-                <TableCell isHeader className="py-3 text-gray-500 text-start text-theme-base dark:text-gray-400">
+                <TableCell
+                  isHeader
+                  className="py-3 px-4 w-40 md:w-48  text-gray-500 text-start text-theme-base dark:text-gray-400"
+                >
                   Email
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                  className="py-3 px-4 w-32 md:w-40  font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
                   Department
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                  className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
                   NGO Name
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                  className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
                   NGO Contact
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                  className="py-3 px-4 w-32 md:w-40  whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
                   NGO Location
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                  className="py-3 px-4 w-32 md:w-40  font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
                   Status
                 </TableCell>
@@ -124,40 +130,42 @@ const StudentTable = () => {
               {students.map((item) => (
                 <TableRow
                   key={item.student.id}
-                  className=""
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                   onClick={() => {
                     handleCellClick(item);
                   }}
                 >
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                     {item.student.id}
                   </TableCell>
-                  <TableCell className="py-3">
+                  <TableCell className="py-3 px-4">
                     <div className="flex items-center gap-3">
                       <div>
-                        <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">{item.user.name}</p>
-                        <span className="text-gray-500 text-theme-xs dark:text-gray-400">
+                        <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90 truncate">
+                          {item.user.name}
+                        </p>
+                        <span className="text-gray-500 text-theme-xs dark:text-gray-400 truncate">
                           {item.student.rollNumber}
                         </span>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                     {item.user.email}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                     {item.student.department}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                     {item.student.ngoName}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                     {item.student.ngoPhone}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                     {item.student.ngoCity}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400">
                     <Badge
                       size="sm"
                       color={

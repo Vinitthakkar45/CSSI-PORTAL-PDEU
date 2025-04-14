@@ -109,33 +109,39 @@ const FacultyTable = () => {
         <Table>
           <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
             <TableRow>
-              <TableCell isHeader className="py-3 text-gray-500 text-start text-theme-base dark:text-gray-400">
+              <TableCell
+                isHeader
+                className="py-3 px-4 w-16 md:w-20 text-gray-500 text-start text-theme-base dark:text-gray-400"
+              >
                 ID
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                className="py-3 px-4 w-32 md:w-40 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
               >
-                User Details
+                Name
               </TableCell>
-              <TableCell isHeader className="py-3 text-gray-500 text-start text-theme-base dark:text-gray-400">
+              <TableCell
+                isHeader
+                className="py-3 px-4 w-32 md:w-40 text-gray-500 text-start text-theme-base dark:text-gray-400"
+              >
                 Email
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                className="py-3 px-4 w-32 md:w-40 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
               >
                 Department
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                className="py-3 px-4 w-32 md:w-40  whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
               >
                 Sitting Location
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
               >
                 Available Time Slots
               </TableCell>
@@ -147,13 +153,13 @@ const FacultyTable = () => {
               </TableCell> */}
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
               >
                 Mentor Status
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
+                className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
               >
                 Evaluator Status
               </TableCell>
@@ -161,23 +167,27 @@ const FacultyTable = () => {
           </TableHeader>
           <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
             {faculties.map((item) => (
-              <TableRow key={item.faculty.id} className="">
-                <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">{item.faculty.id}</TableCell>
-                <TableCell className="py-3">
+              <TableRow key={item.faculty.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer">
+                <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                  {item.faculty.id}
+                </TableCell>
+                <TableCell className="py-3 px-4 truncate">
                   <div className="flex items-center gap-3">
                     <div>
                       <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">{item.faculty.name}</p>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">{item.user.email}</TableCell>
-                <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                  {item.user.email}
+                </TableCell>
+                <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                   {item.faculty.department || 'Not Assigned'}
                 </TableCell>
-                <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                   {item.faculty.sitting || 'Not Assigned'}
                 </TableCell>
-                <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                   {item.faculty.freeTimeSlots && item.faculty.freeTimeSlots.length > 0
                     ? item.faculty.freeTimeSlots.join(', ')
                     : 'No time slots available'}
@@ -187,12 +197,12 @@ const FacultyTable = () => {
                     {item.user.role === 'admin' ? 'Admin' : 'Faculty'}
                   </Badge>
                 </TableCell> */}
-                <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                <TableCell className="py-3  px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                   <Badge size="sm" color={getMentorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}>
                     {getMentorStatus(item.faculty.id)}
                   </Badge>
                 </TableCell>
-                <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                   <Badge size="sm" color={getEvaluatorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}>
                     {getEvaluatorStatus(item.faculty.id)}
                   </Badge>
