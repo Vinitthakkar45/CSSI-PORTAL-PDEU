@@ -1,6 +1,8 @@
 import { sql } from 'drizzle-orm';
+import { int } from 'drizzle-orm/mysql-core';
 import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 import { boolean } from 'drizzle-orm/pg-core';
+import { Presentation } from 'lucide-react';
 
 export const user = pgTable('user', {
   id: serial('id').primaryKey(),
@@ -50,6 +52,30 @@ export const student = pgTable('student', {
   certificate: text('certificate'),
   poster: text('poster'),
   offerLetter: text('offerletter'),
+
+  // Faculty Mentor Evaluation Fields
+
+  // Poster Organization
+  posterOrganization: integer('poster_organization'),
+  dayToDayActivity: integer('day_to_day_activity'),
+  contributionToWork: integer('contribution_to_work'),
+  learningOutcomes: integer('learning_outcomes'),
+  geotagPhotos: integer('geotag_photos'),
+  // Report Organization, Certificate
+  reportOrganization: integer('report_organization'),
+  hardCopyCertificate: integer('hard_copy_certificate'),
+
+  // Faculty Evaluator Evaluation Fields
+
+  // Presentation
+  learningExplanation: integer('learning_explanation'),
+  problemIndentification: integer('problem_ indentification'),
+  contributionExplanation: integer('contribution_explanation'),
+  proposedSolutionExplanation: integer('proposed_solution_explanation'),
+  presentationSkill: integer('presentation_skill'),
+
+  // QnA
+  qnaMarks: integer('qna_marks'),
 });
 
 export const faculty = pgTable('faculty', {
@@ -64,6 +90,7 @@ export const faculty = pgTable('faculty', {
   freeTimeSlots: text('free_time_slots')
     .array()
     .default(sql`ARRAY[]::text[]`),
+  profileImage: text('profile_image'),
 });
 
 export const mentorStudent = pgTable('mentor_student', {

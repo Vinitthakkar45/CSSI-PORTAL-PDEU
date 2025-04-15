@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --fix",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "drizzle:generate": "drizzle-kit generate",
+    "drizzle:push": "drizzle-kit push"
   },
   "husky": {
     "hooks": {
