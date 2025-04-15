@@ -1,0 +1,578 @@
+{
+  "id": "36b995fd-6733-4bc2-af55-e437a06936e2",
+  "prevId": "88fa1db2-5953-4710-96cb-84e7f4315e60",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.evaluator_student": {
+      "name": "evaluator_student",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "evaluator_id": {
+          "name": "evaluator_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "student_id": {
+          "name": "student_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "evaluator_student_evaluator_id_faculty_id_fk": {
+          "name": "evaluator_student_evaluator_id_faculty_id_fk",
+          "tableFrom": "evaluator_student",
+          "tableTo": "faculty",
+          "columnsFrom": [
+            "evaluator_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "evaluator_student_student_id_student_id_fk": {
+          "name": "evaluator_student_student_id_student_id_fk",
+          "tableFrom": "evaluator_student",
+          "tableTo": "student",
+          "columnsFrom": [
+            "student_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.faculty": {
+      "name": "faculty",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "department": {
+          "name": "department",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sitting": {
+          "name": "sitting",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "free_time_slots": {
+          "name": "free_time_slots",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "ARRAY[]::text[]"
+        },
+        "profile_image": {
+          "name": "profile_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "faculty_user_id_user_id_fk": {
+          "name": "faculty_user_id_user_id_fk",
+          "tableFrom": "faculty",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "faculty_user_id_unique": {
+          "name": "faculty_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.mentor_student": {
+      "name": "mentor_student",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "mentor_id": {
+          "name": "mentor_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "student_id": {
+          "name": "student_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "mentor_student_mentor_id_faculty_id_fk": {
+          "name": "mentor_student_mentor_id_faculty_id_fk",
+          "tableFrom": "mentor_student",
+          "tableTo": "faculty",
+          "columnsFrom": [
+            "mentor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "mentor_student_student_id_student_id_fk": {
+          "name": "mentor_student_student_id_student_id_fk",
+          "tableFrom": "mentor_student",
+          "tableTo": "student",
+          "columnsFrom": [
+            "student_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.stage": {
+      "name": "stage",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "year": {
+          "name": "year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stage": {
+          "name": "stage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.student": {
+      "name": "student",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "roll_number": {
+          "name": "roll_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "department": {
+          "name": "department",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "division": {
+          "name": "division",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "group_number": {
+          "name": "group_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contact_number": {
+          "name": "contact_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profile_image": {
+          "name": "profile_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_name": {
+          "name": "ngo_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_city": {
+          "name": "ngo_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_district": {
+          "name": "ngo_district",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_state": {
+          "name": "ngo_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_country": {
+          "name": "ngo_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_address": {
+          "name": "ngo_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_nature_of_work": {
+          "name": "ngo_nature_of_work",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_email": {
+          "name": "ngo_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_phone": {
+          "name": "ngo_phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "problem_definition": {
+          "name": "problem_definition",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proposed_solution": {
+          "name": "proposed_solution",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ngo_chosen": {
+          "name": "ngo_chosen",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "stage": {
+          "name": "stage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "internal_evaluation_marks": {
+          "name": "internal_evaluation_marks",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "final_evaluation_marks": {
+          "name": "final_evaluation_marks",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "report": {
+          "name": "report",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "certificate": {
+          "name": "certificate",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "poster": {
+          "name": "poster",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "offer_letter": {
+          "name": "offer_letter",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "poster_organization": {
+          "name": "poster_organization",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "day_to_day_activity": {
+          "name": "day_to_day_activity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contribution_to_work": {
+          "name": "contribution_to_work",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "learning_outcomes": {
+          "name": "learning_outcomes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geotag_photos": {
+          "name": "geotag_photos",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "report_organization": {
+          "name": "report_organization",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hard_copy_certificate": {
+          "name": "hard_copy_certificate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "learning_explanation": {
+          "name": "learning_explanation",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "problem_ indentification": {
+          "name": "problem_ indentification",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contribution_explanation": {
+          "name": "contribution_explanation",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proposed_solution_explanation": {
+          "name": "proposed_solution_explanation",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "presentation_skill": {
+          "name": "presentation_skill",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "qna_marks": {
+          "name": "qna_marks",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "student_user_id_user_id_fk": {
+          "name": "student_user_id_user_id_fk",
+          "tableFrom": "student",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "student_user_id_unique": {
+          "name": "student_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user": {
+      "name": "user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_email_unique": {
+          "name": "user_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

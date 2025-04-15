@@ -9,44 +9,7 @@ import Label from '@/components/Home/form/Label';
 import Input from '@/components/Home/form/input/InputField';
 import PdfViewer from '@/components/PdfViewer';
 import { co } from '@fullcalendar/core/internal-common';
-import { student } from '@/drizzle/schema';
-
-interface Student {
-  id: number;
-  rollNumber: string;
-  department: string;
-  name: string;
-  email: string;
-  divison: string;
-  groupNumber: string;
-  image: string;
-  contactNumber: string;
-
-  // NGO details
-  ngoName: string | null;
-  ngoCity: string | null;
-  ngoDistrict: string | null;
-  ngoState: string | null;
-  ngoCountry: string | null;
-  ngoAddress: string | null;
-  ngoNatureOfWork: string | null;
-  ngoEmail: string | null;
-  ngoPhone: string | null;
-
-  //Project Details
-  problemDefinition: string | null;
-  proposedSolution: string | null;
-
-  // Status Fields
-  ngoChosen: boolean;
-  stage: number;
-  report: string;
-  certificate: string;
-  poster: string;
-  offerLetter: string;
-  mentorMarks: number;
-  evaluatorMarks: number;
-}
+import { SelectStudent } from '@/drizzle/schema';
 
 export default function TableList({
   students,
@@ -56,51 +19,16 @@ export default function TableList({
   setStudents,
   // setLoading,
 }: {
-  students: Student[];
+  students: SelectStudent[];
   option: 'mentor' | 'evaluator';
   setMarksToggle: React.Dispatch<React.SetStateAction<boolean>>;
   marksToggle: boolean;
-  setStudents: React.Dispatch<React.SetStateAction<Student[]>>;
+  setStudents: React.Dispatch<React.SetStateAction<SelectStudent[]>>;
   // setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { isOpen, openModal, closeModal } = useModal();
-  const [selectedStudent, setSelectedStudent] = useState<Student>({
-    id: 0,
-    rollNumber: '',
-    department: '',
-    name: '',
-    email: '',
-    divison: '',
-    groupNumber: '',
-    image: '',
-    contactNumber: '',
-
-    // NGO details
-    ngoName: '',
-    ngoCity: '',
-    ngoDistrict: '',
-    ngoState: '',
-    ngoCountry: '',
-    ngoAddress: '',
-    ngoNatureOfWork: '',
-    ngoEmail: '',
-    ngoPhone: '',
-
-    //Project Details
-    problemDefinition: '',
-    proposedSolution: '',
-
-    // Status Fields
-    ngoChosen: false,
-    stage: 0,
-    report: '',
-    certificate: '',
-    poster: '',
-    offerLetter: '',
-    mentorMarks: 0,
-    evaluatorMarks: 0,
-  }); // State to store the selected student
-  const [marks, setMarks] = useState<number | 0>(0); // State to store marks
+  const [selectedStudent, setSelectedStudent] = useState<SelectStudent>(); // State to store the selected student
+  const [marks, setMarks] = useState<number | null>(0); // State to store marks
   const [reportUrl, setReportUrl] = useState<string>(''); // State to store report URL
   const [certificateUrl, setCertificateUrl] = useState<string>(''); // State to store certificate URL
   const [posterUrl, setPosterUrl] = useState<string>(''); // State to store poster URL
@@ -123,9 +51,9 @@ export default function TableList({
     }
   };
 
-  const handleOpenModal = async (student: Student, option: 'mentor' | 'evaluator') => {
+  const handleOpenModal = async (student: SelectStudent, option: 'mentor' | 'evaluator') => {
     setSelectedStudent(student); // Set the selected student
-    setMarks(option === 'mentor' ? student.mentorMarks : student.evaluatorMarks); // Set marks field
+    setMarks(option === 'mentor' ? student.internal_evaluation_marks : student.final_evaluation_marks); // Set marks field
     setCertificateUrl(
       `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${student.certificate}`
     ); // Set certificate URL
@@ -172,9 +100,9 @@ export default function TableList({
       students.forEach((student) => {
         if (student == selectedStudent) {
           if (typeofmarks === 'internal') {
-            student.mentorMarks = marks;
+            student.internal_evaluation_marks = marks;
           } else {
-            student.evaluatorMarks = marks;
+            student.final_evaluation_marks = marks;
           }
         }
       });
@@ -257,7 +185,12 @@ export default function TableList({
                     <TableCell className="px-5 py-4 sm:px-6 text-start">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 overflow-hidden rounded-full">
-                          <Image width={40} height={40} src={student.image} alt={student.name} />
+                          <Image
+                            width={40}
+                            height={40}
+                            src={student.profileImage || '/images/user/user-17.jpg'}
+                            alt={student.name || ''}
+                          />
                         </div>
                         <div>
                           <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
@@ -344,7 +277,12 @@ export default function TableList({
                 {/* Personal Details */}
                 <div className="flex justify-center gap-20 mb-5">
                   <div className="w-40 h-40 overflow-hidden rounded-full">
-                    <Image width={160} height={160} src={selectedStudent.image} alt={selectedStudent.name} />
+                    <Image
+                      width={160}
+                      height={160}
+                      src={selectedStudent.profileImage || '/images/user/user-17.jpg'}
+                      alt={selectedStudent.name || ''}
+                    />
                   </div>
                   <div className="flex flex-col justify-center">
                     <div className="mb-4">
@@ -364,7 +302,7 @@ export default function TableList({
                 <div className="grid grid-cols-2 gap-6 mb-4">
                   <div>
                     <Label>Division</Label>
-                    <Input type="text" value={selectedStudent.divison || 'N/A'} disabled />
+                    <Input type="text" value={selectedStudent.division || 'N/A'} disabled />
                   </div>
                   <div>
                     <Label>Group</Label>
