@@ -58,8 +58,10 @@
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.5",
     "react-flatpickr": "^3.10.13",
+    "react-hot-toast": "^2.5.2",
     "swiper": "^11.2.0",
-    "tailwind-merge": "^2.6.0"
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",
