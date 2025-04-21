@@ -43,7 +43,7 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
           const formattedErrors = responseData.errors;
           console.log(formattedErrors);
 
-          toast.error('Please fix the validation errors');
+          toast.error('Invalid values in fields!');
           return { success: false, errors: formattedErrors };
         }
         throw new Error(responseData.message || 'Failed to update data');
@@ -136,10 +136,21 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
     }
   }, [userId]);
 
+  const validateStepAccess = (nextStep: number) => {
+    if ((nextStep > 1 && !userData?.profileData?.name) || (nextStep === 4 && !userData?.profileData?.ngoChosen)) {
+      toast.warning('Please complete the current step first');
+      return false;
+    }
+    return true;
+  };
+
   const handleNextStep = () => {
     if (currentStep < 4) {
+      const nextStep = currentStep + 1;
+      if (!validateStepAccess(nextStep)) return;
+
       setSlideDirection('left');
-      setCurrentStep(currentStep + 1);
+      setCurrentStep(nextStep);
     } else {
       toast.success('Registration process completed!');
       onComplete();
@@ -155,10 +166,8 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
 
   const goToStep = (step: number) => {
     if (step >= 1 && step <= 4 && step !== currentStep) {
-      if (step > currentStep && !userData?.profileData) {
-        toast.warning('Please complete the current step first');
-        return;
-      }
+      if (!validateStepAccess(step)) return;
+
       setSlideDirection(step > currentStep ? 'left' : 'right');
       setCurrentStep(step);
     }

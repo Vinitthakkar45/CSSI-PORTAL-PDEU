@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Document, Page, Text, StyleSheet, pdf, Image } from '@react-pdf/renderer';
 import Button from '@/components/Home/ui/button/Button';
 import ComponentCard from '@/components/Home/common/ComponentCard';
-// import { toast } from 'sonner';
 
 const styles = StyleSheet.create({
   page: {
@@ -76,19 +75,19 @@ const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: 
       try {
         setIsLoading(true);
 
-        // Try to get from localStorage first
-        const localStorageKey = `lorData_${userId}`;
+        const localStorageKey = `userData_${userId}`;
         const storedData = localStorage.getItem(localStorageKey);
 
         if (storedData) {
-          const { name, branch } = JSON.parse(storedData);
-          setName(name);
-          setBranch(branch);
-          setIsLoading(false);
-          return;
+          const userData = JSON.parse(storedData);
+          if (userData?.profileData) {
+            setName(userData.profileData.name);
+            setBranch(userData.profileData.department);
+            setIsLoading(false);
+            return;
+          }
         }
 
-        // If not in localStorage, fetch from API
         const response = await fetch(`/api/user/getUserById/?userId=${userId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch user data for LOR');
@@ -99,11 +98,7 @@ const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: 
           setName(student.profileData.name);
           setBranch(student.profileData.department);
 
-          // Save to localStorage
-          localStorage.setItem(
-            localStorageKey,
-            JSON.stringify({ name: student.profileData.name, branch: student.profileData.department })
-          );
+          localStorage.setItem(localStorageKey, JSON.stringify(student));
         }
       } catch (err) {
         console.error('Error fetching LOR data:', err);
@@ -128,36 +123,22 @@ const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: 
       link.click();
 
       URL.revokeObjectURL(url);
-
-      // toast.success("LOR generated successfully");
     } catch (error) {
       console.error('Error generating PDF:', error);
-      // toast.error("Failed to generate LOR");
     }
   };
 
   return (
-    <ComponentCard title="Letter of Recommendation">
+    <ComponentCard title="Get Your Letter of Recommendation">
       {isLoading ? (
         <div className="flex justify-center items-center py-6">
           <div className="animate-pulse">Loading LOR data...</div>
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className=" p-4 rounded-lg ">
-            <h3 className="font-medium text-blue-800 mb-2">LOR Information</h3>
-            <p className="text-sm text-blue-700 mb-1">Student Name: {name}</p>
-            <p className="text-sm text-blue-700">Department: {branch}</p>
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-4 justify-between">
-            <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90">
-              Download LOR PDF
-            </Button>
-            <Button onClick={onComplete} variant="outline">
-              Continue to Next Step
-            </Button>
-          </div>
+        <div className="flex flex-col md:flex-row gap-4 justify-between">
+          <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90">
+            Download LOR PDF
+          </Button>
         </div>
       )}
     </ComponentCard>
