@@ -135,7 +135,7 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
                 key={step.id}
                 onClick={() => goToStep(step.id)}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors
-                  ${currentStep === step.id ? 'bg-primary text-blue-600' : 'bg-secondary hover:bg-secondary/80'}`}
+                  ${currentStep === step.id ? 'text-blue-600' : 'bg-secondary hover:bg-secondary/80'}`}
               >
                 {step.label}
               </button>

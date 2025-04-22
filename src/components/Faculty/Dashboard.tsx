@@ -9,6 +9,43 @@ import { stages, Stage } from './utils/stages';
 
 type StageStatus = 'locked' | 'current' | 'completed';
 
+interface Student {
+  id: number;
+  rollNumber: string;
+  department: string;
+  name: string;
+  email: string;
+  divison: string;
+  groupNumber: string;
+  image: string;
+  contactNumber: string;
+
+  // NGO details
+  ngoName: string | null;
+  ngoCity: string | null;
+  ngoDistrict: string | null;
+  ngoState: string | null;
+  ngoCountry: string | null;
+  ngoAddress: string | null;
+  ngoNatureOfWork: string | null;
+  ngoEmail: string | null;
+  ngoPhone: string | null;
+
+  //Project Details
+  problemDefinition: string | null;
+  proposedSolution: string | null;
+
+  // Status Fields
+  ngoChosen: boolean;
+  stage: number;
+  report: string;
+  certificate: string;
+  poster: string;
+  offerLetter: string;
+  mentorMarks: number;
+  evaluatorMarks: number;
+}
+
 const Dashboard = () => {
   const { status } = useSession({
     required: true,
@@ -18,11 +55,12 @@ const Dashboard = () => {
   });
   const [currentStage, setCurrentStage] = useState<number>(1);
 
-  const [mentoredStudents, setMentoredStudents] = useState([]);
-  const [evaluatedStudents, setEvaluatedStudents] = useState([]);
+  const [mentoredStudents, setMentoredStudents] = useState<Student[]>([]);
+  const [evaluatedStudents, setEvaluatedStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedToggle, setSelectedToggle] = useState<'mentor' | 'evaluator'>('mentor'); // Toggler state
+  const [marksToggle, setMarksToggle] = useState<boolean>(false); // Toggler state
 
   // Fetch Faculty Student Data
   useEffect(() => {
@@ -43,7 +81,7 @@ const Dashboard = () => {
     };
 
     fetchStudentData();
-  }, []);
+  }, [marksToggle]);
 
   if (status === 'loading' || loading) {
     return <p>Loading...</p>;
@@ -78,6 +116,7 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* <div> */}
       <div className="flex mb-2">
         <button
           className={`px-4 py-2 rounded-l-lg shadow-md transition-colors duration-300 border border-gray-500 ${
@@ -104,7 +143,12 @@ const Dashboard = () => {
       <TableList
         students={selectedToggle === 'mentor' ? mentoredStudents : evaluatedStudents}
         option={selectedToggle}
+        setMarksToggle={setMarksToggle}
+        marksToggle={marksToggle}
+        setStudents={selectedToggle === 'mentor' ? setMentoredStudents : setEvaluatedStudents}
+        // setLoading = {setLoading}
       />
+      {/* </div> */}
     </>
   );
 };

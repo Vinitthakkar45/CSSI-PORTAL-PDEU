@@ -1,6 +1,6 @@
 import { db } from './db';
 import { eq, inArray } from 'drizzle-orm/expressions';
-import { faculty, mentorStudent, student, evaluatorStudent, user } from './schema';
+import { faculty, mentorStudent, student, evaluatorStudent, user, SelectStudent } from './schema';
 
 export const getMentoredStudents = async (facultyId: number) => {
   // Fetch the faculty ID based on the user ID
@@ -21,44 +21,14 @@ export const getMentoredStudents = async (facultyId: number) => {
   const ids = stu_ids.map((stud) => stud.id);
 
   // Fetch the student details
-  const students_data = (await db
-    .select({
-      id: student.id,
-      rollNumber: student.rollNumber,
-      department: student.department,
-      ngoName: student.ngoName,
-      ngoLocation: student.ngoAddress,
-      ngoPhone: student.ngoPhone,
-      ngoDescription: student.ngoNatureOfWork,
-      name: student.name,
-      email: user.email,
-      mentorMarks: student.internal_evaluation_marks,
-      evaluatorMarks: student.final_evaluation_marks,
-      ngoChosen: student.ngoChosen,
-      stage: student.stage,
-    })
+  const result = await db
+    .select({ student })
     .from(student)
     .innerJoin(user, eq(student.userId, user.id))
-    .where(inArray(student.id, ids))) as Array<{
-    id: number;
-    rollNumber: string;
-    department: string | null;
-    ngoName: string | null;
-    ngoLocation: string | null;
-    ngoPhone: string | null;
-    ngoDescription: string | null;
-    name: string | null;
-    email: string;
-    ngoChosen: boolean;
-    stage: number;
-    image?: string;
-    ngoStatus?: string;
-  }>;
+    .where(inArray(student.id, ids));
 
-  students_data.forEach((student) => {
-    student.image = '/images/user/user-16.jpg';
-    student.ngoStatus = student.ngoChosen ? 'active' : 'pending';
-  });
+  const students_data: SelectStudent[] = result.map((row) => row.student);
+  console.log('Students Data:', students_data);
 
   return students_data;
 };
@@ -80,42 +50,19 @@ export const getEvaluatedStudents = async (facultyId: number) => {
 
   const ids = stu_ids.map((stud) => stud.id);
 
-  const students_data = (await db
-    .select({
-      id: student.id,
-      rollNumber: student.rollNumber,
-      department: student.department,
-      ngoName: student.ngoName,
-      ngoLocation: student.ngoAddress,
-      ngoPhone: student.ngoPhone,
-      ngoDescription: student.ngoNatureOfWork,
-      name: student.name,
-      email: user.email,
-      mentorMarks: student.internal_evaluation_marks,
-      evaluatorMarks: student.final_evaluation_marks,
-      ngoChosen: student.ngoChosen,
-    })
+  const result = await db
+    .select({ student })
     .from(student)
     .innerJoin(user, eq(student.userId, user.id))
-    .where(inArray(student.id, ids))) as Array<{
-    id: number;
-    rollNumber: string;
-    department: string | null;
-    ngoName: string | null;
-    ngoLocation: string | null;
-    ngoPhone: string | null;
-    ngoDescription: string | null;
-    name: string | null;
-    email: string;
-    image?: string;
-    ngoStatus?: string;
-    ngoChosen: boolean;
-  }>;
+    .where(inArray(student.id, ids));
 
-  students_data.forEach((student) => {
-    student.image = '/images/user/user-17.jpg';
-    student.ngoStatus = student.ngoChosen ? 'active' : 'pending';
-  });
+  const students_data: SelectStudent[] = result.map((row) => row.student);
+  console.log('Students Data:', students_data);
+
+  // students_data.forEach((student) => {
+  //   student.image = '/images/user/user-17.jpg'; // Static image path
+  //   student.ngoStatus = student.ngoChosen ? 'active' : 'pending'; // NGO status
+  // });
   return students_data;
 };
 
