@@ -17,6 +17,52 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
+  const filterSensitiveData = (data: Record<string, unknown>) => {
+    const allowedFields = [
+      // Personal Details
+      'rollNumber',
+      'name',
+      'department',
+      'division',
+      'groupNumber',
+      'contactNumber',
+      'profileImage',
+      // NGO Details
+      'ngoName',
+      'ngoCity',
+      'ngoDistrict',
+      'ngoState',
+      'ngoCountry',
+      'ngoAddress',
+      'ngoNatureOfWork',
+      'ngoEmail',
+      'ngoPhone',
+      'ngoChosen',
+      // Project Details
+      'problemDefinition',
+      'proposedSolution',
+      // Document Details
+      'offerLetter',
+      'report',
+      'certificate',
+      'poster',
+      'weekOnePhoto',
+      'weekTwoPhoto',
+      // Progress
+      'stage',
+    ] as const;
+
+    return Object.keys(data)
+      .filter((key) => allowedFields.includes(key as (typeof allowedFields)[number]))
+      .reduce(
+        (obj, key) => {
+          obj[key] = data[key];
+          return obj;
+        },
+        {} as Record<string, unknown>
+      );
+  };
+
   const updateStudentData = async (data: StudentUpdateData) => {
     if (!userId) {
       toast.error('User ID not found. Please try logging in again.');
@@ -39,9 +85,7 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
 
       if (!response.ok) {
         if (responseData.errors) {
-          console.log(responseData.errors);
           const formattedErrors = responseData.errors;
-          console.log(formattedErrors);
 
           toast.error('Invalid values in fields!');
           return { success: false, errors: formattedErrors };
@@ -50,11 +94,16 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
       }
 
       if (userId && userData) {
+        // Filter sensitive data before storing
+        const filteredData = filterSensitiveData(responseData.data);
+
         const updatedUserData = {
-          ...userData,
+          id: userData.id,
+          email: userData.email,
+          role: userData.role,
           profileData: {
             ...userData.profileData,
-            ...responseData.data,
+            ...filteredData,
           },
         };
 
@@ -118,9 +167,17 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
             throw new Error('Failed to fetch user data');
           }
 
-          const userData = await response.json();
-          setUserData(userData);
-          localStorage.setItem(localStorageKey, JSON.stringify(userData));
+          const fetchedUserData = await response.json();
+          // Filter sensitive data before storing
+          const filteredData = {
+            id: fetchedUserData.id,
+            email: fetchedUserData.email,
+            role: fetchedUserData.role,
+            profileData: filterSensitiveData(fetchedUserData.profileData || {}),
+          };
+
+          setUserData(filteredData);
+          localStorage.setItem(localStorageKey, JSON.stringify(filteredData));
         } catch (err) {
           console.error('Error fetching user data:', err);
           toast.error('Failed to load user data. Please refresh the page.');

@@ -39,7 +39,7 @@ const MyPDF = ({ name, branch }: { name: string; branch: string }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <Image src="/topLogo.png" />
+        <Image src="/assets/images/lor-preview.png" alt="LOR Preview" width={200} height={200} />
         <Text style={styles.date}>Date : April 1, {year}</Text>
         <Text style={styles.heading}> Letter of Recommendation</Text>
         <Text style={styles.body}>
@@ -59,7 +59,7 @@ const MyPDF = ({ name, branch }: { name: string; branch: string }) => {
           required to undergo the internship.
         </Text>
         <Text style={styles.body}>Sincerely,</Text>
-        <Image src="/footer.png" style={styles.footer} />
+        <Image src={previewUrl} alt="Generated LOR Preview" width={200} height={200} />
       </Page>
     </Document>
   );
@@ -117,12 +117,53 @@ const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: 
       const blob = await pdf(<MyPDF name={name} branch={branch} />).toBlob();
       const url = URL.createObjectURL(blob);
 
+      // Create an invisible iframe to detect when download dialog closes
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      // Create download link
       const link = document.createElement('a');
       link.href = url;
       link.download = `${name}_lor.pdf`;
+
+      // Track download completion
+      let dialogClosed = false;
+
+      // Create a promise that resolves when download dialog closes
+      const downloadPromise = new Promise((resolve) => {
+        // Monitor focus to detect when download dialog closes
+        const handleFocus = () => {
+          if (!dialogClosed) {
+            dialogClosed = true;
+            window.removeEventListener('focus', handleFocus);
+            document.body.removeChild(iframe);
+            URL.revokeObjectURL(url);
+            resolve(true);
+          }
+        };
+
+        window.addEventListener('focus', handleFocus);
+
+        // Fallback if focus event doesn't fire
+        setTimeout(() => {
+          if (!dialogClosed) {
+            window.removeEventListener('focus', handleFocus);
+            document.body.removeChild(iframe);
+            URL.revokeObjectURL(url);
+            resolve(false);
+          }
+        }, 5000); // 5 second timeout fallback
+      });
+
+      // Trigger download
       link.click();
 
-      URL.revokeObjectURL(url);
+      // Wait for download dialog to close
+      const completed = await downloadPromise;
+      if (completed) {
+        onComplete();
+      }
     } catch (error) {
       console.error('Error generating PDF:', error);
     }

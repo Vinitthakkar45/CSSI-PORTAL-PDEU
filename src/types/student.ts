@@ -62,5 +62,5 @@ export interface UserDetails {
   id: number;
   email: string;
   role: string;
-  profileData: StudentData | null;
+  profileData: Partial<StudentData> | null;
 }
