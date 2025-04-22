@@ -6,6 +6,7 @@ import {
   getEvaluatedStudents,
   updateFinalMarks,
   updateInternalMarks,
+  MarksType,
 } from '@/drizzle/facultyQueries';
 
 export async function GET(req: NextRequest) {
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
   console.log('POST request received for faculty marks update');
   try {
     const session = await getServerSession(authOptions);
-
+    console.log('Session:', session);
     if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -71,15 +72,17 @@ export async function POST(req: NextRequest) {
     const isEvaluator = evaluatedStudents.some((student) => student.id === studentid);
 
     if (typeofmarks === 'internal') {
+      console.log('Updating internal marks');
       if (!isMentor) {
         return NextResponse.json({ error: 'Unauthorized to update internal marks' }, { status: 403 });
       }
-      await updateInternalMarks(facultyId, studentid, marks);
+      await updateInternalMarks(studentid, marks);
     } else if (typeofmarks === 'final') {
+      console.log('Updating final marks');
       if (!isEvaluator) {
         return NextResponse.json({ error: 'Unauthorized to update final marks' }, { status: 403 });
       }
-      await updateFinalMarks(facultyId, studentid, marks);
+      await updateFinalMarks(studentid, marks);
     } else {
       return NextResponse.json({ error: 'Invalid typeofmarks value' }, { status: 400 });
     }
