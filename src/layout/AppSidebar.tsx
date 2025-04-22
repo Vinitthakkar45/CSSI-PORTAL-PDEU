@@ -37,7 +37,20 @@ const AppSidebar: React.FC = () => {
 
   if (status === 'authenticated' && session) {
     const role = session.user.role;
-
+    if (role === 'coordinator') {
+      navItems.push(
+        {
+          name: 'Students',
+          path: '/home/coordinator/studentTable',
+          icon: <GraduationCap size={22} />,
+        },
+        {
+          name: 'Faculties',
+          path: '/home/coordinator/facultyTable',
+          icon: <BookOpen size={22} />,
+        }
+      );
+    }
     if (role === 'admin') {
       navItems.push(
         {

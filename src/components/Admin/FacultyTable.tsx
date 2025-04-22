@@ -4,7 +4,6 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
 import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
-import { countEvaluators, countMentors } from './utils/countrecords';
 import FacultyTableModal from './FacultyTableModal';
 
 type FacultyWithUser = {
@@ -63,7 +62,6 @@ const FacultyTable = () => {
         if (mentorCount > 0 || evaluatorCount > 0) {
           const res = await fetch('/api/admin/checkassignment');
           const data = await res.json();
-          console.log(data);
           setAssignments(data);
         }
 
@@ -80,7 +78,6 @@ const FacultyTable = () => {
   const getMentorStatus = (facultyId: number) => {
     if (!assignmentsLoaded) return 'Loading...';
 
-    // If no mentors exist yet, everything is pending
     if (!hasMentors) return 'Pending';
 
     const assignment = assignments.find((item) => item.facultyId === facultyId);
@@ -90,7 +87,6 @@ const FacultyTable = () => {
   const getEvaluatorStatus = (facultyId: number) => {
     if (!assignmentsLoaded) return 'Loading...';
 
-    // If no evaluators exist yet, everything is pending
     if (!hasEvaluators) return 'Pending';
 
     const assignment = assignments.find((item) => item.facultyId === facultyId);
