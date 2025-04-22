@@ -4,10 +4,11 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
 import { SelectStudent, student, user } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
+import LoadingOverlay from '../LoadingOverlay';
 import TableModal from './tableModal';
 
 type StudentWithUser = {
-  student: SelectStudent;
+  student: InferSelectModel<typeof student>;
   user: {
     name: string | null;
     email: string | null;
@@ -17,21 +18,21 @@ type StudentWithUser = {
 
 const StudentTable = () => {
   const [students, setStudents] = useState<StudentWithUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<StudentWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchStudents() {
       try {
-        setLoading(true);
+        setIsLoading(true);
         const res = await fetch('/api/admin/students');
         const data = await res.json();
         setStudents(data);
       } catch (error) {
         console.error('Error fetching student data:', error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     }
 
@@ -47,9 +48,9 @@ const StudentTable = () => {
     setShowModal(true);
   };
 
-  if (loading) {
-    return <div className="p-4 text-center">Loading student data...</div>;
-  }
+  // if (isLoading) {
+  //   return <div className="p-4 text-center">Loading student data...</div>;
+  // }
 
   return (
     <>
@@ -61,6 +62,8 @@ const StudentTable = () => {
           onCloseCross={handleModalclose}
         ></TableModal>
       )}
+
+      {isLoading && <LoadingOverlay />}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
         <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

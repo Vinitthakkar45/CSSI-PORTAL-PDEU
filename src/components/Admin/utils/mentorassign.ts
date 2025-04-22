@@ -37,7 +37,7 @@ export async function mentorAssignment() {
     if (faculties.length === 0) continue; // No faculty in this department
 
     let studentIndex = 0;
-    const studentsPerFaculty = Math.floor(students.length / faculties.length);
+    const studentsPerFaculty = Math.ceil(students.length / faculties.length);
 
     for (let i = 0; i < faculties.length; i++) {
       for (let j = 0; j < studentsPerFaculty; j++) {

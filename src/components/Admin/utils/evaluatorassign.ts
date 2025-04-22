@@ -30,7 +30,7 @@ export async function evaluatorAssignment() {
     const possibleEvaluators = facultyList.filter((f) => f.department !== studentDept);
 
     if (possibleEvaluators.length > 0) {
-      const evaluatorsPerStudent = Math.floor(students.length / possibleEvaluators.length);
+      const evaluatorsPerStudent = Math.ceil(students.length / possibleEvaluators.length);
 
       for (let i = 0; i < possibleEvaluators.length && studentIndex < students.length; i++) {
         for (let j = 0; j < evaluatorsPerStudent && studentIndex < students.length; j++) {
