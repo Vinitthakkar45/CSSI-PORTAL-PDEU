@@ -6,7 +6,7 @@ import StudentDashboard from '@/components/Student/Dashboard';
 import FacultyDashboard from '@/components/Faculty/Dashboard';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-
+import CoordinatorDashboard from '@/components/Coordinator/Dashboard';
 export const metadata: Metadata = {
   title: 'Home',
   description: 'This is Home for Dashboard',
@@ -15,10 +15,12 @@ export const metadata: Metadata = {
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
   const userRole = session?.user?.role;
-
   let dashboardContent;
 
   switch (userRole) {
+    case 'coordinator':
+      dashboardContent = <CoordinatorDashboard />;
+      break;
     case 'admin':
       dashboardContent = <AdminDashboard />;
       break;
