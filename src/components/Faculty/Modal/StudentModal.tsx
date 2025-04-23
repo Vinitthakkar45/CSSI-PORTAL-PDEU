@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SelectStudent } from '@/drizzle/schema';
 import { co } from '@fullcalendar/core/internal-common';
+import { ExternalLink } from 'lucide-react';
 
 export default function StudentModal({
   isOpen,
@@ -56,16 +57,16 @@ export default function StudentModal({
     if (selectedStudent) {
       //   setMarks(option === 'mentor' ? selectedStudent.internal_evaluation_marks : selectedStudent.final_evaluation_marks);
       setCertificateUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${selectedStudent.certificate}`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Certificate/${selectedStudent.userId}.pdf`
       );
       setOfferLetterUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${selectedStudent.offerLetter}`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/OfferLetter/${selectedStudent.userId}.pdf`
       );
       setPosterUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${selectedStudent.poster}`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Poster/${selectedStudent.userId}.pdf`
       );
       setReportUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${selectedStudent.report}`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Report/${selectedStudent.userId}.pdf`
       );
 
       setMarks({
@@ -83,9 +84,6 @@ export default function StudentModal({
         presentationSkills: selectedStudent.presentationSkill || 0,
         qnaViva: selectedStudent.qnaMarks || 0,
       });
-
-      console.log('Selected Student:', selectedStudent);
-      console.log('Marks:', marks);
     }
   }, [selectedStudent]);
 
@@ -226,7 +224,7 @@ export default function StudentModal({
             </button>
           </div>
           <div className="flex flex-col sm:flex-row  mb-7">
-            <div className="hidden sm:flex whitespace-nowrap overflow-hidden text-ellipsis justify-center items-center">
+            <div className="hidden sm:flex whitespace-nowrap overflow-hidden text-ellipsis justify-center items-center no-scrollbar">
               {tabs.map((tab) => (
                 <button
                   key={tab}
@@ -254,6 +252,9 @@ export default function StudentModal({
           {/* Tab Content */}
           {activeTab === 'personal' && (
             <div>
+              <p className="mb-5 text-gray-400 text-center">
+                <i> Personal Details </i>
+              </p>
               {/* Personal Details */}
               <div className="flex justify-center gap-20 mb-5">
                 <div className="w-40 h-40 overflow-hidden rounded-full">
@@ -305,6 +306,10 @@ export default function StudentModal({
           {activeTab === 'ngo' && (
             <div>
               {/* NGO Details */}
+              <p className="mb-5 text-gray-400 text-center">
+                <i> Registered NGO Details </i>
+              </p>
+
               <div className="grid grid-cols-2 gap-6 mb-4">
                 <div>
                   <Label>NGO Name</Label>
@@ -347,12 +352,15 @@ export default function StudentModal({
           {activeTab === 'project' && (
             <div>
               {/* Project Details */}
+              <p className="mb-5 text-gray-400 text-center">
+                <i> Details of undergoing project </i>
+              </p>
               <div className="mb-4">
-                <Label>Problem Statement</Label>
+                <Label> Problem Statement </Label>
                 <Input type="text" value={selectedStudent.problemDefinition || 'N/A'} disabled />
               </div>
               <div className="mb-6">
-                <Label>Approach of Solving Problem</Label>
+                <Label> Approach of Solving Problem </Label>
                 <Input type="text" value={selectedStudent.proposedSolution || 'N/A'} disabled />
               </div>
             </div>
@@ -360,30 +368,39 @@ export default function StudentModal({
 
           {activeTab === 'documents' && (
             <div>
-              {/* Documents */}
-              <div className="mb-4">
-                {/* <Label>Report</Label> */}
+              <p className="mb-5 text-gray-400 text-center">
+                <i> Documents Uploaded </i>
+              </p>
+              <div className="mb-4 ml-6">
                 <p>
-                  <a href={reportUrl}> Report </a>
+                  <a href={reportUrl} target="_blank" className="flex ">
+                    {' '}
+                    Report <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
+                  </a>
                 </p>
               </div>
-              <div className="mb-4">
-                {/* <Label>Certificate</Label> */}
+              <div className="mb-4 ml-6">
                 <p>
-                  <a href={certificateUrl}> Certificate </a>
+                  <a href={certificateUrl} target="_blank" className="flex ">
+                    {' '}
+                    Certificate <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
+                  </a>
                 </p>
               </div>
-              <div className="mb-4">
-                {/* <Label>Poster</Label> */}
-                {/* <p>{selectedStudent.poster || 'No Poster Uploaded'}</p> */}
+              <div className="mb-4  ml-6">
                 <p>
-                  <a href={posterUrl}> Poster </a>
+                  <a href={posterUrl} target="_blank" className="flex ">
+                    {' '}
+                    Poster <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
+                  </a>
                 </p>
               </div>
-              <div className="mb-4">
-                {/* <Label><a href={offerLetterUrl}> Offer Letter </a></Label> */}
+              <div className="mb-4 ml-6">
                 <p>
-                  <a href={offerLetterUrl}> Offer Letter </a>
+                  <a href={offerLetterUrl} target="_blank" className="flex">
+                    {' '}
+                    Offer Letter <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
+                  </a>
                 </p>
               </div>
             </div>
@@ -481,6 +498,19 @@ export default function StudentModal({
                       />
                     </div>
                   </div>
+                  <div>
+                    <p>
+                      Total Marks:{' '}
+                      {marks.posterOrganization +
+                        marks.dayToDayActivity +
+                        marks.contributionToWork +
+                        marks.learningOutcomes +
+                        marks.geoTagPhotos +
+                        marks.reportOrganization +
+                        marks.certificate}{' '}
+                      / 50
+                    </p>
+                  </div>
 
                   <div className="flex items-center justify-end w-full gap-3 mt-6">
                     <Button size="sm" variant="outline" onClick={onClose}>
@@ -559,6 +589,18 @@ export default function StudentModal({
                       </div>
                       <div></div>
                     </div>
+                  </div>
+                  <div>
+                    <p>
+                      Total Marks:{' '}
+                      {marks.learningExplanation +
+                        marks.problemIdentification +
+                        marks.contributionExplanation +
+                        marks.proposedSolution +
+                        marks.presentationSkills +
+                        marks.qnaViva}{' '}
+                      / 50
+                    </p>
                   </div>
                   <div className="flex items-center justify-end w-full gap-3 mt-6">
                     <Button size="sm" variant="outline" onClick={onClose}>

@@ -17,7 +17,6 @@ const Dashboard = () => {
       redirect('/signin');
     },
   });
-  const [currentStage, setCurrentStage] = useState<number>(1);
 
   const [mentoredStudents, setMentoredStudents] = useState<SelectStudent[]>([]);
   const [evaluatedStudents, setEvaluatedStudents] = useState<SelectStudent[]>([]);
@@ -56,8 +55,6 @@ const Dashboard = () => {
   }
 
   const getStageStatus = (stageNumber: number): StageStatus => {
-    // if (stageNumber < currentStage) return 'completed';
-    // if (stageNumber === currentStage) return 'current';
     return 'current';
   };
 
@@ -110,7 +107,6 @@ const Dashboard = () => {
         setMarksToggle={setMarksToggle}
         marksToggle={marksToggle}
         setStudents={selectedToggle === 'mentor' ? setMentoredStudents : setEvaluatedStudents}
-        // setLoading = {setLoading}
       />
       {/* </div> */}
     </>
