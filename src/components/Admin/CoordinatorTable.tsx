@@ -1,11 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/Coordinator/Table';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
 import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
-import FacultyTableModal from '@/components/Coordinator/FacultyTableModal';
-import { useSession } from 'next-auth/react';
+import FacultyTableModal from './FacultyTableModal';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -21,16 +20,13 @@ type AssignmentItem = {
   evaluatorAssigned: number;
 };
 
-const FacultyTable = () => {
-  const session = useSession();
+const CoordinatorTable = () => {
   const [faculties, setFaculties] = useState<FacultyWithUser[]>([]);
   const [filteredFaculties, setFilteredFaculties] = useState<FacultyWithUser[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
-  const [hasMentors, setHasMentors] = useState(false);
-  const [hasEvaluators, setHasEvaluators] = useState(false);
   const [assignmentsLoaded, setAssignmentsLoaded] = useState(false);
   const [selectedFaculty, setSelectedFaculty] = useState<FacultyWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -39,70 +35,19 @@ const FacultyTable = () => {
     async function fetchFaculties() {
       try {
         setLoading(true);
-        const id = session.data?.user.id;
-        const res = await fetch('/api/coord/faculty', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ id }),
-        });
+        const res = await fetch('/api/admin/coordinator');
         const data = await res.json();
         setFaculties(data);
         setFilteredFaculties(data);
       } catch (error) {
         console.error('Error fetching faculty data:', error);
       } finally {
-      }
-    }
-
-    fetchFaculties();
-    async function checkRecordsAndFetchAssignments() {
-      try {
-        const res = await fetch('/api/coord/countrecords');
-        const data = await res.json();
-
-        const mentorCount = data.mentors;
-        const evaluatorCount = data.evaluators;
-
-        setHasMentors(mentorCount > 0);
-        setHasEvaluators(evaluatorCount > 0);
-
-        if (mentorCount > 0 || evaluatorCount > 0) {
-          const res = await fetch('/api/coord/checkassignment');
-          const data = await res.json();
-          setAssignments(data);
-        }
-
-        setAssignmentsLoaded(true);
-      } catch (error) {
-        console.error('Error checking records or fetching assignment data:', error);
-        setAssignmentsLoaded(true);
-      } finally {
         setLoading(false);
       }
     }
 
-    checkRecordsAndFetchAssignments();
+    fetchFaculties();
   }, []);
-
-  const getMentorStatus = (facultyId: number) => {
-    if (!assignmentsLoaded) return 'Loading...';
-
-    if (!hasMentors) return 'Pending';
-
-    const assignment = assignments.find((item) => item.facultyId === facultyId);
-    return assignment && assignment.assignedMentor === 1 ? 'Assigned' : 'Pending';
-  };
-
-  const getEvaluatorStatus = (facultyId: number) => {
-    if (!assignmentsLoaded) return 'Loading...';
-
-    if (!hasEvaluators) return 'Pending';
-
-    const assignment = assignments.find((item) => item.facultyId === facultyId);
-    return assignment && assignment.evaluatorAssigned === 1 ? 'Assigned' : 'Pending';
-  };
 
   const handleModalclose = () => {
     setShowModal(false);
@@ -168,6 +113,21 @@ const FacultyTable = () => {
                 className="rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white w-full"
               />
             </div>
+
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Department:</label>
+              <select
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
+                className="rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white"
+              >
+                <option value="ALL">All</option>
+                <option value="CSE">CSE</option>
+                <option value="CIVIL">CIVIL</option>
+                <option value="ECE">ECE</option>
+                <option value="ICT">ICT</option>
+              </select>
+            </div>
           </div>
         </div>
         <div className="max-w-full overflow-x-auto">
@@ -210,18 +170,6 @@ const FacultyTable = () => {
                 >
                   Available Time Slots
                 </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
-                >
-                  Mentor Status
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
-                >
-                  Evaluator Status
-                </TableCell>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -260,19 +208,6 @@ const FacultyTable = () => {
                         ? item.faculty.freeTimeSlots.join(', ')
                         : 'No time slots available'}
                     </TableCell>
-                    <TableCell className="py-3  px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                      <Badge size="sm" color={getMentorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}>
-                        {getMentorStatus(item.faculty.id)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                      <Badge
-                        size="sm"
-                        color={getEvaluatorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}
-                      >
-                        {getEvaluatorStatus(item.faculty.id)}
-                      </Badge>
-                    </TableCell>
                   </TableRow>
                 ))
               ) : (
@@ -290,4 +225,4 @@ const FacultyTable = () => {
   );
 };
 
-export default FacultyTable;
+export default CoordinatorTable;
