@@ -101,14 +101,18 @@ const Dashboard = () => {
         </button>
       </div>
 
-      <TableList
-        students={selectedToggle === 'mentor' ? mentoredStudents : evaluatedStudents}
-        option={selectedToggle}
-        setMarksToggle={setMarksToggle}
-        marksToggle={marksToggle}
-        setStudents={selectedToggle === 'mentor' ? setMentoredStudents : setEvaluatedStudents}
-      />
-      {/* </div> */}
+      {(selectedToggle === 'mentor' && mentoredStudents.length > 0) ||
+      (selectedToggle != 'mentor' && evaluatedStudents.length > 0) ? (
+        <TableList
+          students={selectedToggle === 'mentor' ? mentoredStudents : evaluatedStudents}
+          option={selectedToggle}
+          setMarksToggle={setMarksToggle}
+          marksToggle={marksToggle}
+          setStudents={selectedToggle === 'mentor' ? setMentoredStudents : setEvaluatedStudents}
+        />
+      ) : (
+        <p className="m-4">Students are yet to be assigned !</p>
+      )}
     </>
   );
 };

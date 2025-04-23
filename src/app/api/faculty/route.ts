@@ -24,9 +24,6 @@ export async function GET(req: NextRequest) {
       getEvaluatedStudents(facultyId),
     ]);
 
-    // console.log(mentoredStudents);
-    // console.log(evaluatedStudents);
-
     return NextResponse.json(
       {
         mentoredStudents,
@@ -41,20 +38,16 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  console.log('POST request received for faculty marks update');
   try {
     const session = await getServerSession(authOptions);
-    console.log('Session:', session);
     if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const facultyId = Number(session.user.id);
     // const facultyId = 7;
-    console.log('Faculty ID from session:', facultyId);
 
     const body = await req.json();
-    console.log('Request body:', body);
     const { studentid, typeofmarks, marks } = body;
 
     if (!studentid || !typeofmarks || marks === undefined) {
@@ -72,13 +65,11 @@ export async function POST(req: NextRequest) {
     const isEvaluator = evaluatedStudents.some((student) => student.id === studentid);
 
     if (typeofmarks === 'internal') {
-      console.log('Updating internal marks');
       if (!isMentor) {
         return NextResponse.json({ error: 'Unauthorized to update internal marks' }, { status: 403 });
       }
       await updateInternalMarks(studentid, marks);
     } else if (typeofmarks === 'final') {
-      console.log('Updating final marks');
       if (!isEvaluator) {
         return NextResponse.json({ error: 'Unauthorized to update final marks' }, { status: 403 });
       }

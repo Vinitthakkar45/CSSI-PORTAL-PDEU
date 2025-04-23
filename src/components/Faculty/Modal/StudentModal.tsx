@@ -9,6 +9,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SelectStudent } from '@/drizzle/schema';
 import { co } from '@fullcalendar/core/internal-common';
 import { ExternalLink } from 'lucide-react';
+import { z } from 'zod';
 
 export default function StudentModal({
   isOpen,
@@ -87,32 +88,36 @@ export default function StudentModal({
     }
   }, [selectedStudent]);
 
-  const validateMarks = () => {
-    const newErrors: Record<string, string> = {};
-    const limits = {
-      posterOrganization: 10,
-      dayToDayActivity: 10,
-      contributionToWork: 5,
-      learningOutcomes: 5,
-      geoTagPhotos: 5,
-      reportOrganization: 10,
-      certificate: 5,
-      learningExplanation: 5,
-      problemIdentification: 5,
-      contributionExplanation: 10,
-      proposedSolution: 10,
-      presentationSkills: 10,
-      qnaViva: 10,
-    };
+  const marksSchema = z.object({
+    posterOrganization: z.number().min(0).max(10),
+    dayToDayActivity: z.number().min(0).max(10),
+    contributionToWork: z.number().min(0).max(5),
+    learningOutcomes: z.number().min(0).max(5),
+    geoTagPhotos: z.number().min(0).max(5),
+    reportOrganization: z.number().min(0).max(10),
+    certificate: z.number().min(0).max(5),
+    learningExplanation: z.number().min(0).max(5),
+    problemIdentification: z.number().min(0).max(5),
+    contributionExplanation: z.number().min(0).max(10),
+    proposedSolution: z.number().min(0).max(10),
+    presentationSkills: z.number().min(0).max(10),
+    qnaViva: z.number().min(0).max(10),
+  });
 
-    Object.entries(marks).forEach(([key, value]) => {
-      const typedKey = key as keyof typeof marks; // Explicitly type the key
-      if (value < 0 || value > limits[typedKey]) {
-        newErrors[key] = `Must be between 0 and ${limits[typedKey]}`;
-      }
-    });
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const validateMarks = () => {
+    const result = marksSchema.safeParse(marks);
+    if (!result.success) {
+      const newErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          newErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(newErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
   };
 
   const handlePrevTab = () => {
@@ -133,8 +138,6 @@ export default function StudentModal({
 
     const typeofmarks = option === 'mentor' ? 'internal' : 'final';
     const studentid = selectedStudent.id;
-
-    // console.log('Saving marks for student ID:', studentid, 'Type:', typeofmarks, 'Marks:', marks);
 
     try {
       const response = await fetch('/api/faculty', {
@@ -178,7 +181,6 @@ export default function StudentModal({
   };
 
   function savemarks() {
-    console.log('Marks:', marks);
     if (option === 'mentor') {
       handleSave('mentor');
     } else {
@@ -187,15 +189,14 @@ export default function StudentModal({
     setMarksToggle(!marksToggle);
   }
 
-  const handleInputChange = (field: keyof typeof marks, value: string) => {
-    // console.log('Field:', field, 'Value:', value);
-    setMarks((prevMarks) => ({
-      ...prevMarks,
-      [field]: Number(value),
-    }));
+  const handleInputChange = (field: keyof typeof marks, value: string, upperlim: number) => {
+    if (Number(value) <= upperlim && Number(value) >= 0) {
+      setMarks((prevMarks) => ({
+        ...prevMarks,
+        [field]: Number(value),
+      }));
+    }
   };
-
-  //   console.log('Marks:', marks);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-5 lg:p-10">
@@ -417,55 +418,52 @@ export default function StudentModal({
                     <div>
                       <Label>{'Poster Organization'}</Label>
                       <Input
+                        error={marks.posterOrganization < 0 || marks.posterOrganization > 10 ? true : false}
                         id="posterOrganization"
                         name="posterOrganization"
                         type="number"
                         value={marks.posterOrganization || ''}
-                        onChange={(e) => handleInputChange('posterOrganization', e.target.value)}
+                        onChange={(e) => handleInputChange('posterOrganization', e.target.value, 10)}
                         placeholder="Marks - out of 10"
                       />
                     </div>
                     <div>
                       <Label>{'Day To Day Activity'}</Label>
                       <Input
-                        id="dayToDayActivity"
-                        name="dayToDayActivity"
+                        error={marks.dayToDayActivity < 0 || marks.dayToDayActivity > 10 ? true : false}
                         type="number"
                         value={marks.dayToDayActivity || ''}
-                        onChange={(e) => handleInputChange('dayToDayActivity', e.target.value)}
+                        onChange={(e) => handleInputChange('dayToDayActivity', e.target.value, 10)}
                         placeholder="Marks - out of 10"
                       />
                     </div>
                     <div>
                       <Label>{'Contribution to Work'}</Label>
                       <Input
-                        id="contributionToWork"
-                        name="contributionToWork"
+                        error={marks.contributionToWork < 0 || marks.contributionToWork > 5 ? true : false}
                         type="number"
                         value={marks.contributionToWork || ''}
-                        onChange={(e) => handleInputChange('contributionToWork', e.target.value)}
+                        onChange={(e) => handleInputChange('contributionToWork', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                       />
                     </div>
                     <div>
                       <Label>{'Learning Outcomes'}</Label>
                       <Input
-                        id="learningOutcomes"
-                        name="learningOutcomes"
+                        error={marks.learningOutcomes < 0 || marks.learningOutcomes > 5 ? true : false}
                         type="number"
                         value={marks.learningOutcomes || ''}
-                        onChange={(e) => handleInputChange('learningOutcomes', e.target.value)}
+                        onChange={(e) => handleInputChange('learningOutcomes', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                       />
                     </div>
                     <div>
                       <Label>{'GeoTag Photos'}</Label>
                       <Input
-                        id="geoTagPhotos"
-                        name="geoTagPhotos"
+                        error={marks.geoTagPhotos < 0 || marks.geoTagPhotos > 5 ? true : false}
                         type="number"
                         value={marks.geoTagPhotos || ''}
-                        onChange={(e) => handleInputChange('geoTagPhotos', e.target.value)}
+                        onChange={(e) => handleInputChange('geoTagPhotos', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                       />
                     </div>
@@ -478,22 +476,20 @@ export default function StudentModal({
                     <div>
                       <Label>{'Report Organization'}</Label>
                       <Input
-                        id="reportOrganization"
-                        name="reportOrganization"
+                        error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
                         type="number"
                         value={marks.reportOrganization || ''}
-                        onChange={(e) => handleInputChange('reportOrganization', e.target.value)}
+                        onChange={(e) => handleInputChange('reportOrganization', e.target.value, 10)}
                         placeholder="Marks - out of 10"
                       />
                     </div>
                     <div>
                       <Label>{'Hard Copy Certificate'}</Label>
                       <Input
-                        id="certificate"
-                        name="certificate"
+                        error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
                         type="number"
                         value={marks.certificate || ''}
-                        onChange={(e) => handleInputChange('certificate', e.target.value)}
+                        onChange={(e) => handleInputChange('certificate', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                       />
                     </div>
@@ -530,45 +526,50 @@ export default function StudentModal({
                       <div>
                         <Label>{'Learning Explanation'}</Label>
                         <Input
+                          error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
                           type="number"
                           value={marks.learningExplanation || ''}
-                          onChange={(e) => handleInputChange('learningExplanation', e.target.value)}
+                          onChange={(e) => handleInputChange('learningExplanation', e.target.value, 5)}
                           placeholder="Marks - out of 5"
                         />
                       </div>
                       <div>
                         <Label>{'Problem Identification'}</Label>
                         <Input
+                          error={marks.problemIdentification < 0 || marks.problemIdentification > 5}
                           type="number"
                           value={marks.problemIdentification || ''}
-                          onChange={(e) => handleInputChange('problemIdentification', e.target.value)}
+                          onChange={(e) => handleInputChange('problemIdentification', e.target.value, 5)}
                           placeholder="Marks - out of 5"
                         />
                       </div>
                       <div>
                         <Label>{'Contribution Explanation'}</Label>
                         <Input
+                          error={marks.contributionExplanation < 0 || marks.contributionExplanation > 10}
                           type="number"
                           value={marks.contributionExplanation || ''}
-                          onChange={(e) => handleInputChange('contributionExplanation', e.target.value)}
+                          onChange={(e) => handleInputChange('contributionExplanation', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                         />
                       </div>
                       <div>
                         <Label>{'Proposed Solution'}</Label>
                         <Input
+                          error={marks.proposedSolution < 0 || marks.proposedSolution > 10}
                           type="number"
                           value={marks.proposedSolution || ''}
-                          onChange={(e) => handleInputChange('proposedSolution', e.target.value)}
+                          onChange={(e) => handleInputChange('proposedSolution', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                         />
                       </div>
                       <div>
                         <Label>{'Presenatation Skills'}</Label>
                         <Input
+                          error={marks.presentationSkills < 0 || marks.presentationSkills > 10}
                           type="number"
                           value={marks.presentationSkills || ''}
-                          onChange={(e) => handleInputChange('presentationSkills', e.target.value)}
+                          onChange={(e) => handleInputChange('presentationSkills', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                         />
                       </div>
@@ -581,9 +582,10 @@ export default function StudentModal({
                       <div>
                         <Label>{'QnA Viva'}</Label>
                         <Input
+                          error={marks.qnaViva < 0 || marks.qnaViva > 10}
                           type="number"
                           value={marks.qnaViva || ''}
-                          onChange={(e) => handleInputChange('qnaViva', e.target.value)}
+                          onChange={(e) => handleInputChange('qnaViva', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                         />
                       </div>
