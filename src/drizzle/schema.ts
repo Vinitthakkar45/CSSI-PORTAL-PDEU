@@ -113,6 +113,16 @@ export const evaluatorStudent = pgTable('evaluator_student', {
     .references(() => student.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
 });
 
+export const coordinatorFaculty = pgTable('coordinator_faculty', {
+  id: serial('id').primaryKey(),
+  coordinatorId: integer('coordinator_id')
+    .notNull()
+    .references(() => faculty.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
+  facultyId: integer('faculty_id')
+    .notNull()
+    .references(() => faculty.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
+});
+
 export const stage = pgTable('stage', {
   id: serial('id').primaryKey(),
   year: integer('year').notNull(),
@@ -129,5 +139,7 @@ export type InsertMentorStudent = typeof mentorStudent.$inferInsert;
 export type SelectMentorStudent = typeof mentorStudent.$inferSelect;
 export type InsertEvaluatorStudent = typeof evaluatorStudent.$inferInsert;
 export type SelectEvaluatorStudent = typeof evaluatorStudent.$inferSelect;
+export type InsertCoordinatorFaculty = typeof coordinatorFaculty.$inferInsert;
+export type SelectCoordinatorFaculty = typeof coordinatorFaculty.$inferSelect;
 export type InsertStage = typeof stage.$inferInsert;
 export type SelectStage = typeof stage.$inferSelect;

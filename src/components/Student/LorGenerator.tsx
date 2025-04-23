@@ -39,7 +39,7 @@ const MyPDF = ({ name, branch }: { name: string; branch: string }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <Image src="/assets/images/lor-preview.png" alt="LOR Preview" width={200} height={200} />
+        <Image src="/topLogo.png" />
         <Text style={styles.date}>Date : April 1, {year}</Text>
         <Text style={styles.heading}> Letter of Recommendation</Text>
         <Text style={styles.body}>
@@ -59,7 +59,7 @@ const MyPDF = ({ name, branch }: { name: string; branch: string }) => {
           required to undergo the internship.
         </Text>
         <Text style={styles.body}>Sincerely,</Text>
-        <Image src={previewUrl} alt="Generated LOR Preview" width={200} height={200} />
+        <Image src="/footer.png" style={styles.footer} />
       </Page>
     </Document>
   );
