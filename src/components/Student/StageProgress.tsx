@@ -18,17 +18,17 @@ const StageProgress: React.FC<StageProgressProps> = ({
   const stageLabels = ['Select', 'Internship', 'Uploads', 'Grade'];
 
   return (
-    <div className="w-full lg:mb-4 mx-auto">
+    <div className="w-full lg:mb-4 mb-2 mx-auto">
       <div className="flex items-center justify-between gap-20">
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <h3 className="text-theme-xl font-normal text-gray-800 dark:text-white/90">Internship Progress</h3>
             <div className="flex gap-2">
-              <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-500">
+              {/* <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-500">
                 {currentStage < 5 ? `Stage ${currentStage} of ${totalStages}` : 'Completed'}
-              </span>
+              </span> */}
               {maxStageUnlocked < totalStages && (
-                <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-500 dark:bg-amber-500/20 dark:text-amber-600">
+                <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-500">
                   {maxStageUnlocked} Unlocked
                 </span>
               )}
