@@ -1,140 +1,66 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ComponentCard from '@/components/Home/common/ComponentCard';
 import Form from '@/components/Home/form/Form';
 import Input from '@/components/Home/form/input/InputField';
 import Button from '@/components/Home/ui/button/Button';
-import { useSession } from 'next-auth/react';
-import { SelectStudent } from '@/drizzle/schema';
-// import { toast } from 'sonner';
+import { UserDetails, NGODetails, ProjectDetails } from '@/types/student';
 
-type UserDetails = {
-  id: number;
-  email: string;
-  role: string;
-  profileData: SelectStudent | null;
+type NGOFormProps = {
+  onComplete: (formData: NGODetails & ProjectDetails) => Promise<Record<string, string> | null>;
+  userData: UserDetails | null;
 };
 
-export default function NGODetailsForm({
-  onComplete,
-  userData,
-}: {
-  onComplete: () => void;
-  userData: UserDetails | null;
-}) {
-  const [formData, setFormData] = useState({
-    ngoName: '',
-    ngoCity: '',
-    ngoDistrict: '',
-    ngoState: '',
-    ngoCountry: '',
-    ngoAddress: '',
-    ngoNatureOfWork: '',
-    ngoEmail: '',
-    ngoPhone: '',
+export default function NGODetailsForm({ onComplete, userData }: NGOFormProps) {
+  const [formData, setFormData] = useState<NGODetails & ProjectDetails>({
+    ngoName: userData?.profileData?.ngoName || '',
+    ngoCity: userData?.profileData?.ngoCity || '',
+    ngoDistrict: userData?.profileData?.ngoDistrict || '',
+    ngoState: userData?.profileData?.ngoState || '',
+    ngoCountry: userData?.profileData?.ngoCountry || '',
+    ngoAddress: userData?.profileData?.ngoAddress || '',
+    ngoNatureOfWork: userData?.profileData?.ngoNatureOfWork || '',
+    ngoEmail: userData?.profileData?.ngoEmail || '',
+    ngoPhone: userData?.profileData?.ngoPhone || '',
+    problemDefinition: userData?.profileData?.problemDefinition || '',
+    proposedSolution: userData?.profileData?.proposedSolution || '',
+    ngoChosen: true,
   });
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const { data: session } = useSession();
-  const userId = session?.user?.id;
 
-  useEffect(() => {
-    if (!userId || !userData) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const localStorageKey = `ngoDetails_${userId}`;
-      const storedData = localStorage.getItem(localStorageKey);
-
-      if (storedData) {
-        const parsedData = JSON.parse(storedData);
-        setFormData(parsedData);
-      } else if (userData.profileData) {
-        // Only use profile data if no localStorage data exists
-        const profile = userData.profileData;
-        const newFormData = {
-          ngoName: profile.ngoName || '',
-          ngoCity: profile.ngoCity || '',
-          ngoDistrict: profile.ngoDistrict || '',
-          ngoState: profile.ngoState || '',
-          ngoCountry: profile.ngoCountry || '',
-          ngoAddress: profile.ngoAddress || '',
-          ngoNatureOfWork: profile.ngoNatureOfWork || '',
-          ngoEmail: profile.ngoEmail || '',
-          ngoPhone: profile.ngoPhone || '',
-        };
-
-        setFormData(newFormData);
-        localStorage.setItem(localStorageKey, JSON.stringify(newFormData));
-      }
-    } catch (err) {
-      console.error('Error loading form data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId, userData]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => {
-      const newData = { ...prev, [name]: value };
-
-      // Update localStorage as user types
-      if (userId) {
-        localStorage.setItem(`ngoDetails_${userId}`, JSON.stringify(newData));
-      }
-
-      return newData;
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError('');
-
-    const ngoData = {
-      ngoName: formData.ngoName,
-      ngoCity: formData.ngoCity,
-      ngoDistrict: formData.ngoDistrict,
-      ngoState: formData.ngoState,
-      ngoCountry: formData.ngoCountry,
-      ngoAddress: formData.ngoAddress,
-      ngoNatureOfWork: formData.ngoNatureOfWork,
-      ngoEmail: formData.ngoEmail,
-      ngoPhone: formData.ngoPhone,
-    };
 
     try {
-      const response = await fetch('/api/student/update-ngo', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          ngoData,
-        }),
-      });
+      const validationErrors = await onComplete(formData);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `API responded with status: ${response.status}`);
+      if (validationErrors) {
+        setErrors(validationErrors);
+
+        const firstErrorField = Object.keys(validationErrors)[0];
+        const element = document.getElementsByName(firstErrorField)[0];
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       }
-
-      await response.json();
-      // toast.success("NGO details saved successfully");
-
-      onComplete();
-    } catch (err) {
-      console.error('Submission error:', err);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      // toast.error("Failed to save NGO details");
     } finally {
       setIsSubmitting(false);
     }
@@ -142,114 +68,148 @@ export default function NGODetailsForm({
 
   return (
     <ComponentCard title="NGO Details">
-      {isLoading ? (
-        <div className="flex justify-center items-center py-6">
-          <div className="animate-pulse">Loading form data...</div>
-        </div>
-      ) : (
-        <Form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
-            <div className="w-full">
-              <Input
-                type="text"
-                name="ngoName"
-                value={formData.ngoName}
-                onChange={handleChange}
-                placeholder="Enter NGO name"
-                required
-              />
-            </div>
-            <div className="w-full">
-              <Input
-                type="text"
-                name="ngoCity"
-                value={formData.ngoCity}
-                onChange={handleChange}
-                placeholder="Enter city"
-                required
-              />
-            </div>
-            <div className="w-full">
-              <Input
-                type="text"
-                name="ngoDistrict"
-                value={formData.ngoDistrict}
-                onChange={handleChange}
-                placeholder="Enter district"
-                required
-              />
-            </div>
-            <div className="w-full">
-              <Input
-                type="text"
-                name="ngoState"
-                value={formData.ngoState}
-                onChange={handleChange}
-                placeholder="Enter state"
-                required
-              />
-            </div>
-            <div className="w-full">
-              <Input
-                type="text"
-                name="ngoCountry"
-                value={formData.ngoCountry}
-                onChange={handleChange}
-                placeholder="Enter country"
-                required
-              />
-            </div>
-            <div className="w-full">
-              <Input
-                type="text"
-                name="ngoNatureOfWork"
-                value={formData.ngoNatureOfWork}
-                onChange={handleChange}
-                placeholder="Describe nature of work"
-                required
-              />
-            </div>
-            <div className="w-full">
-              <Input
-                type="email"
-                name="ngoEmail"
-                value={formData.ngoEmail}
-                onChange={handleChange}
-                placeholder="Enter NGO email"
-                required
-              />
-            </div>
-            <div className="w-full">
-              <Input
-                type="tel"
-                name="ngoPhone"
-                value={formData.ngoPhone}
-                onChange={handleChange}
-                placeholder="Enter NGO phone"
-                required
-              />
-            </div>
-            <div className="w-full md:col-span-2">
-              <Input
-                type="text"
-                name="ngoAddress"
-                value={formData.ngoAddress}
-                onChange={handleChange}
-                placeholder="Enter complete address"
-                required
-              />
-            </div>
-
-            {error && <div className="col-span-1 md:col-span-2 text-red-500 text-sm">{error}</div>}
-
-            <div className="col-span-1 md:col-span-2">
-              <Button className="w-full" size="sm" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Save & Continue'}
-              </Button>
-            </div>
+      <Form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
+          <div className="w-full">
+            <Input
+              type="text"
+              name="ngoName"
+              value={formData.ngoName}
+              onChange={handleChange}
+              placeholder="Enter NGO name"
+              error={errors.ngoName}
+              required
+            />
+            {errors.ngoName && <span className="text-red-500 text-sm">{errors.ngoName}</span>}
           </div>
-        </Form>
-      )}
+          <div className="w-full">
+            <Input
+              type="text"
+              name="ngoCity"
+              value={formData.ngoCity}
+              onChange={handleChange}
+              placeholder="Enter city"
+              error={errors.ngoCity}
+              required
+            />
+            {errors.ngoCity && <span className="text-red-500 text-sm">{errors.ngoCity}</span>}
+          </div>
+          <div className="w-full">
+            <Input
+              type="text"
+              name="ngoDistrict"
+              value={formData.ngoDistrict}
+              onChange={handleChange}
+              placeholder="Enter district"
+              error={errors.ngoDistrict}
+              required
+            />
+            {errors.ngoDistrict && <span className="text-red-500 text-sm">{errors.ngoDistrict}</span>}
+          </div>
+          <div className="w-full">
+            <Input
+              type="text"
+              name="ngoState"
+              value={formData.ngoState}
+              onChange={handleChange}
+              placeholder="Enter state"
+              error={errors.ngoState}
+              required
+            />
+            {errors.ngoState && <span className="text-red-500 text-sm">{errors.ngoState}</span>}
+          </div>
+          <div className="w-full">
+            <Input
+              type="text"
+              name="ngoCountry"
+              value={formData.ngoCountry}
+              onChange={handleChange}
+              placeholder="Enter country"
+              error={errors.ngoCountry}
+              required
+            />
+            {errors.ngoCountry && <span className="text-red-500 text-sm">{errors.ngoCountry}</span>}
+          </div>
+          <div className="w-full">
+            <Input
+              type="text"
+              name="ngoNatureOfWork"
+              value={formData.ngoNatureOfWork}
+              onChange={handleChange}
+              placeholder="Describe nature of work"
+              error={errors.ngoNatureOfWork}
+              required
+            />
+            {errors.ngoNatureOfWork && <span className="text-red-500 text-sm">{errors.ngoNatureOfWork}</span>}
+          </div>
+          <div className="w-full">
+            <Input
+              type="email"
+              name="ngoEmail"
+              value={formData.ngoEmail}
+              onChange={handleChange}
+              placeholder="Enter NGO email"
+              error={errors.ngoEmail}
+              required
+            />
+            {errors.ngoEmail && <span className="text-red-500 text-sm">{errors.ngoEmail}</span>}
+          </div>
+          <div className="w-full">
+            <Input
+              type="tel"
+              name="ngoPhone"
+              value={formData.ngoPhone}
+              onChange={handleChange}
+              placeholder="Enter NGO phone"
+              error={errors.ngoPhone}
+              required
+            />
+            {errors.ngoPhone && <span className="text-red-500 text-sm">{errors.ngoPhone}</span>}
+          </div>
+          <div className="w-full md:col-span-2">
+            <Input
+              type="text"
+              name="ngoAddress"
+              value={formData.ngoAddress}
+              onChange={handleChange}
+              placeholder="Enter complete address"
+              error={errors.ngoAddress}
+              required
+            />
+            {errors.ngoAddress && <span className="text-red-500 text-sm">{errors.ngoAddress}</span>}
+          </div>
+          <div className="w-full md:col-span-2">
+            <Input
+              type="text"
+              name="problemDefinition"
+              value={formData.problemDefinition}
+              onChange={handleChange}
+              placeholder="Enter problem definition"
+              error={errors.problemDefinition}
+              required
+            />
+            {errors.problemDefinition && <span className="text-red-500 text-sm">{errors.problemDefinition}</span>}
+          </div>
+          <div className="w-full md:col-span-2">
+            <Input
+              type="text"
+              name="proposedSolution"
+              value={formData.proposedSolution}
+              onChange={handleChange}
+              placeholder="Enter proposed solution"
+              error={errors.proposedSolution}
+              required
+            />
+            {errors.proposedSolution && <span className="text-red-500 text-sm">{errors.proposedSolution}</span>}
+          </div>
+
+          <div className="col-span-1 md:col-span-2">
+            <Button className="w-full" size="sm" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Save & Continue'}
+            </Button>
+          </div>
+        </div>
+      </Form>
     </ComponentCard>
   );
 }

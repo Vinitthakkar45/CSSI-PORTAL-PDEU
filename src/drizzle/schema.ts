@@ -1,8 +1,6 @@
 import { sql } from 'drizzle-orm';
-import { int } from 'drizzle-orm/mysql-core';
 import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 import { boolean } from 'drizzle-orm/pg-core';
-import { Presentation } from 'lucide-react';
 
 export const user = pgTable('user', {
   id: serial('id').primaryKey(),
@@ -52,6 +50,8 @@ export const student = pgTable('student', {
   certificate: text('certificate'),
   poster: text('poster'),
   offerLetter: text('offerletter'),
+  week_one_photo: text('week_one_photo'),
+  week_two_photo: text('week_two_photo'),
 
   // Faculty Mentor Evaluation Fields
 
