@@ -20,7 +20,8 @@ export default function TableModal({ selectedStudent, isOpen, onClose, onCloseCr
   const [certiUrl, setCertiUrl] = useState();
   const [posterUrl, setPosterUrl] = useState();
   const [offerUrl, setOfferUrl] = useState();
-
+  const [mentorName, setMentorName] = useState();
+  const [evalName, setEvalName] = useState();
   useEffect(() => {
     async function fetchPdfUrls() {
       const userId = selectedStudent.userId;
@@ -30,8 +31,19 @@ export default function TableModal({ selectedStudent, isOpen, onClose, onCloseCr
       setCertiUrl(data.urls.certificate);
       setPosterUrl(data.urls.poster);
       setOfferUrl(data.urls.offerLetter);
-      // console.log(data);
     }
+    async function fetchNames() {
+      const id = selectedStudent.id;
+      const res = await fetch('/api/mentorandevaluator', {
+        method: 'POST',
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      setMentorName(data.mentorname.name);
+      setEvalName(data.evalname.name);
+    }
+    fetchPdfUrls();
+    fetchNames();
 
     fetchPdfUrls();
   }, []);
@@ -208,7 +220,19 @@ export default function TableModal({ selectedStudent, isOpen, onClose, onCloseCr
               disabled
             />
           </div>
-
+          <div className="mt-6 mb-4">
+            <h5 className="mb-4 text-md font-medium text-gray-800 dark:text-white/90">Faculty Information</h5>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <Label>Mentor</Label>
+                <Input type="text" value={mentorName || 'Not Assigned'} disabled />
+              </div>
+              <div>
+                <Label>Evaluator</Label>
+                <Input type="text" value={evalName || 'Not Assigned'} disabled />
+              </div>
+            </div>
+          </div>
           <div className="flex items-center justify-end w-full gap-3 mt-6">
             <Button size="sm" variant="outline" onClick={onClose}>
               Close
