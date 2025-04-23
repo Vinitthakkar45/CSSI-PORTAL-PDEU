@@ -4,7 +4,6 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
 import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
-import { countEvaluators, countMentors } from './utils/countrecords';
 import FacultyTableModal from './FacultyTableModal';
 
 type FacultyWithUser = {
@@ -23,6 +22,9 @@ type AssignmentItem = {
 
 const FacultyTable = () => {
   const [faculties, setFaculties] = useState<FacultyWithUser[]>([]);
+  const [filteredFaculties, setFilteredFaculties] = useState<FacultyWithUser[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
   const [hasMentors, setHasMentors] = useState(false);
@@ -38,6 +40,7 @@ const FacultyTable = () => {
         const res = await fetch('/api/admin/faculty');
         const data = await res.json();
         setFaculties(data);
+        setFilteredFaculties(data); // initialize with all
       } catch (error) {
         console.error('Error fetching faculty data:', error);
       } finally {
@@ -63,7 +66,6 @@ const FacultyTable = () => {
         if (mentorCount > 0 || evaluatorCount > 0) {
           const res = await fetch('/api/admin/checkassignment');
           const data = await res.json();
-          console.log(data);
           setAssignments(data);
         }
 
@@ -80,7 +82,6 @@ const FacultyTable = () => {
   const getMentorStatus = (facultyId: number) => {
     if (!assignmentsLoaded) return 'Loading...';
 
-    // If no mentors exist yet, everything is pending
     if (!hasMentors) return 'Pending';
 
     const assignment = assignments.find((item) => item.facultyId === facultyId);
@@ -90,7 +91,6 @@ const FacultyTable = () => {
   const getEvaluatorStatus = (facultyId: number) => {
     if (!assignmentsLoaded) return 'Loading...';
 
-    // If no evaluators exist yet, everything is pending
     if (!hasEvaluators) return 'Pending';
 
     const assignment = assignments.find((item) => item.facultyId === facultyId);
@@ -105,6 +105,32 @@ const FacultyTable = () => {
     setSelectedFaculty(item);
     setShowModal(true);
   };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Filter faculties based on search term and department
+  useEffect(() => {
+    let result = faculties;
+
+    // Apply department filter
+    if (selectedDepartment !== 'ALL') {
+      result = result.filter((item) => item.faculty.department === selectedDepartment);
+    }
+
+    // Apply search term filter
+    if (searchTerm.trim() !== '') {
+      const term = searchTerm.toLowerCase().trim();
+      result = result.filter(
+        (faculty) =>
+          (faculty.faculty.name && faculty.faculty.name.toLowerCase().includes(term)) ||
+          (faculty.user.email && faculty.user.email.toLowerCase().includes(term))
+      );
+    }
+
+    setFilteredFaculties(result);
+  }, [searchTerm, selectedDepartment, faculties]);
 
   if (loading) {
     return <div className="p-4 text-center">Loading faculty data...</div>;
@@ -124,6 +150,32 @@ const FacultyTable = () => {
         <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Faculty Details</h3>
+          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="w-full sm:w-auto mb-2 sm:mb-0">
+              <input
+                type="text"
+                placeholder="Search by name or email"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white w-full"
+              />
+            </div>
+
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Department:</label>
+              <select
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
+                className="rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white"
+              >
+                <option value="ALL">All</option>
+                <option value="CSE">CSE</option>
+                <option value="CIVIL">CIVIL</option>
+                <option value="ECE">ECE</option>
+                <option value="ICT">ICT</option>
+              </select>
+            </div>
           </div>
         </div>
         <div className="max-w-full overflow-x-auto">
@@ -166,12 +218,6 @@ const FacultyTable = () => {
                 >
                   Available Time Slots
                 </TableCell>
-                {/* <TableCell
-                isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
-                >
-                Role
-                </TableCell> */}
                 <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
@@ -187,57 +233,63 @@ const FacultyTable = () => {
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {faculties.map((item) => (
-                <TableRow
-                  key={item.faculty.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
-                  onClick={() => {
-                    handleModalopen(item);
-                  }}
-                >
-                  <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                    {item.faculty.id}
-                  </TableCell>
-                  <TableCell className="py-3 px-4 truncate">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                          {item.faculty.name}
-                        </p>
+              {filteredFaculties.length > 0 ? (
+                filteredFaculties.map((item) => (
+                  <TableRow
+                    key={item.faculty.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
+                    onClick={() => {
+                      handleModalopen(item);
+                    }}
+                  >
+                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                      {item.faculty.id}
+                    </TableCell>
+                    <TableCell className="py-3 px-4 truncate">
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {item.faculty.name}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                    {item.user.email}
-                  </TableCell>
-                  <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                    {item.faculty.department || 'Not Assigned'}
-                  </TableCell>
-                  <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                    {item.faculty.sitting || 'Not Assigned'}
-                  </TableCell>
-                  <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                    {item.faculty.freeTimeSlots && item.faculty.freeTimeSlots.length > 0
-                      ? item.faculty.freeTimeSlots.join(', ')
-                      : 'No time slots available'}
-                  </TableCell>
-                  {/* <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  <Badge size="sm" color={item.user.role === 'admin' ? 'success' : 'warning'}>
-                  {item.user.role === 'admin' ? 'Admin' : 'Faculty'}
-                  </Badge>
-                  </TableCell> */}
-                  <TableCell className="py-3  px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                    <Badge size="sm" color={getMentorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}>
-                      {getMentorStatus(item.faculty.id)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                    <Badge size="sm" color={getEvaluatorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}>
-                      {getEvaluatorStatus(item.faculty.id)}
-                    </Badge>
+                    </TableCell>
+                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                      {item.user.email}
+                    </TableCell>
+                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                      {item.faculty.department || 'Not Assigned'}
+                    </TableCell>
+                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                      {item.faculty.sitting || 'Not Assigned'}
+                    </TableCell>
+                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                      {item.faculty.freeTimeSlots && item.faculty.freeTimeSlots.length > 0
+                        ? item.faculty.freeTimeSlots.join(', ')
+                        : 'No time slots available'}
+                    </TableCell>
+                    <TableCell className="py-3  px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                      <Badge size="sm" color={getMentorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}>
+                        {getMentorStatus(item.faculty.id)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                      <Badge
+                        size="sm"
+                        color={getEvaluatorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}
+                      >
+                        {getEvaluatorStatus(item.faculty.id)}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} className="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
+                    No faculty found matching your search criteria
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </div>
