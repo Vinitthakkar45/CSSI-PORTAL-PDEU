@@ -5,6 +5,7 @@ import Badge from '../Home/ui/badge/Badge';
 import { SelectStudent } from '@/drizzle/schema';
 import TableModal from '@/components/Coordinator/StudentTableModal';
 import { useSession } from 'next-auth/react';
+import Button from '../Home/ui/button/Button';
 
 type StudentWithUser = {
   student: SelectStudent;
@@ -24,6 +25,16 @@ const StudentTable = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<StudentWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  // Pagination state
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const itemsPerPage = 6;
+
+  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+
+  const paginatedStudents = filteredStudents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   useEffect(() => {
     async function fetchStudents() {
@@ -86,7 +97,9 @@ const StudentTable = () => {
   useEffect(() => {
     handleFilter();
   }, [searchTerm, selectedDepartment]);
-
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredStudents]);
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
@@ -244,6 +257,31 @@ const StudentTable = () => {
               )}
             </TableBody>
           </Table>
+        </div>
+        {/* Pagination Controls */}
+
+        <div className="flex justify-between items-center mt-4">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          >
+            Previous
+          </Button>
+
+          <span className="text-sm text-gray-600 dark:text-gray-300">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          >
+            Next
+          </Button>
         </div>
       </div>
     </>
