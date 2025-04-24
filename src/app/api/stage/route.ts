@@ -15,7 +15,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
     const date = new Date();
     const year = date.getFullYear();

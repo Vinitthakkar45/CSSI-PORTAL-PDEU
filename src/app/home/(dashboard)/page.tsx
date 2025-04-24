@@ -11,7 +11,7 @@ import AdminDashboard from '@/components/Admin/Dashboard';
 import StudentDashboard from '@/components/Student/Dashboard';
 import FacultyDashboard from '@/components/Faculty/Dashboard';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/api/auth/authOptions';
 
 export const metadata: Metadata = {
   title: 'Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template',
