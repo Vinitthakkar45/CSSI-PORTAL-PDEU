@@ -30,6 +30,8 @@ export default async function Dashboard() {
     case 'student':
       dashboardContent = <StudentDashboard />;
       break;
+    default:
+      dashboardContent = <div>Loading or Unauthorized</div>; // Handle cases where role is missing
   }
 
   return <>{dashboardContent}</>;

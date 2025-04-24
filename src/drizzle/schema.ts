@@ -9,6 +9,12 @@ export const user = pgTable('user', {
   role: text('role').notNull(),
 });
 
+export const sessionuser = pgTable('user', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  role: text('role').notNull(),
+});
+
 export const student = pgTable('student', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
@@ -143,3 +149,4 @@ export type InsertCoordinatorFaculty = typeof coordinatorFaculty.$inferInsert;
 export type SelectCoordinatorFaculty = typeof coordinatorFaculty.$inferSelect;
 export type InsertStage = typeof stage.$inferInsert;
 export type SelectStage = typeof stage.$inferSelect;
+export type SessionUser = typeof sessionuser.$inferSelect;

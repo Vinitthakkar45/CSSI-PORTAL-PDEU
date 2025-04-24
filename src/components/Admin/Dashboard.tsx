@@ -7,6 +7,7 @@ import StageCard from './StageCard';
 import { stages } from './utils/stages';
 import Button from '../Home/ui/button/Button';
 import { InfoModal } from './ConfirmationModals';
+import LoadingOverlay from '../LoadingOverlay';
 
 type StageStatus = 'locked' | 'current' | 'completed';
 
@@ -231,6 +232,8 @@ const Dashboard = () => {
 
   return (
     <>
+      {/* {isLoading && <LoadingOverlay />} */}
+
       {isLoading && <LoadingOverlay />}
       {showModal && (
         <InfoModal
@@ -292,12 +295,12 @@ const Dashboard = () => {
   );
 };
 
-const LoadingOverlay = () => {
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="text-white text-lg font-semibold animate-pulse">Loading...</div>
-    </div>
-  );
-};
+// const LoadingOverlay = () => {
+//   return (
+//     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+//       <div className="text-white text-lg font-semibold animate-pulse">Loading...</div>
+//     </div>
+//   );
+// };
 
 export default Dashboard;

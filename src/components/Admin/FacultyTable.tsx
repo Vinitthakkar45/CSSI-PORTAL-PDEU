@@ -5,6 +5,7 @@ import Badge from '../Home/ui/badge/Badge';
 import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import FacultyTableModal from './FacultyTableModal';
+import LoadingOverlay from '../LoadingOverlay';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -138,6 +139,7 @@ const FacultyTable = () => {
 
   return (
     <>
+      {loading && <LoadingOverlay />}
       {showModal && selectedFaculty && (
         <FacultyTableModal
           selectedFaculty={selectedFaculty.faculty}
