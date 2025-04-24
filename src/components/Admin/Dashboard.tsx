@@ -232,6 +232,8 @@ const Dashboard = () => {
 
   return (
     <>
+      {/* {isLoading && <LoadingOverlay />} */}
+
       {isLoading && <LoadingOverlay />}
       {showModal && (
         <InfoModal

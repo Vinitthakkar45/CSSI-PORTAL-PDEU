@@ -1,29 +1,77 @@
 'use client';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import { signOut } from 'next-auth/react';
 
+type SessionUserBasic = {
+  role: 'admin' | 'faculty' | 'student';
+  info: {
+    name: string;
+    email: string;
+    profile_image?: string;
+  };
+};
+
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<SessionUserBasic | null>(null);
 
-  function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch('/api/user/getUserBySession');
+        if (!res.ok) throw new Error('Failed to fetch user');
+        const data = (await res.json()) as SessionUserBasic;
+        setUser({
+          role: data.role,
+          info: {
+            name: data.role === 'admin' ? 'Admin' : data.info.name,
+            email: data.info.email,
+            profile_image: data.info.profile_image,
+          },
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    fetchUser();
+  }, []);
+
+  const toggleDropdown = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    setIsOpen((prev) => !prev);
-  }
+    setIsOpen((v) => !v);
+  };
+  const closeDropdown = () => setIsOpen(false);
 
-  function closeDropdown() {
-    setIsOpen(false);
-  }
   return (
     <div className="relative">
       <button onClick={toggleDropdown} className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle">
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <Image width={44} height={44} src="/images/user/owner.jpg" alt="User" />
+          {user?.info.profile_image ? (
+            <Image width={44} height={44} src={user.info.profile_image} alt="avatar" />
+          ) : (
+            <>
+              <Image
+                width={44}
+                height={44}
+                src="/images/user/DefaultProfile_Light.png"
+                alt="avatar"
+                className="dark:hidden"
+              />
+              <Image
+                width={44}
+                height={44}
+                src="/images/user/DefaultProfile_dark.png"
+                alt="avatar"
+                className="hidden dark:block"
+              />
+            </>
+          )}
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
+        <span className="block mr-1 font-medium text-theme-sm">{user?.info.name}</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
@@ -51,8 +99,10 @@ export default function UserDropdown() {
         className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
         <div>
-          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">Musharof Chowdhury</span>
-          <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">randomuser@pimjo.com</span>
+          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
+            {user?.info?.name ? user?.info?.name : user?.role}
+          </span>
+          <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">{user?.info?.email}</span>
         </div>
 
         <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
@@ -110,7 +160,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              href="/home/profile"
+              href="/contact"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <svg

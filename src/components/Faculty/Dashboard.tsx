@@ -6,45 +6,9 @@ import TableList from './Table/TableList';
 import StageProgress from './Stages/StageProgress';
 import StageCard from './Stages/StageCard';
 import { stages, Stage } from './utils/stages';
+import { SelectStudent } from '@/drizzle/schema';
 
 type StageStatus = 'locked' | 'current' | 'completed';
-
-interface Student {
-  id: number;
-  rollNumber: string;
-  department: string;
-  name: string;
-  email: string;
-  divison: string;
-  groupNumber: string;
-  image: string;
-  contactNumber: string;
-
-  // NGO details
-  ngoName: string | null;
-  ngoCity: string | null;
-  ngoDistrict: string | null;
-  ngoState: string | null;
-  ngoCountry: string | null;
-  ngoAddress: string | null;
-  ngoNatureOfWork: string | null;
-  ngoEmail: string | null;
-  ngoPhone: string | null;
-
-  //Project Details
-  problemDefinition: string | null;
-  proposedSolution: string | null;
-
-  // Status Fields
-  ngoChosen: boolean;
-  stage: number;
-  report: string;
-  certificate: string;
-  poster: string;
-  offerLetter: string;
-  mentorMarks: number;
-  evaluatorMarks: number;
-}
 
 const Dashboard = () => {
   const { status } = useSession({
@@ -55,8 +19,8 @@ const Dashboard = () => {
   });
   const [currentStage, setCurrentStage] = useState<number>(1);
 
-  const [mentoredStudents, setMentoredStudents] = useState<Student[]>([]);
-  const [evaluatedStudents, setEvaluatedStudents] = useState<Student[]>([]);
+  const [mentoredStudents, setMentoredStudents] = useState<SelectStudent[]>([]);
+  const [evaluatedStudents, setEvaluatedStudents] = useState<SelectStudent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedToggle, setSelectedToggle] = useState<'mentor' | 'evaluator'>('mentor'); // Toggler state

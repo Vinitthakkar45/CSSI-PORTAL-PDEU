@@ -1,49 +1,193 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useModal } from '@/hooks/useModal';
 import { Modal } from '../ui/modal';
 import Button from '../ui/button/Button';
 import Input from '../form/input/InputField';
 import Label from '../form/Label';
+import { SessionUser, SelectFaculty, SelectStudent } from '@/drizzle/schema';
+
+type FacultyWithEmail = SelectFaculty & { email: string };
+
+type AdminUser = { role: 'admin'; info: SessionUser };
+type FacultyUser = { role: 'faculty'; info: FacultyWithEmail };
+type StudentUser = { role: 'student'; info: SelectStudent };
 
 export default function UserInfoCard() {
   const { isOpen, openModal, closeModal } = useModal();
+  const [adminInfo, setAdminInfo] = useState<AdminUser | null>(null);
+  const [facultyInfo, setFacultyInfo] = useState<FacultyUser | null>(null);
+  const [studentInfo, setStudentInfo] = useState<StudentUser | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch('/api/user/getUserBySession');
+        if (!res.ok) throw new Error('Failed to fetch user');
+        const data = await res.json();
+        setRole(data.role);
+        if (data.role === 'admin') {
+          setAdminInfo(data as AdminUser);
+        } else if (data.role === 'faculty') {
+          setFacultyInfo(data as FacultyUser);
+        } else {
+          setStudentInfo(data as StudentUser);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUser();
+  }, []);
+
   const handleSave = () => {
     // Handle save logic here
     console.log('Saving changes...');
     closeModal();
   };
+
+  if (loading) {
+    return (
+      <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+        <div className="flex justify-center py-8">
+          <div className="text-center text-gray-500 dark:text-gray-400">Loading user information...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+        <div className="flex justify-center py-8">
+          <div className="text-center text-red-500">Error: {error}</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if we have any user data
+  const hasUserData = adminInfo !== null || facultyInfo !== null || studentInfo !== null;
+
+  if (!hasUserData) {
+    return (
+      <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+        <div className="flex justify-center py-8">
+          <div className="text-center text-gray-500 dark:text-gray-400">No user information available</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">Personal Information</h4>
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
-            <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">First Name</p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">Musharof</p>
-            </div>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-7 2xl:gap-x-32">
+            {role === 'admin' && adminInfo && (
+              <>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Email</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {adminInfo.info?.email || 'Not provided'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Bio</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">Admin</p>
+                </div>
+              </>
+            )}
 
-            <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Last Name</p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">Chowdhury</p>
-            </div>
+            {role === 'faculty' && facultyInfo && (
+              <>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Name</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {facultyInfo.info?.name || 'Not provided'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Email</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {facultyInfo.info?.email || 'Not provided'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Department</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {facultyInfo.info?.department || 'Not specified'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Seating</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {facultyInfo.info?.sitting || 'Not specified'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Free Time Slots</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {Array.isArray(facultyInfo.info?.freeTimeSlots) && facultyInfo.info?.freeTimeSlots.length > 0
+                      ? facultyInfo.info.freeTimeSlots.join(', ')
+                      : 'Not specified'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Bio</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">Faculty</p>
+                </div>
+              </>
+            )}
 
-            <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Email address</p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">randomuser@pimjo.com</p>
-            </div>
+            {role === 'student' && studentInfo && (
+              <>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Name</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {studentInfo.info?.name || 'Not provided'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Email</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {studentInfo.info?.email || 'Not provided'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Roll Number</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {studentInfo.info?.rollNumber || 'Not provided'}
+                  </p>
+                </div>
 
-            <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Phone</p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">+09 363 398 46</p>
-            </div>
-
-            <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Bio</p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">Team Manager</p>
-            </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Division</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {studentInfo.info?.division || 'Not specified'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Group</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {studentInfo.info?.groupNumber || 'Not specified'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Contact</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {studentInfo.info?.contactNumber || 'Not provided'}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -80,63 +224,97 @@ export default function UserInfoCard() {
           </div>
           <form className="flex flex-col">
             <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-              <div>
-                <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">Social Links</h5>
+              {role === 'admin' && adminInfo && (
+                <div className="mt-7">
+                  <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
+                    Admin Information
+                  </h5>
 
-                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  <div>
-                    <Label>Facebook</Label>
-                    <Input type="text" defaultValue="https://www.facebook.com/PimjoHQ" />
-                  </div>
-
-                  <div>
-                    <Label>X.com</Label>
-                    <Input type="text" defaultValue="https://x.com/PimjoHQ" />
-                  </div>
-
-                  <div>
-                    <Label>Linkedin</Label>
-                    <Input type="text" defaultValue="https://www.linkedin.com/company/pimjo" />
-                  </div>
-
-                  <div>
-                    <Label>Instagram</Label>
-                    <Input type="text" defaultValue="https://instagram.com/PimjoHQ" />
+                  <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Email</Label>
+                      <Input type="email" defaultValue={adminInfo.info?.email || ''} />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="mt-7">
-                <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                  Personal Information
-                </h5>
+              )}
 
-                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>First Name</Label>
-                    <Input type="text" defaultValue="Musharof" />
-                  </div>
+              {role === 'faculty' && facultyInfo && (
+                <div className="mt-7">
+                  <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
+                    Faculty Information
+                  </h5>
 
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>Last Name</Label>
-                    <Input type="text" defaultValue="Chowdhury" />
-                  </div>
-
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>Email Address</Label>
-                    <Input type="text" defaultValue="randomuser@pimjo.com" />
-                  </div>
-
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>Phone</Label>
-                    <Input type="text" defaultValue="+09 363 398 46" />
-                  </div>
-
-                  <div className="col-span-2">
-                    <Label>Bio</Label>
-                    <Input type="text" defaultValue="Team Manager" />
+                  <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Name</Label>
+                      <Input type="text" defaultValue={facultyInfo.info?.name || ''} />
+                    </div>
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Email</Label>
+                      <Input type="email" defaultValue={facultyInfo.info?.email || ''} />
+                    </div>
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Department</Label>
+                      <Input type="text" defaultValue={facultyInfo.info?.department || ''} />
+                    </div>
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Seating</Label>
+                      <Input type="text" defaultValue={facultyInfo.info?.sitting || ''} />
+                    </div>
+                    <div className="col-span-2">
+                      <Label>Free Time Slots (comma separated)</Label>
+                      <Input
+                        type="text"
+                        defaultValue={
+                          Array.isArray(facultyInfo.info?.freeTimeSlots)
+                            ? facultyInfo.info.freeTimeSlots.join(', ')
+                            : ''
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {role === 'student' && studentInfo && (
+                <div className="mt-7">
+                  <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
+                    Student Information
+                  </h5>
+
+                  <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Name</Label>
+                      <Input type="text" defaultValue={studentInfo.info?.name || ''} />
+                    </div>
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Email</Label>
+                      <Input type="email" defaultValue={studentInfo.info?.email || ''} />
+                    </div>
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Roll Number</Label>
+                      <Input type="text" defaultValue={studentInfo.info?.rollNumber || ''} />
+                    </div>
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Department</Label>
+                      <Input type="text" defaultValue={studentInfo.info?.department || ''} />
+                    </div>
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Division</Label>
+                      <Input type="text" defaultValue={studentInfo.info?.division || ''} />
+                    </div>
+                    <div className="col-span-2 lg:col-span-1">
+                      <Label>Group</Label>
+                      <Input type="text" defaultValue={studentInfo.info?.groupNumber || ''} />
+                    </div>
+                    <div className="col-span-2">
+                      <Label>Contact Number</Label>
+                      <Input type="text" defaultValue={studentInfo.info?.contactNumber || ''} />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
               <Button size="sm" variant="outline" onClick={closeModal}>

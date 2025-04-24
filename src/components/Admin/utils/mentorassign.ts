@@ -1,75 +1,95 @@
-import { countStudents, countFaculty } from './countrecords';
 import { db } from '@/drizzle/db';
 import { faculty, student, mentorStudent } from '@/drizzle/schema';
 
 export async function mentorAssignment() {
-  const totalStudents = await countStudents();
-  const totalFaculty = await countFaculty();
+  try {
+    // Fetch all students with their department
+    const allStudents = await db.select({ id: student.id, department: student.department }).from(student);
 
-  // Fetch students grouped by department
-  const studentsByDept = await db
-    .select({ id: student.id, department: student.department })
-    .from(student)
-    .orderBy(student.department);
+    // Fetch all faculty with their department
+    const allFaculty = await db.select({ id: faculty.id, department: faculty.department }).from(faculty);
 
-  // Fetch faculties grouped by department
-  const facultiesByDept = await db
-    .select({ id: faculty.id, department: faculty.department })
-    .from(faculty)
-    .orderBy(faculty.department);
+    // Group students by department
+    const studentsByDept = new Map<string | null, number[]>();
+    allStudents.forEach(({ id, department }) => {
+      if (!studentsByDept.has(department)) {
+        studentsByDept.set(department, []);
+      }
+      studentsByDept.get(department)!.push(id);
+    });
 
-  // Organizing students and faculties by department
-  const studentMap = new Map();
-  studentsByDept.forEach(({ id, department }) => {
-    if (!studentMap.has(department)) studentMap.set(department, []);
-    studentMap.get(department).push(id);
-  });
+    // Group faculty by department
+    const facultyByDept = new Map<string | null, number[]>();
+    allFaculty.forEach(({ id, department }) => {
+      if (!facultyByDept.has(department)) {
+        facultyByDept.set(department, []);
+      }
+      facultyByDept.get(department)!.push(id);
+    });
 
-  const facultyMap = new Map();
-  facultiesByDept.forEach(({ id, department }) => {
-    if (!facultyMap.has(department)) facultyMap.set(department, []);
-    facultyMap.get(department).push(id);
-  });
+    // List to track students who couldn't be assigned to faculty in their department
+    const unassignedStudents: Array<{ id: number; department: string | null }> = [];
 
-  // Assign students to faculty within the same department
-  for (const [dept, students] of studentMap.entries()) {
-    const faculties = facultyMap.get(dept) || [];
-    if (faculties.length === 0) continue; // No faculty in this department
+    // Process each department
+    for (const [department, studentIds] of studentsByDept.entries()) {
+      const departmentFaculty = facultyByDept.get(department);
 
-    let studentIndex = 0;
-    const studentsPerFaculty = Math.ceil(students.length / faculties.length);
+      // If no faculty in this department, add students to unassigned list
+      if (!departmentFaculty || departmentFaculty.length === 0) {
+        studentIds.forEach((id) => unassignedStudents.push({ id, department }));
+        continue;
+      }
 
-    for (let i = 0; i < faculties.length; i++) {
-      for (let j = 0; j < studentsPerFaculty; j++) {
-        if (studentIndex >= students.length) break;
-        await db.insert(mentorStudent).values({
-          mentorId: faculties[i],
-          studentId: students[studentIndex++],
-        });
+      // Calculate students per faculty (equal distribution)
+      const studentsPerFaculty = Math.floor(studentIds.length / departmentFaculty.length);
+      const remainingStudents = studentIds.length % departmentFaculty.length;
+
+      let studentIndex = 0;
+
+      // Assign students to faculty in this department
+      for (let facIndex = 0; facIndex < departmentFaculty.length; facIndex++) {
+        const facultyId = departmentFaculty[facIndex];
+        const studentsToAssign = studentsPerFaculty + (facIndex < remainingStudents ? 1 : 0);
+
+        for (let i = 0; i < studentsToAssign && studentIndex < studentIds.length; i++) {
+          await db.insert(mentorStudent).values({
+            mentorId: facultyId,
+            studentId: studentIds[studentIndex],
+          });
+          studentIndex++;
+        }
       }
     }
 
-    // Assign remaining students to any faculty in the same department
-    for (; studentIndex < students.length; studentIndex++) {
-      await db.insert(mentorStudent).values({
-        mentorId: faculties[faculties.length - 1],
-        studentId: students[studentIndex],
-      });
-    }
-  }
+    // Handle unassigned students (those with no faculty in their department)
+    if (unassignedStudents.length > 0) {
+      console.log(`Assigning ${unassignedStudents.length} students with no faculty in their department`);
 
-  // Assign unassigned students to any available faculty
-  const remainingStudents = studentsByDept.filter((s) => !facultyMap.has(s.department));
-  if (remainingStudents.length > 0) {
-    const allFaculties = facultiesByDept.map((f) => f.id);
-    let facultyIndex = 0;
+      // Create a load counter for all faculty
+      const facultyLoad = new Map<number, number>();
+      allFaculty.forEach((f) => facultyLoad.set(f.id, 0));
 
-    for (const { id } of remainingStudents) {
-      await db.insert(mentorStudent).values({
-        mentorId: allFaculties[facultyIndex % allFaculties.length],
-        studentId: id,
-      });
-      facultyIndex++;
+      // Assign each unassigned student to faculty with the least load
+      for (const { id: studentId } of unassignedStudents) {
+        // Sort faculty by current load
+        const sortedFaculty = [...allFaculty].sort(
+          (a, b) => (facultyLoad.get(a.id) || 0) - (facultyLoad.get(b.id) || 0)
+        );
+
+        const leastLoadedFaculty = sortedFaculty[0].id;
+
+        await db.insert(mentorStudent).values({
+          mentorId: leastLoadedFaculty,
+          studentId: studentId,
+        });
+
+        facultyLoad.set(leastLoadedFaculty, (facultyLoad.get(leastLoadedFaculty) || 0) + 1);
+      }
     }
+
+    console.log('Mentor assignment completed successfully');
+  } catch (error) {
+    console.error('Error in mentor assignment:', error);
+    throw error;
   }
 }
