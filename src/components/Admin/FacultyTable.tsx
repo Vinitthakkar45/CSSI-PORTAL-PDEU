@@ -6,7 +6,7 @@ import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import FacultyTableModal from './FacultyTableModal';
 import Button from '../Home/ui/button/Button';
-
+import LoadingOverlay from '../LoadingOverlay';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
