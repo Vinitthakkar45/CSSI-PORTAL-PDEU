@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import Button from '@/components/Home/ui/button/Button';
 import { toast } from '@/components/Home/ui/toast/Toast';
 import { UserDetails, PersonalDetails, NGODetails, ProjectDetails, StudentUpdateData } from '@/types/student';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function MultiStepForm({ onComplete }: { onComplete: () => void }) {
   const [currentStep, setCurrentStep] = useState(1);
@@ -231,10 +232,10 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
   };
 
   const steps = [
-    { id: 1, label: 'Personal Details' },
-    { id: 2, label: 'LOR Generation' },
-    { id: 3, label: 'NGO Details' },
-    { id: 4, label: 'Offer Letter' },
+    { id: 1, shortLabel: 'Info' },
+    { id: 2, shortLabel: 'LOR' },
+    { id: 3, shortLabel: 'NGO' },
+    { id: 4, shortLabel: 'Offer' },
   ];
 
   const renderCurrentStep = () => {
@@ -274,35 +275,79 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-900 overflow-hidden">
-        <div className="border-b border-gray-200 dark:border-gray-600 pb-4 mb-4">
-          <nav className="flex flex-wrap gap-2">
-            {steps.map((step) => (
+    <div className="bg-white rounded-lg shadow-md dark:bg-gray-900 overflow-hidden">
+      <div className="flex justify-between items-center m-3">
+        <button
+          onClick={handlePrevStep}
+          disabled={currentStep === 1}
+          className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-500 hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-300"
+        >
+          <ChevronLeft size={16} />
+          Previous
+        </button>
+
+        <button
+          onClick={handleNextStep}
+          disabled={currentStep === 4}
+          className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-500 hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-300"
+        >
+          Next
+          <ChevronRight size={16} />
+        </button>
+      </div>
+
+      <div className="relative mb-6">
+        <div className="overflow-x-auto hide-scrollbar">
+          <nav className="flex whitespace-nowrap min-w-full p-2 gap-2">
+            {steps.map((step, index) => (
               <button
                 key={step.id}
                 onClick={() => goToStep(step.id)}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors
-                  ${currentStep === step.id ? 'text-blue-600' : 'bg-secondary hover:bg-secondary/80'}`}
+                className={`
+                    relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 gap-2
+                    ${
+                      currentStep === step.id
+                        ? 'bg-brand-500 text-white'
+                        : index < currentStep
+                          ? 'bg-gray-100 text-brand-500 dark:bg-gray-800 dark:text-brand-400'
+                          : 'bg-transparent text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'
+                    }
+                    ${index === 0 ? 'ml-0' : ''}
+                  `}
               >
-                {step.label}
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`
+                      w-6 h-6 rounded-full flex items-center justify-center text-xs
+                      ${
+                        currentStep === step.id
+                          ? 'bg-white text-brand-500'
+                          : index < currentStep
+                            ? 'bg-brand-500 text-white'
+                            : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                      }
+                    `}
+                  >
+                    {index + 1}
+                  </div>
+                  {step.shortLabel}
+                </div>
               </button>
             ))}
           </nav>
         </div>
 
-        <div className="relative overflow-hidden">{renderCurrentStep()}</div>
-
-        <div className="flex justify-between mt-8">
-          <Button variant="outline" onClick={handlePrevStep} disabled={currentStep === 1}>
-            Previous
-          </Button>
-
-          <Button onClick={handleNextStep} disabled={currentStep === 4}>
-            {currentStep < 4 ? 'Next' : 'Complete'}
-          </Button>
+        <div className="absolute left-0 -bottom-2 w-full">
+          <div className="absolute h-[2px] w-full bg-gray-200 dark:bg-gray-700">
+            <div
+              className="h-full bg-brand-500 transition-all duration-300 ease-out"
+              style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
+            />
+          </div>
         </div>
       </div>
+
+      <div className="relative overflow-hidden">{renderCurrentStep()}</div>
     </div>
   );
 }

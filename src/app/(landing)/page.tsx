@@ -6,8 +6,8 @@ import Hero from '@/components/Landing/Hero';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Free Next.js Template for Startup and SaaS',
-  description: 'This is Home for Startup Nextjs Template',
+  title: 'PDEU CSSI',
+  description: 'This is Home for the PDEU CSSI PORTAL',
   // other metadata
 };
 

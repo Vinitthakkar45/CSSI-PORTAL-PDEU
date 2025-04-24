@@ -12,21 +12,25 @@ The CSSI Portal is a web-based platform designed to streamline the Civic & Socia
 ## Features
 
 - **Authentication & Authorization**
+
   - Secure login system for students, faculty, and administrators
   - Role-based access control
 
 - **Student Dashboard**
+
   - Profile management
   - Document upload system (Offer Letter, Report, Certificate, Poster)
   - Internship progress tracking
   - Schedule viewing
 
 - **Faculty Interface**
+
   - Student supervision
   - Document verification
   - Performance evaluation
 
 - **Admin Panel**
+
   - User management
   - Student and faculty data administration
   - System monitoring
@@ -38,6 +42,7 @@ The CSSI Portal is a web-based platform designed to streamline the Civic & Socia
 ## Technology Stack
 
 - **Frontend**
+
   - Next.js 14 (App Router)
   - TypeScript
   - Tailwind CSS
@@ -45,11 +50,13 @@ The CSSI Portal is a web-based platform designed to streamline the Civic & Socia
   - Lucide Icons
 
 - **Backend**
+
   - Next.js API Routes
   - DrizzleORM
   - PostgreSQL (Neon)
 
 - **Authentication**
+
   - NextAuth.js
 
 - **File Storage**
@@ -66,23 +73,28 @@ The CSSI Portal is a web-based platform designed to streamline the Civic & Socia
 ### Installation
 
 1. Clone the repository
+
 ```bash
 git clone https://github.com/your-username/cssi-portal.git
 cd cssi-portal
 ```
 
 2. Install dependencies
+
 ```bash
 pnpm install
 ```
 
 3. Set up environment variables
+
 ```bash
 cp .env.example .env.local
 ```
+
 Fill in your environment variables in `.env.local`
 
 4. Run the development server
+
 ```bash
 pnpm dev
 ```
@@ -112,7 +124,6 @@ cssi-portal/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-
 ## Acknowledgments
 
 - PDEU for supporting the CSSI initiative
@@ -121,6 +132,6 @@ cssi-portal/
 ## Contact
 
 For any queries regarding the CSSI Portal, please contact:
+
 - Project Coordinator - [Dr. Himanshu Gajera](mailto:himanshugajera.ce@gmail.com)
 - Technical Support - [Vinit Thakkar](mailto:vinit.tce22@sot.pdpu.ac.in)
-

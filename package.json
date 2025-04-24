@@ -45,6 +45,7 @@
     "clsx": "^2.1.1",
     "file-saver": "^2.0.5",
     "flatpickr": "^4.6.13",
+    "gsap": "^3.12.7",
     "lucide-react": "^0.483.0",
     "next": "15.1.7",
     "next-auth": "^4.24.11",

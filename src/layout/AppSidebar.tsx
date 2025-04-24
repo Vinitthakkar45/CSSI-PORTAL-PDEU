@@ -122,7 +122,7 @@ const AppSidebar: React.FC = () => {
               />
             </>
           ) : (
-            <Image src="/images/logo/logo.png" alt="Logo" width={32} height={32} />
+            <Image src="/images/logo/PDEU_LOGO.svg" alt="Logo" width={32} height={32} />
           )}
         </Link>
       </div>
