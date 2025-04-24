@@ -5,6 +5,7 @@ import Badge from '../Home/ui/badge/Badge';
 import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import FacultyTableModal from './FacultyTableModal';
+import Button from '../Home/ui/button/Button';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -32,6 +33,11 @@ const FacultyTable = () => {
   const [assignmentsLoaded, setAssignmentsLoaded] = useState(false);
   const [selectedFaculty, setSelectedFaculty] = useState<FacultyWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(filteredFaculties.length / itemsPerPage);
 
   useEffect(() => {
     async function fetchFaculties() {
@@ -234,7 +240,7 @@ const FacultyTable = () => {
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {filteredFaculties.length > 0 ? (
-                filteredFaculties.map((item) => (
+                filteredFaculties.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item) => (
                   <TableRow
                     key={item.faculty.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
@@ -292,6 +298,29 @@ const FacultyTable = () => {
               )}
             </TableBody>
           </Table>
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center mt-4">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-gray-600 dark:text-gray-300">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          >
+            Next
+          </Button>
         </div>
       </div>
     </>

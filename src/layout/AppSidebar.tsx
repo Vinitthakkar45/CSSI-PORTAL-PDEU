@@ -23,11 +23,11 @@ const AppSidebar: React.FC = () => {
       path: '/home',
       icon: <LayoutGrid size={22} />,
     },
-    {
-      name: 'Schedule',
-      path: '/home/calendar',
-      icon: <Calendar size={22} />,
-    },
+    // {
+    //   name: 'Schedule',
+    //   path: '/home/calendar',
+    //   icon: <Calendar size={22} />,
+    // },
     {
       name: 'Profile',
       path: '/home/profile',
