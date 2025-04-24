@@ -17,6 +17,12 @@ export async function middleware(req: NextRequest) {
   const isHomeRoute = pathname === '/home' || pathname.startsWith('/home/');
 
   const isAdminRoute = pathname === '/admin' || pathname.includes('/admin/');
+  const isCoordRoute = pathname === '/coordinator' || pathname.includes('/coordinator/');
+
+  if (isCoordRoute && token?.role !== 'coordinator') {
+    return NextResponse.redirect(new URL('/home', req.url));
+  }
+
   // If user is not authenticated and tries to access protected routes
   if (isAdminRoute && token?.role !== 'admin') {
     return NextResponse.redirect(new URL('/home', req.url));

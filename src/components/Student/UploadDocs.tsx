@@ -129,15 +129,13 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-theme-sm dark:bg-gray-900 dark:border-gray-800">
-      <h3 className="text-lg font-semibold mb-5 text-gray-800 dark:text-white/90">Submit Report and Documents</h3>
-
       <div className="space-y-6">
         <div className="space-y-2">
           <h4 className="text-theme-xl font-medium text-gray-800 dark:text-white/90">
             Upload Report <span className="text-error-500">*</span>
           </h4>
           <div className={reportUploaded ? 'border-2 border-success-500 rounded-xl p-1' : ''}>
-            <DropzoneComponent onDrop={handleReportDrop} isLoading={isLoading.Report} />
+            <DropzoneComponent onDrop={handleReportDrop} isLoading={isLoading.Report} title="" />
           </div>
           {reportUploaded && <p className="text-sm text-success-500 font-medium">Report uploaded successfully!</p>}
           {error && <p className="text-sm text-error-500 font-medium">{error}</p>}
@@ -148,7 +146,7 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
             Upload NGO Certificate <span className="text-error-500">*</span>
           </h4>
           <div className={certificateUploaded ? 'border-2 border-success-500 rounded-xl p-1' : ''}>
-            <DropzoneComponent onDrop={handleCertificateDrop} isLoading={isLoading.Certificate} />
+            <DropzoneComponent onDrop={handleCertificateDrop} isLoading={isLoading.Certificate} title="" />
           </div>
           {certificateUploaded && (
             <p className="text-sm text-success-500 font-medium">Certificate uploaded successfully!</p>
@@ -160,7 +158,7 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
             Upload Poster <span className="text-error-500">*</span>
           </h4>
           <div className={posterUploaded ? 'border-2 border-success-500 rounded-xl p-1' : ''}>
-            <DropzoneComponent onDrop={handlePosterDrop} isLoading={isLoading.Poster} />
+            <DropzoneComponent onDrop={handlePosterDrop} isLoading={isLoading.Poster} title="" />
           </div>
           {posterUploaded && <p className="text-sm text-success-500 font-medium">Poster uploaded successfully!</p>}
         </div>
@@ -169,7 +167,7 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
           <Button
             onClick={handleSubmit}
             className="bg-brand-500 hover:bg-brand-600 text-white"
-            // disabled={!reportUploaded || !certificateUploaded || !posterUploaded}
+            disabled={!reportUploaded || !certificateUploaded || !posterUploaded}
           >
             Submit All Documents
           </Button>

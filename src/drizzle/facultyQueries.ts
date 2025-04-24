@@ -44,7 +44,6 @@ export const getMentoredStudents = async (facultyId: number) => {
     .where(inArray(student.id, ids));
 
   const students_data: SelectStudent[] = result.map((row) => row.student);
-  // console.log('Students Data:', students_data);
 
   return students_data;
 };
@@ -73,7 +72,6 @@ export const getEvaluatedStudents = async (facultyId: number) => {
     .where(inArray(student.id, ids));
 
   const students_data: SelectStudent[] = result.map((row) => row.student);
-  // console.log('Students Data:', students_data);
 
   // students_data.forEach((student) => {
   //   student.image = '/images/user/user-17.jpg'; // Static image path

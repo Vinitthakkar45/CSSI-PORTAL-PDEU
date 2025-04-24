@@ -1,8 +1,6 @@
 import { sql } from 'drizzle-orm';
-import { int } from 'drizzle-orm/mysql-core';
 import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 import { boolean } from 'drizzle-orm/pg-core';
-import { Presentation } from 'lucide-react';
 
 export const user = pgTable('user', {
   id: serial('id').primaryKey(),
@@ -58,6 +56,8 @@ export const student = pgTable('student', {
   certificate: text('certificate'),
   poster: text('poster'),
   offerLetter: text('offerletter'),
+  week_one_photo: text('week_one_photo'),
+  week_two_photo: text('week_two_photo'),
 
   // Faculty Mentor Evaluation Fields
 
@@ -119,6 +119,16 @@ export const evaluatorStudent = pgTable('evaluator_student', {
     .references(() => student.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
 });
 
+export const coordinatorFaculty = pgTable('coordinator_faculty', {
+  id: serial('id').primaryKey(),
+  coordinatorId: integer('coordinator_id')
+    .notNull()
+    .references(() => faculty.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
+  facultyId: integer('faculty_id')
+    .notNull()
+    .references(() => faculty.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
+});
+
 export const stage = pgTable('stage', {
   id: serial('id').primaryKey(),
   year: integer('year').notNull(),
@@ -135,6 +145,8 @@ export type InsertMentorStudent = typeof mentorStudent.$inferInsert;
 export type SelectMentorStudent = typeof mentorStudent.$inferSelect;
 export type InsertEvaluatorStudent = typeof evaluatorStudent.$inferInsert;
 export type SelectEvaluatorStudent = typeof evaluatorStudent.$inferSelect;
+export type InsertCoordinatorFaculty = typeof coordinatorFaculty.$inferInsert;
+export type SelectCoordinatorFaculty = typeof coordinatorFaculty.$inferSelect;
 export type InsertStage = typeof stage.$inferInsert;
 export type SelectStage = typeof stage.$inferSelect;
 export type SessionUser = typeof sessionuser.$inferSelect;

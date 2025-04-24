@@ -6,9 +6,7 @@ import StudentDashboard from '@/components/Student/Dashboard';
 import FacultyDashboard from '@/components/Faculty/Dashboard';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import UserInfoCard from '@/components/Home/user-profile/UserInfoCard'; // Import the Client Component
-import { SessionUser } from '@/drizzle/schema';
-
+import CoordinatorDashboard from '@/components/Coordinator/Dashboard';
 export const metadata: Metadata = {
   title: 'Home',
   description: 'This is Home for Dashboard',
@@ -16,15 +14,13 @@ export const metadata: Metadata = {
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
-  const user = session?.user as SessionUser | undefined | null; // Extract the user object
-
-  console.log('Session in Dashboard:', session); // This will log on the server
-
+  const userRole = session?.user?.role;
   let dashboardContent;
 
-  switch (
-    user?.role // Use user?.role to safely access the property
-  ) {
+  switch (userRole) {
+    case 'coordinator':
+      dashboardContent = <CoordinatorDashboard />;
+      break;
     case 'admin':
       dashboardContent = <AdminDashboard />;
       break;

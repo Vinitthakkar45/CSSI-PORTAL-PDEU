@@ -6,9 +6,10 @@ import { useDropzone } from 'react-dropzone';
 interface DropzoneComponentProps {
   onDrop: (acceptedFiles: File[]) => void;
   isLoading?: boolean;
+  title?: string;
 }
 
-const DropzoneComponent: React.FC<DropzoneComponentProps> = ({ onDrop, isLoading = false }) => {
+const DropzoneComponent: React.FC<DropzoneComponentProps> = ({ onDrop, isLoading = false, title = 'File Upload' }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
@@ -22,7 +23,7 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({ onDrop, isLoading
     },
   });
   return (
-    <ComponentCard title="Dropzone">
+    <ComponentCard title={title}>
       <div className="transition border border-gray-300 border-dashed cursor-pointer dark:hover:border-brand-500 dark:border-gray-700 rounded-xl hover:border-brand-500">
         <form
           {...getRootProps()}
@@ -66,12 +67,8 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({ onDrop, isLoading
 
             {/* Text Content */}
             <h4 className="mb-3 font-semibold text-gray-800 text-theme-xl dark:text-white/90">
-              {isDragActive ? 'Drop Files Here' : 'Drag & Drop Files Here'}
+              {isDragActive ? 'Drop Files Here' : 'Drag & Drop Files'}
             </h4>
-
-            <span className=" text-center mb-5 block w-full max-w-[290px] text-sm text-gray-700 dark:text-gray-400">
-              Drag and drop your PNG, JPG, WebP, SVG images here or browse
-            </span>
 
             <span className="font-medium underline text-theme-sm text-brand-500">Browse File</span>
           </div>

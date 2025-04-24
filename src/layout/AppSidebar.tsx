@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/context/SidebarContext';
-import { Ellipsis, LayoutGrid, Calendar, CircleUserRound, GraduationCap, BookOpen } from 'lucide-react';
+import { UserCog, Ellipsis, LayoutGrid, Calendar, CircleUserRound, GraduationCap, BookOpen } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 type NavItem = {
@@ -37,7 +37,20 @@ const AppSidebar: React.FC = () => {
 
   if (status === 'authenticated' && session) {
     const role = session.user.role;
-
+    if (role === 'coordinator') {
+      navItems.push(
+        {
+          name: 'Students',
+          path: '/home/coordinator/studentTable',
+          icon: <GraduationCap size={22} />,
+        },
+        {
+          name: 'Faculties',
+          path: '/home/coordinator/facultyTable',
+          icon: <BookOpen size={22} />,
+        }
+      );
+    }
     if (role === 'admin') {
       navItems.push(
         {
@@ -49,6 +62,11 @@ const AppSidebar: React.FC = () => {
           name: 'Faculties',
           path: '/home/admin/facultyTable',
           icon: <BookOpen size={22} />,
+        },
+        {
+          name: 'Coordinators',
+          path: '/home/admin/coordTable',
+          icon: <UserCog size={22} />,
         }
       );
     }

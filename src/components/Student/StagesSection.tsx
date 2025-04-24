@@ -38,8 +38,8 @@ const StagesSection: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="container pb-4 mx-auto">
-        <div className="flex justify-center items-center py-12">
+      <div className="container mx-auto">
+        <div className="flex justify-center items-center py-8">
           <div className="animate-pulse">Loading your internship progress...</div>
         </div>
       </div>
@@ -49,7 +49,7 @@ const StagesSection: React.FC = () => {
   const hasCompletedAvailableStages = currentStage > maxStageUnlocked;
 
   return (
-    <div className="container pb-4 mx-auto">
+    <div className="container mx-auto">
       <StageProgress
         currentStage={hasCompletedAvailableStages ? maxStageUnlocked + 1 : currentStage}
         totalStages={stages.length}
@@ -57,7 +57,7 @@ const StagesSection: React.FC = () => {
         maxStageUnlocked={maxStageUnlocked}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
         {stages.map((stage) => (
           <StageCard
             key={stage.number}
@@ -70,7 +70,7 @@ const StagesSection: React.FC = () => {
         ))}
       </div>
 
-      {activeForm && <div className="mt-8">{renderActiveForm()}</div>}
+      {activeForm && <div className="mt-4">{renderActiveForm()}</div>}
 
       {!activeForm && currentStage < 5 && (
         <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center dark:bg-gray-900 dark:border-gray-800">

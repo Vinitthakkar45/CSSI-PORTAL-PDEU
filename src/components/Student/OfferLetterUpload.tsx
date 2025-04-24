@@ -111,15 +111,12 @@ const OfferLetterUpload = ({ onComplete, userId }: OfferLetterUploadProps) => {
         <div className="space-y-6">
           <div className={`space-y-2 ${isUploading ? 'opacity-50' : ''}`}>
             <div className={hasUploadedFile ? 'border-2 border-success-500 rounded-xl p-1' : ''}>
-              <DropzoneComponent onDrop={handleFileDrop} isLoading={isUploading} />
+              <DropzoneComponent onDrop={handleFileDrop} isLoading={isUploading} title="" />
             </div>
             {error && <p className="text-sm text-error-500 font-medium">{error}</p>}
           </div>
 
           <div className="flex justify-between items-center">
-            <Button onClick={onComplete} variant="outline" className="w-full md:w-auto">
-              Skip for Now
-            </Button>
             <Button onClick={onComplete} disabled={!hasUploadedFile} className="w-full md:w-auto">
               Continue
             </Button>

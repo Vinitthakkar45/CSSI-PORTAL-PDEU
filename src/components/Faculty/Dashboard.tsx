@@ -17,7 +17,6 @@ const Dashboard = () => {
       redirect('/signin');
     },
   });
-  const [currentStage, setCurrentStage] = useState<number>(1);
 
   const [mentoredStudents, setMentoredStudents] = useState<SelectStudent[]>([]);
   const [evaluatedStudents, setEvaluatedStudents] = useState<SelectStudent[]>([]);
@@ -56,8 +55,6 @@ const Dashboard = () => {
   }
 
   const getStageStatus = (stageNumber: number): StageStatus => {
-    // if (stageNumber < currentStage) return 'completed';
-    // if (stageNumber === currentStage) return 'current';
     return 'current';
   };
 
@@ -104,15 +101,18 @@ const Dashboard = () => {
         </button>
       </div>
 
-      <TableList
-        students={selectedToggle === 'mentor' ? mentoredStudents : evaluatedStudents}
-        option={selectedToggle}
-        setMarksToggle={setMarksToggle}
-        marksToggle={marksToggle}
-        setStudents={selectedToggle === 'mentor' ? setMentoredStudents : setEvaluatedStudents}
-        // setLoading = {setLoading}
-      />
-      {/* </div> */}
+      {(selectedToggle === 'mentor' && mentoredStudents.length > 0) ||
+      (selectedToggle != 'mentor' && evaluatedStudents.length > 0) ? (
+        <TableList
+          students={selectedToggle === 'mentor' ? mentoredStudents : evaluatedStudents}
+          option={selectedToggle}
+          setMarksToggle={setMarksToggle}
+          marksToggle={marksToggle}
+          setStudents={selectedToggle === 'mentor' ? setMentoredStudents : setEvaluatedStudents}
+        />
+      ) : (
+        <p className="m-4">Students are yet to be assigned !</p>
+      )}
     </>
   );
 };

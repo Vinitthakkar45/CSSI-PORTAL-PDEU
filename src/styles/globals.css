@@ -4,6 +4,38 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Add these animation keyframes */
+@keyframes enter {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes leave {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* Define the animation utilities */
+@utility animate-enter {
+  animation: enter 200ms ease-out;
+}
+
+@utility animate-leave {
+  animation: leave 150ms ease-in forwards;
+}
+
 @theme {
   --font-*: initial;
   --font-outfit: Outfit, sans-serif;
@@ -606,4 +638,15 @@
 
 .slide-right {
   animation: slideRight 0.3s ease-out forwards;
+}
+
+/* Hide arrows for number input */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield; /* Firefox */
 }
