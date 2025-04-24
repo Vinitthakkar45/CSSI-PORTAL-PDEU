@@ -8,6 +8,8 @@ import Image from 'next/image';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SelectStudent } from '@/drizzle/schema';
 import { co } from '@fullcalendar/core/internal-common';
+import { ExternalLink } from 'lucide-react';
+import { z } from 'zod';
 
 export default function StudentModal({
   isOpen,
@@ -56,16 +58,16 @@ export default function StudentModal({
     if (selectedStudent) {
       //   setMarks(option === 'mentor' ? selectedStudent.internal_evaluation_marks : selectedStudent.final_evaluation_marks);
       setCertificateUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${selectedStudent.certificate}`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Certificate/${selectedStudent.userId}.pdf`
       );
       setOfferLetterUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${selectedStudent.offerLetter}`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/OfferLetter/${selectedStudent.userId}.pdf`
       );
       setPosterUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${selectedStudent.poster}`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Poster/${selectedStudent.userId}.pdf`
       );
       setReportUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${selectedStudent.report}`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Report/${selectedStudent.userId}.pdf`
       );
 
       setMarks({
@@ -83,38 +85,39 @@ export default function StudentModal({
         presentationSkills: selectedStudent.presentationSkill || 0,
         qnaViva: selectedStudent.qnaMarks || 0,
       });
-
-      console.log('Selected Student:', selectedStudent);
-      console.log('Marks:', marks);
     }
   }, [selectedStudent]);
 
-  const validateMarks = () => {
-    const newErrors: Record<string, string> = {};
-    const limits = {
-      posterOrganization: 10,
-      dayToDayActivity: 10,
-      contributionToWork: 5,
-      learningOutcomes: 5,
-      geoTagPhotos: 5,
-      reportOrganization: 10,
-      certificate: 5,
-      learningExplanation: 5,
-      problemIdentification: 5,
-      contributionExplanation: 10,
-      proposedSolution: 10,
-      presentationSkills: 10,
-      qnaViva: 10,
-    };
+  const marksSchema = z.object({
+    posterOrganization: z.number().min(0).max(10),
+    dayToDayActivity: z.number().min(0).max(10),
+    contributionToWork: z.number().min(0).max(5),
+    learningOutcomes: z.number().min(0).max(5),
+    geoTagPhotos: z.number().min(0).max(5),
+    reportOrganization: z.number().min(0).max(10),
+    certificate: z.number().min(0).max(5),
+    learningExplanation: z.number().min(0).max(5),
+    problemIdentification: z.number().min(0).max(5),
+    contributionExplanation: z.number().min(0).max(10),
+    proposedSolution: z.number().min(0).max(10),
+    presentationSkills: z.number().min(0).max(10),
+    qnaViva: z.number().min(0).max(10),
+  });
 
-    Object.entries(marks).forEach(([key, value]) => {
-      const typedKey = key as keyof typeof marks; // Explicitly type the key
-      if (value < 0 || value > limits[typedKey]) {
-        newErrors[key] = `Must be between 0 and ${limits[typedKey]}`;
-      }
-    });
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const validateMarks = () => {
+    const result = marksSchema.safeParse(marks);
+    if (!result.success) {
+      const newErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          newErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(newErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
   };
 
   const handlePrevTab = () => {
@@ -135,8 +138,6 @@ export default function StudentModal({
 
     const typeofmarks = option === 'mentor' ? 'internal' : 'final';
     const studentid = selectedStudent.id;
-
-    // console.log('Saving marks for student ID:', studentid, 'Type:', typeofmarks, 'Marks:', marks);
 
     try {
       const response = await fetch('/api/faculty', {
@@ -180,7 +181,6 @@ export default function StudentModal({
   };
 
   function savemarks() {
-    console.log('Marks:', marks);
     if (option === 'mentor') {
       handleSave('mentor');
     } else {
@@ -189,15 +189,14 @@ export default function StudentModal({
     setMarksToggle(!marksToggle);
   }
 
-  const handleInputChange = (field: keyof typeof marks, value: string) => {
-    // console.log('Field:', field, 'Value:', value);
-    setMarks((prevMarks) => ({
-      ...prevMarks,
-      [field]: Number(value),
-    }));
+  const handleInputChange = (field: keyof typeof marks, value: string, upperlim: number) => {
+    if (Number(value) <= upperlim && Number(value) >= 0) {
+      setMarks((prevMarks) => ({
+        ...prevMarks,
+        [field]: Number(value),
+      }));
+    }
   };
-
-  //   console.log('Marks:', marks);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-5 lg:p-10">
@@ -226,7 +225,7 @@ export default function StudentModal({
             </button>
           </div>
           <div className="flex flex-col sm:flex-row  mb-7">
-            <div className="hidden sm:flex whitespace-nowrap overflow-hidden text-ellipsis justify-center items-center">
+            <div className="hidden sm:flex whitespace-nowrap overflow-hidden text-ellipsis justify-center items-center no-scrollbar">
               {tabs.map((tab) => (
                 <button
                   key={tab}
@@ -254,6 +253,9 @@ export default function StudentModal({
           {/* Tab Content */}
           {activeTab === 'personal' && (
             <div>
+              <p className="mb-5 text-gray-400 text-center">
+                <i> Personal Details </i>
+              </p>
               {/* Personal Details */}
               <div className="flex justify-center gap-20 mb-5">
                 <div className="w-40 h-40 overflow-hidden rounded-full">
@@ -305,6 +307,10 @@ export default function StudentModal({
           {activeTab === 'ngo' && (
             <div>
               {/* NGO Details */}
+              <p className="mb-5 text-gray-400 text-center">
+                <i> Registered NGO Details </i>
+              </p>
+
               <div className="grid grid-cols-2 gap-6 mb-4">
                 <div>
                   <Label>NGO Name</Label>
@@ -347,12 +353,15 @@ export default function StudentModal({
           {activeTab === 'project' && (
             <div>
               {/* Project Details */}
+              <p className="mb-5 text-gray-400 text-center">
+                <i> Details of undergoing project </i>
+              </p>
               <div className="mb-4">
-                <Label>Problem Statement</Label>
+                <Label> Problem Statement </Label>
                 <Input type="text" value={selectedStudent.problemDefinition || 'N/A'} disabled />
               </div>
               <div className="mb-6">
-                <Label>Approach of Solving Problem</Label>
+                <Label> Approach of Solving Problem </Label>
                 <Input type="text" value={selectedStudent.proposedSolution || 'N/A'} disabled />
               </div>
             </div>
@@ -360,30 +369,39 @@ export default function StudentModal({
 
           {activeTab === 'documents' && (
             <div>
-              {/* Documents */}
-              <div className="mb-4">
-                {/* <Label>Report</Label> */}
+              <p className="mb-5 text-gray-400 text-center">
+                <i> Documents Uploaded </i>
+              </p>
+              <div className="mb-4 ml-6">
                 <p>
-                  <a href={reportUrl}> Report </a>
+                  <a href={reportUrl} target="_blank" className="flex ">
+                    {' '}
+                    Report <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
+                  </a>
                 </p>
               </div>
-              <div className="mb-4">
-                {/* <Label>Certificate</Label> */}
+              <div className="mb-4 ml-6">
                 <p>
-                  <a href={certificateUrl}> Certificate </a>
+                  <a href={certificateUrl} target="_blank" className="flex ">
+                    {' '}
+                    Certificate <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
+                  </a>
                 </p>
               </div>
-              <div className="mb-4">
-                {/* <Label>Poster</Label> */}
-                {/* <p>{selectedStudent.poster || 'No Poster Uploaded'}</p> */}
+              <div className="mb-4  ml-6">
                 <p>
-                  <a href={posterUrl}> Poster </a>
+                  <a href={posterUrl} target="_blank" className="flex ">
+                    {' '}
+                    Poster <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
+                  </a>
                 </p>
               </div>
-              <div className="mb-4">
-                {/* <Label><a href={offerLetterUrl}> Offer Letter </a></Label> */}
+              <div className="mb-4 ml-6">
                 <p>
-                  <a href={offerLetterUrl}> Offer Letter </a>
+                  <a href={offerLetterUrl} target="_blank" className="flex">
+                    {' '}
+                    Offer Letter <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
+                  </a>
                 </p>
               </div>
             </div>
@@ -400,55 +418,52 @@ export default function StudentModal({
                     <div>
                       <Label>{'Poster Organization'}</Label>
                       <Input
+                        error={marks.posterOrganization < 0 || marks.posterOrganization > 10 ? true : false}
                         id="posterOrganization"
                         name="posterOrganization"
                         type="number"
                         value={marks.posterOrganization || ''}
-                        onChange={(e) => handleInputChange('posterOrganization', e.target.value)}
+                        onChange={(e) => handleInputChange('posterOrganization', e.target.value, 10)}
                         placeholder="Marks - out of 10"
                       />
                     </div>
                     <div>
                       <Label>{'Day To Day Activity'}</Label>
                       <Input
-                        id="dayToDayActivity"
-                        name="dayToDayActivity"
+                        error={marks.dayToDayActivity < 0 || marks.dayToDayActivity > 10 ? true : false}
                         type="number"
                         value={marks.dayToDayActivity || ''}
-                        onChange={(e) => handleInputChange('dayToDayActivity', e.target.value)}
+                        onChange={(e) => handleInputChange('dayToDayActivity', e.target.value, 10)}
                         placeholder="Marks - out of 10"
                       />
                     </div>
                     <div>
                       <Label>{'Contribution to Work'}</Label>
                       <Input
-                        id="contributionToWork"
-                        name="contributionToWork"
+                        error={marks.contributionToWork < 0 || marks.contributionToWork > 5 ? true : false}
                         type="number"
                         value={marks.contributionToWork || ''}
-                        onChange={(e) => handleInputChange('contributionToWork', e.target.value)}
+                        onChange={(e) => handleInputChange('contributionToWork', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                       />
                     </div>
                     <div>
                       <Label>{'Learning Outcomes'}</Label>
                       <Input
-                        id="learningOutcomes"
-                        name="learningOutcomes"
+                        error={marks.learningOutcomes < 0 || marks.learningOutcomes > 5 ? true : false}
                         type="number"
                         value={marks.learningOutcomes || ''}
-                        onChange={(e) => handleInputChange('learningOutcomes', e.target.value)}
+                        onChange={(e) => handleInputChange('learningOutcomes', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                       />
                     </div>
                     <div>
                       <Label>{'GeoTag Photos'}</Label>
                       <Input
-                        id="geoTagPhotos"
-                        name="geoTagPhotos"
+                        error={marks.geoTagPhotos < 0 || marks.geoTagPhotos > 5 ? true : false}
                         type="number"
                         value={marks.geoTagPhotos || ''}
-                        onChange={(e) => handleInputChange('geoTagPhotos', e.target.value)}
+                        onChange={(e) => handleInputChange('geoTagPhotos', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                       />
                     </div>
@@ -461,25 +476,36 @@ export default function StudentModal({
                     <div>
                       <Label>{'Report Organization'}</Label>
                       <Input
-                        id="reportOrganization"
-                        name="reportOrganization"
+                        error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
                         type="number"
                         value={marks.reportOrganization || ''}
-                        onChange={(e) => handleInputChange('reportOrganization', e.target.value)}
+                        onChange={(e) => handleInputChange('reportOrganization', e.target.value, 10)}
                         placeholder="Marks - out of 10"
                       />
                     </div>
                     <div>
                       <Label>{'Hard Copy Certificate'}</Label>
                       <Input
-                        id="certificate"
-                        name="certificate"
+                        error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
                         type="number"
                         value={marks.certificate || ''}
-                        onChange={(e) => handleInputChange('certificate', e.target.value)}
+                        onChange={(e) => handleInputChange('certificate', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                       />
                     </div>
+                  </div>
+                  <div>
+                    <p>
+                      Total Marks:{' '}
+                      {marks.posterOrganization +
+                        marks.dayToDayActivity +
+                        marks.contributionToWork +
+                        marks.learningOutcomes +
+                        marks.geoTagPhotos +
+                        marks.reportOrganization +
+                        marks.certificate}{' '}
+                      / 50
+                    </p>
                   </div>
 
                   <div className="flex items-center justify-end w-full gap-3 mt-6">
@@ -500,45 +526,50 @@ export default function StudentModal({
                       <div>
                         <Label>{'Learning Explanation'}</Label>
                         <Input
+                          error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
                           type="number"
                           value={marks.learningExplanation || ''}
-                          onChange={(e) => handleInputChange('learningExplanation', e.target.value)}
+                          onChange={(e) => handleInputChange('learningExplanation', e.target.value, 5)}
                           placeholder="Marks - out of 5"
                         />
                       </div>
                       <div>
                         <Label>{'Problem Identification'}</Label>
                         <Input
+                          error={marks.problemIdentification < 0 || marks.problemIdentification > 5}
                           type="number"
                           value={marks.problemIdentification || ''}
-                          onChange={(e) => handleInputChange('problemIdentification', e.target.value)}
+                          onChange={(e) => handleInputChange('problemIdentification', e.target.value, 5)}
                           placeholder="Marks - out of 5"
                         />
                       </div>
                       <div>
                         <Label>{'Contribution Explanation'}</Label>
                         <Input
+                          error={marks.contributionExplanation < 0 || marks.contributionExplanation > 10}
                           type="number"
                           value={marks.contributionExplanation || ''}
-                          onChange={(e) => handleInputChange('contributionExplanation', e.target.value)}
+                          onChange={(e) => handleInputChange('contributionExplanation', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                         />
                       </div>
                       <div>
                         <Label>{'Proposed Solution'}</Label>
                         <Input
+                          error={marks.proposedSolution < 0 || marks.proposedSolution > 10}
                           type="number"
                           value={marks.proposedSolution || ''}
-                          onChange={(e) => handleInputChange('proposedSolution', e.target.value)}
+                          onChange={(e) => handleInputChange('proposedSolution', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                         />
                       </div>
                       <div>
                         <Label>{'Presenatation Skills'}</Label>
                         <Input
+                          error={marks.presentationSkills < 0 || marks.presentationSkills > 10}
                           type="number"
                           value={marks.presentationSkills || ''}
-                          onChange={(e) => handleInputChange('presentationSkills', e.target.value)}
+                          onChange={(e) => handleInputChange('presentationSkills', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                         />
                       </div>
@@ -551,14 +582,27 @@ export default function StudentModal({
                       <div>
                         <Label>{'QnA Viva'}</Label>
                         <Input
+                          error={marks.qnaViva < 0 || marks.qnaViva > 10}
                           type="number"
                           value={marks.qnaViva || ''}
-                          onChange={(e) => handleInputChange('qnaViva', e.target.value)}
+                          onChange={(e) => handleInputChange('qnaViva', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                         />
                       </div>
                       <div></div>
                     </div>
+                  </div>
+                  <div>
+                    <p>
+                      Total Marks:{' '}
+                      {marks.learningExplanation +
+                        marks.problemIdentification +
+                        marks.contributionExplanation +
+                        marks.proposedSolution +
+                        marks.presentationSkills +
+                        marks.qnaViva}{' '}
+                      / 50
+                    </p>
                   </div>
                   <div className="flex items-center justify-end w-full gap-3 mt-6">
                     <Button size="sm" variant="outline" onClick={onClose}>

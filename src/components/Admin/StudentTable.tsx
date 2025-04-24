@@ -64,7 +64,8 @@ const StudentTable = () => {
       result = result.filter(
         (student) =>
           (student.student.rollNumber && student.student.rollNumber.toLowerCase().includes(term)) ||
-          (student.user.email && student.user.email.toLowerCase().includes(term))
+          (student.user.email && student.user.email.toLowerCase().includes(term)) ||
+          (student.student.name && student.student.name.toLowerCase().includes(term))
       );
     }
 
@@ -140,7 +141,7 @@ const StudentTable = () => {
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Roll Number
+                  Name
                 </TableCell>
                 <TableCell
                   isHeader
@@ -195,7 +196,7 @@ const StudentTable = () => {
                       <div className="flex items-center gap-3">
                         <div>
                           <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90 truncate">
-                            {item.user.name}
+                            {item.student.name}
                           </p>
                           <span className="text-gray-500 text-theme-xs dark:text-gray-400 truncate">
                             {item.student.rollNumber}

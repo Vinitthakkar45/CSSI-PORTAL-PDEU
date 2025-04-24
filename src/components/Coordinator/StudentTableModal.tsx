@@ -22,7 +22,6 @@ export default function TableModal({ selectedStudent, isOpen, onClose, onCloseCr
   const [offerUrl, setOfferUrl] = useState();
   const [mentorName, setMentorName] = useState();
   const [evalName, setEvalName] = useState();
-
   useEffect(() => {
     async function fetchPdfUrls() {
       const userId = selectedStudent.userId;
@@ -32,7 +31,6 @@ export default function TableModal({ selectedStudent, isOpen, onClose, onCloseCr
       setCertiUrl(data.urls.certificate);
       setPosterUrl(data.urls.poster);
       setOfferUrl(data.urls.offerLetter);
-      // console.log(data);
     }
     async function fetchNames() {
       const id = selectedStudent.id;
@@ -46,6 +44,8 @@ export default function TableModal({ selectedStudent, isOpen, onClose, onCloseCr
     }
     fetchPdfUrls();
     fetchNames();
+
+    fetchPdfUrls();
   }, []);
 
   return (
