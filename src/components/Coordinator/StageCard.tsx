@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Check, ArrowRight, Upload } from 'lucide-react';
+import { Lock, Check, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type StageStatus = 'locked' | 'current' | 'completed';

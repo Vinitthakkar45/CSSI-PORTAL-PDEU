@@ -2,7 +2,6 @@ import ScrollUp from '@/components/Landing/Common/ScrollUp';
 import Contact from '@/components/Landing/Contact';
 import Features from '@/components/Landing/Features';
 import Hero from '@/components/Landing/Hero';
-// import Video from "@/components/Video";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

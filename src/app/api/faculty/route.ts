@@ -6,10 +6,9 @@ import {
   getEvaluatedStudents,
   updateFinalMarks,
   updateInternalMarks,
-  MarksType,
 } from '@/drizzle/facultyQueries';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
@@ -45,7 +44,6 @@ export async function POST(req: NextRequest) {
     }
 
     const facultyId = Number(session.user.id);
-    // const facultyId = 7;
 
     const body = await req.json();
     const { studentid, typeofmarks, marks } = body;
@@ -54,13 +52,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Get faculty-related students
     const [mentoredStudents, evaluatedStudents] = await Promise.all([
       getMentoredStudents(facultyId),
       getEvaluatedStudents(facultyId),
     ]);
 
-    // Check if student belongs to faculty's mentored or evaluated list
     const isMentor = mentoredStudents.some((student) => student.id === studentid);
     const isEvaluator = evaluatedStudents.some((student) => student.id === studentid);
 

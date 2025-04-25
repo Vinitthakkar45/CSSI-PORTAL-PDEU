@@ -1,19 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from './app/api/auth/authOptions';
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
-  // const session = await getServerSession(authOptions);
-  // const userRole: string = session?.user?.role || "";
 
-  // Special auth pages that should redirect to /home if user is authenticated
   const authPages = ['/signin', '/'];
 
-  // Protected routes - only /home and its sub-routes
   const isHomeRoute = pathname === '/home' || pathname.startsWith('/home/');
 
   const isAdminRoute = pathname === '/admin' || pathname.includes('/admin/');
