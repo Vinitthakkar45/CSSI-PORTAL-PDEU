@@ -1,4 +1,4 @@
-import { Modal } from '../Home/ui/modal';
+import { Modal } from './Home/ui/modal';
 
 type ModalType = {
   title: string;

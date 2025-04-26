@@ -102,7 +102,7 @@ export default function UserDropdown() {
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
             {user?.info?.name ? user?.info?.name : user?.role}
           </span>
-          <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">{user?.info?.email}</span>
+          <span className="ml-5 mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">{user?.info?.email}</span>
         </div>
 
         <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
