@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import ComponentCard from '@/components/Home/common/ComponentCard';
 import Button from '@/components/Home/ui/button/Button';
 import DropzoneComponent from '@/components/Home/form/form-elements/DropZone';
-import { FileCheck } from 'lucide-react';
 // import { toast } from 'sonner';
 
 interface OfferLetterUploadProps {

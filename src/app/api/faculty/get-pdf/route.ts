@@ -1,4 +1,3 @@
-// /app/api/get-pdf/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 
@@ -10,7 +9,7 @@ cloudinary.config({
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const filePath = searchParams.get('filePath'); // e.g., "Report/8.pdf"
+  const filePath = searchParams.get('filePath');
 
   if (!filePath) {
     return NextResponse.json({ error: 'Missing filePath' }, { status: 400 });
@@ -18,9 +17,9 @@ export async function GET(req: NextRequest) {
 
   try {
     const publicUrl = cloudinary.url(filePath, {
-      resource_type: 'auto', // Automatically determine the resource type
+      resource_type: 'auto',
       type: 'upload',
-      flags: 'attachment', // Allow public access
+      flags: 'attachment',
     });
 
     return NextResponse.json({ publicUrl });

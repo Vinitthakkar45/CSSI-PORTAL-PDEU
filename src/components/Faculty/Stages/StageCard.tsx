@@ -1,5 +1,4 @@
 import React from 'react';
-import { Lock, Check, ArrowRight, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useModal } from '@/hooks/useModal';
 import DefaultModal from '../Modal/DefaultModal';

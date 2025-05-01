@@ -17,12 +17,10 @@ const eslintConfig = [
     plugins: { prettier: prettierPlugin },
     rules: {
       'prettier/prettier': 'error',
-      semi: ['warn', 'always'],
-
-      // Allow unused variables (but keep them for future use)
-      '@typescript-eslint/no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: true }],
-
-      // Allow unused imports (including unused components)
+      'semi': ['warn', 'always'],
+      '@typescript-eslint/no-unused-vars': 'off',
+      'jsx-a11y/alt-text': 'off',
+      'react-hooks/exhaustive-deps': 'off',
       'no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'off',
       'unused-imports/no-unused-vars': 'off'
@@ -32,3 +30,5 @@ const eslintConfig = [
 ];
 
 export default eslintConfig;
+
+

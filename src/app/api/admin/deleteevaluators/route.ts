@@ -1,12 +1,10 @@
-// File: app/api/admin/deleteevaluators/route.ts
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/drizzle/db';
 import { evaluatorStudent } from '@/drizzle/schema';
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE() {
   try {
-    // Delete all records from the evaluatorStudent table
-    const result = await db.delete(evaluatorStudent);
+    await db.delete(evaluatorStudent);
 
     return NextResponse.json({
       success: true,

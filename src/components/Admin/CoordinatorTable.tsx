@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
-import Badge from '../Home/ui/badge/Badge';
 import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import FacultyTableModal from './FacultyTableModal';
@@ -26,8 +25,6 @@ const CoordinatorTable = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
-  const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
-  const [assignmentsLoaded, setAssignmentsLoaded] = useState(false);
   const [selectedFaculty, setSelectedFaculty] = useState<FacultyWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
 

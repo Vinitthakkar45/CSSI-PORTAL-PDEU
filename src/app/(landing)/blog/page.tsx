@@ -1,5 +1,3 @@
-// import SingleBlog from '@/components/Landing/Blog/SingleBlog';
-// import blogData from '@/components/Landing/Blog/blogData';
 import Breadcrumb from '@/components/Landing/Common/Breadcrumb';
 // import PdfViewer from '@/components/PdfViewer';
 import { Metadata } from 'next';

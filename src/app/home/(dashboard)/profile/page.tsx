@@ -1,4 +1,3 @@
-import UserAddressCard from '@/components/Home/user-profile/UserAddressCard';
 import UserInfoCard from '@/components/Home/user-profile/UserInfoCard';
 import UserMetaCard from '@/components/Home/user-profile/UserMetaCard';
 import { Metadata } from 'next';

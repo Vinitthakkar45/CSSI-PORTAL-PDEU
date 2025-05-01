@@ -6,7 +6,6 @@ import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import FacultyTableModal from './FacultyTableModal';
 import Button from '../Home/ui/button/Button';
-import LoadingOverlay from '../LoadingOverlay';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -145,7 +144,6 @@ const FacultyTable = () => {
 
   return (
     <>
-      {loading && <LoadingOverlay />}
       {showModal && selectedFaculty && (
         <FacultyTableModal
           selectedFaculty={selectedFaculty.faculty}

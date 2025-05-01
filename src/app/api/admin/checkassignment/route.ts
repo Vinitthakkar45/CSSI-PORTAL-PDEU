@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/drizzle/db';
 import { mentorStudent, evaluatorStudent, faculty } from '@/drizzle/schema';
 

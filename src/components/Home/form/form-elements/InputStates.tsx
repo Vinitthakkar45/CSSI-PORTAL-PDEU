@@ -35,7 +35,6 @@ export default function InputStates() {
             error={error}
             onChange={handleEmailChange}
             placeholder="Enter your email"
-            hint={error ? 'This is an invalid email address.' : ''}
           />
         </div>
 
@@ -48,20 +47,13 @@ export default function InputStates() {
             success={!error}
             onChange={handleEmailChange}
             placeholder="Enter your email"
-            hint={!error ? 'Valid email!' : ''}
           />
         </div>
 
         {/* Disabled Input */}
         <div>
           <Label>Email</Label>
-          <Input
-            type="text"
-            defaultValue="disabled@example.com"
-            disabled={true}
-            placeholder="Disabled email"
-            hint="This field is disabled."
-          />
+          <Input type="text" defaultValue="disabled@example.com" disabled={true} placeholder="Disabled email" />
         </div>
       </div>
     </ComponentCard>

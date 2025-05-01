@@ -57,16 +57,14 @@ const studentUpdateSchema = z.object({
     .partial(),
 });
 
-export async function PATCH(request: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await req.json();
 
     const validatedData = studentUpdateSchema.safeParse(body);
 
     if (!validatedData.success) {
-      // Improve error mapping to match frontend field names
       const formattedErrors = validatedData.error.issues.map((issue) => {
-        // Remove 'data.' prefix from the path if it exists
         const fieldPath = issue.path.filter((p) => p !== 'data').join('.');
 
         return {
@@ -76,7 +74,6 @@ export async function PATCH(request: NextRequest) {
         };
       });
 
-      // Group errors by field name for better organization
       const errorsByField = formattedErrors.reduce((acc: Record<string, string>, error) => {
         acc[error.field] = error.message;
         return acc;

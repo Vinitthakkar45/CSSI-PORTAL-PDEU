@@ -1,10 +1,8 @@
 'use client';
-import React, { useEffect, useState } from 'react';
 import { InferSelectModel } from 'drizzle-orm';
 import { Modal } from '../Home/ui/modal';
 import Button from '../Home/ui/button/Button';
 import { faculty } from '@/drizzle/schema';
-import Image from 'next/image';
 import Label from '@/components/Home/form/Label';
 import Input from '../Home/form/input/InputField';
 
