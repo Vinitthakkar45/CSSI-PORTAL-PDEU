@@ -135,7 +135,7 @@ const CoordinatorTable = () => {
                   isHeader
                   className="py-3 px-4 w-16 md:w-20 text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  ID
+                  No
                 </TableCell>
                 <TableCell
                   isHeader
@@ -171,7 +171,7 @@ const CoordinatorTable = () => {
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {filteredFaculties.length > 0 ? (
-                filteredFaculties.map((item) => (
+                filteredFaculties.map((item, index) => (
                   <TableRow
                     key={item.faculty.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
@@ -180,7 +180,7 @@ const CoordinatorTable = () => {
                     }}
                   >
                     <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                      {item.faculty.id}
+                      {index + 1}
                     </TableCell>
                     <TableCell className="py-3 px-4 truncate">
                       <div className="flex items-center gap-3">

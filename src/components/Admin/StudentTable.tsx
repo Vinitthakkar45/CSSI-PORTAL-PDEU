@@ -9,7 +9,7 @@ import TableModal from './tableModal';
 import Button from '../Home/ui/button/Button';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-
+import { Download } from 'lucide-react';
 type StudentWithUser = {
   student: InferSelectModel<typeof student>;
   user: {
@@ -177,10 +177,13 @@ const StudentTable = () => {
                 <option value="ECE">ECE</option>
                 <option value="ICT">ICT</option>
               </select>
+              <Button size="sm" variant="primary" className="mr-4" onClick={handleCSVDownload}>
+                <span className="hidden sm:inline">Download CSV</span>
+                <span className="inline sm:hidden">
+                  <Download className="w-4 h-4" />
+                </span>
+              </Button>
             </div>
-            <Button size="sm" variant="primary" className="mr-4" onClick={handleCSVDownload}>
-              Download CSV
-            </Button>
           </div>
         </div>
 
@@ -189,7 +192,7 @@ const StudentTable = () => {
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
                 <TableCell isHeader className="py-3 px-4 w-16 md:w-20 text-gray-500 text-start dark:text-gray-400">
-                  ID
+                  No
                 </TableCell>
                 <TableCell isHeader className="py-3 px-4 w-32 md:w-40 text-gray-500 text-start dark:text-gray-400">
                   Name
@@ -216,13 +219,13 @@ const StudentTable = () => {
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {paginatedStudents.length > 0 ? (
-                paginatedStudents.map((item) => (
+                paginatedStudents.map((item, index) => (
                   <TableRow
                     key={item.student.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                     onClick={() => handleCellClick(item)}
                   >
-                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">{item.student.id}</TableCell>
+                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">{index + 1}</TableCell>
                     <TableCell className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <div>
