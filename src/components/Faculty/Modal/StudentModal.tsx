@@ -371,35 +371,63 @@ export default function StudentModal({
                 <i> Documents Uploaded </i>
               </p>
               <div className="mb-4 ml-6">
+                <Label>Offer Letter</Label>
                 <p>
-                  <a href={reportUrl} target="_blank" className="flex ">
-                    {' '}
-                    Report <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
-                  </a>
+                  {selectedStudent.offerLetter ? (
+                    <a href={offerLetterUrl} target="_blank" className="flex text-gray-200 mt-1 ml-4">
+                      {' '}
+                      View Offer Letter <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
+                    </a>
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
+                      Offer Letter is not yet uploaded by the student
+                    </p>
+                  )}
                 </p>
               </div>
               <div className="mb-4 ml-6">
+                <Label>Report</Label>
                 <p>
-                  <a href={certificateUrl} target="_blank" className="flex ">
-                    {' '}
-                    Certificate <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
-                  </a>
-                </p>
-              </div>
-              <div className="mb-4  ml-6">
-                <p>
-                  <a href={posterUrl} target="_blank" className="flex ">
-                    {' '}
-                    Poster <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
-                  </a>
+                  {selectedStudent.report ? (
+                    <a href={reportUrl} target="_blank" className="flex text-gray-200 mt-1 ml-4">
+                      {' '}
+                      View Report <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
+                    </a>
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
+                      Report is not yet uploaded by the student
+                    </p>
+                  )}
                 </p>
               </div>
               <div className="mb-4 ml-6">
+                <Label>Certificate</Label>
                 <p>
-                  <a href={offerLetterUrl} target="_blank" className="flex">
-                    {' '}
-                    Offer Letter <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
-                  </a>
+                  {selectedStudent.certificate ? (
+                    <a href={certificateUrl} target="_blank" className="flex text-gray-200 mt-1 ml-4">
+                      {' '}
+                      View Certificate <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
+                    </a>
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
+                      Certificate is not yet uploaded by the student
+                    </p>
+                  )}
+                </p>
+              </div>
+              <div className="mb-4 ml-6">
+                <Label>Poster</Label>
+                <p>
+                  {selectedStudent.poster ? (
+                    <a href={posterUrl} target="_blank" className="flex text-gray-200 mt-1 ml-4">
+                      {' '}
+                      View Poster <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
+                    </a>
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
+                      Poster is not yet uploaded by the student
+                    </p>
+                  )}
                 </p>
               </div>
             </div>

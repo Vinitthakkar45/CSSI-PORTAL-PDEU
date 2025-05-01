@@ -46,14 +46,6 @@ const Dashboard = () => {
     fetchStudentData();
   }, [marksToggle]);
 
-  if (status === 'loading' || loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
-
   const getStageStatus = (stageNumber: number): StageStatus => {
     return 'current';
   };
@@ -101,8 +93,14 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {(selectedToggle === 'mentor' && mentoredStudents.length > 0) ||
-      (selectedToggle != 'mentor' && evaluatedStudents.length > 0) ? (
+      {status === 'loading' || loading || error ? (
+        error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <p>Loading...</p>
+        )
+      ) : (selectedToggle === 'mentor' && mentoredStudents.length > 0) ||
+        (selectedToggle != 'mentor' && evaluatedStudents.length > 0) ? (
         <TableList
           students={selectedToggle === 'mentor' ? mentoredStudents : evaluatedStudents}
           option={selectedToggle}
