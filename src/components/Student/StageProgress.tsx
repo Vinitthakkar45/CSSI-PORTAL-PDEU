@@ -1,6 +1,8 @@
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Check, Lock, CircleAlert } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 interface StageProgressProps {
   currentStage: number;
@@ -16,7 +18,25 @@ const StageProgress: React.FC<StageProgressProps> = ({
   maxStageUnlocked = currentStage,
 }) => {
   const stageLabels = ['Select', 'Internship', 'Uploads', 'Grade'];
-
+  const [mentorName, setMentorName] = useState('');
+  const [evalName, setEvalName] = useState('');
+  const session = useSession();
+  useEffect(() => {
+    if (!session.data?.user?.id) return;
+    async function fetchME() {
+      const id = session.data?.user.id;
+      const role = session.data?.user.role;
+      const res = await fetch('/api/mentorandevaluator', {
+        method: 'POST',
+        body: JSON.stringify({ id, role }),
+      });
+      const data = await res.json();
+      console.log(data);
+      setMentorName(data.mentorname.name);
+      setEvalName(data.evalname.name);
+    }
+    fetchME();
+  }, [session.data?.user?.id]);
   return (
     <div className="w-full lg:mb-4 mb-2 mx-auto">
       <div className="flex items-center justify-between gap-20">
@@ -104,8 +124,8 @@ const StageProgress: React.FC<StageProgressProps> = ({
         </div>
         <div className="hidden md:flex justify-end items-center gap-8">
           {[
-            { initials: 'TBA', label: 'Mentor' },
-            { initials: 'TBA', label: 'Evaluator' },
+            { initials: 'Mentor', label: mentorName != '' ? mentorName : 'TBA' },
+            { initials: 'Evaluator', label: evalName != '' ? evalName : 'TBA' },
           ].map((item, index) => (
             <div key={index} className="flex flex-col items-center gap-1.5">
               <div className="w-24 h-24 flex items-center justify-center text-xl font-semibold text-white bg-gray-400 dark:bg-gray-600 rounded-full">
