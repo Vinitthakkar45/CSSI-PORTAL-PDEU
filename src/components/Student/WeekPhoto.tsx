@@ -42,11 +42,13 @@ const WeekPhoto: React.FC<WeekPhotoProps> = ({ onComplete }) => {
     }
 
     if (file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/webp') {
+      toast.error('Only JPG, PNG, and WebP images are allowed');
       setError('Only JPG, PNG, and WebP images are allowed');
       return;
     }
 
     if (file.size > 1 * 1024 * 1024) {
+      toast.error('File size must be less than 1MB');
       setError('File size must be less than 1MB');
       return;
     }

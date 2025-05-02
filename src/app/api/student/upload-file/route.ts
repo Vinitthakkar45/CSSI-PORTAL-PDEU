@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     let columnName = '';
     switch (folderName.toLowerCase()) {
       case 'offerletter':
-        columnName = 'offerletter';
+        columnName = 'offerLetter';
         break;
       case 'report':
         columnName = 'report';

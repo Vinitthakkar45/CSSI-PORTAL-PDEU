@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import ComponentCard from '@/components/Home/common/ComponentCard';
-import Button from '@/components/Home/ui/button/Button';
 import DropzoneComponent from '@/components/Home/form/form-elements/DropZone';
 import { toast } from '../Home/ui/toast/Toast';
 
@@ -47,11 +46,13 @@ const OfferLetterUpload = ({ onComplete, userId }: OfferLetterUploadProps) => {
     const file = files[0];
 
     if (file.type !== 'application/pdf') {
+      toast.error('Only PDF files are allowed');
       setError('Only PDF files are allowed');
       return;
     }
 
     if (file.size > 1 * 1024 * 1024) {
+      toast.error('File size must be less than 1MB');
       setError('File size must be less than 1MB');
       return;
     }
