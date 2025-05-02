@@ -1,4 +1,3 @@
-// --- StudentModal.tsx ---
 import React, { useState, useEffect } from 'react';
 import { Modal } from '@/components/Home/ui/modal';
 import Button from '@/components/Home/ui/button/Button';
@@ -7,7 +6,6 @@ import Input from '@/components/Home/form/input/InputField';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SelectStudent } from '@/drizzle/schema';
-import { co } from '@fullcalendar/core/internal-common';
 import { ExternalLink } from 'lucide-react';
 import { z } from 'zod';
 

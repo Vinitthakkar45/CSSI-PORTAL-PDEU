@@ -5,7 +5,6 @@ import LORGenerator from '@/components/Student/LorGenerator';
 import NGODetailsForm from '@/components/Student/NGODetailsForm';
 import OfferLetter from '@/components/Student/OfferLetterUpload';
 import { useSession } from 'next-auth/react';
-import Button from '@/components/Home/ui/button/Button';
 import { toast } from '@/components/Home/ui/toast/Toast';
 import { UserDetails, PersonalDetails, NGODetails, ProjectDetails, StudentUpdateData } from '@/types/student';
 import { ChevronLeft, ChevronRight } from 'lucide-react';

@@ -1,7 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Check, Lock } from 'lucide-react';
-import Button from '../Home/ui/button/Button';
 
 interface StageProgressProps {
   currentStage: number;

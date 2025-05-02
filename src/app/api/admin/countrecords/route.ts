@@ -1,4 +1,3 @@
-// app/api/counts/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/drizzle/db';
 import { student, faculty, mentorStudent, evaluatorStudent } from '@/drizzle/schema';

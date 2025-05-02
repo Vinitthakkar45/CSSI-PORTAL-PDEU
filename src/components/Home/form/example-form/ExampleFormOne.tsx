@@ -59,7 +59,6 @@ export default function ExampleFormOne() {
               placeholder="Type your message here..."
               rows={6}
               value={message}
-              onChange={handleTextareaChange}
               className=" bg-gray-50 dark:bg-gray-800"
             />
           </div>

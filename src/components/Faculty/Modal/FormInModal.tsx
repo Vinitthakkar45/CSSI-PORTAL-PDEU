@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import ComponentCard from '@/components/Home/common/ComponentCard';
 import Button from '@/components/Home/ui/button/Button';
 import { Modal } from '@/components/Home/ui/modal';
 import Label from '@/components/Home/form/Label';

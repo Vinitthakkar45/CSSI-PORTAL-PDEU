@@ -5,7 +5,7 @@ import AdminDashboard from '@/components/Admin/Dashboard';
 import StudentDashboard from '@/components/Student/Dashboard';
 import FacultyDashboard from '@/components/Faculty/Dashboard';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/api/auth/authOptions';
 import CoordinatorDashboard from '@/components/Coordinator/Dashboard';
 export const metadata: Metadata = {
   title: 'Home',
@@ -31,7 +31,7 @@ export default async function Dashboard() {
       dashboardContent = <StudentDashboard />;
       break;
     default:
-      dashboardContent = <div>Loading or Unauthorized</div>; // Handle cases where role is missing
+      dashboardContent = <div>Loading or Unauthorized</div>;
   }
 
   return <>{dashboardContent}</>;

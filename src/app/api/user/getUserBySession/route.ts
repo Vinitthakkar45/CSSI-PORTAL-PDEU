@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/api/auth/authOptions';
 import { db } from '@/drizzle/db';
 import { user, student, faculty } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const session = await getServerSession(authOptions);
   const currentUser = session?.user as { id: number; email: string; role: string } | undefined;
 

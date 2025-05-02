@@ -1,12 +1,10 @@
-// File: app/api/admin/deletementors/route.ts
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/drizzle/db';
 import { mentorStudent } from '@/drizzle/schema';
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE() {
   try {
-    // Delete all records from the mentorStudent table
-    const result = await db.delete(mentorStudent);
+    await db.delete(mentorStudent);
 
     return NextResponse.json({
       success: true,

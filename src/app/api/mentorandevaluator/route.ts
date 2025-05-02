@@ -1,5 +1,5 @@
 import { db } from '@/drizzle/db';
-import { evaluatorStudent, faculty, mentorStudent, student } from '@/drizzle/schema';
+import { evaluatorStudent, faculty, mentorStudent } from '@/drizzle/schema';
 import { NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 
