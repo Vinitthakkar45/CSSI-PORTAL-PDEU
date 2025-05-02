@@ -6,6 +6,7 @@ import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import FacultyTableModal from './FacultyTableModal';
 import Button from '../Home/ui/button/Button';
+import AddFacultyModal from './AddFacultyModal';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -33,7 +34,7 @@ const FacultyTable = () => {
   const [assignmentsLoaded, setAssignmentsLoaded] = useState(false);
   const [selectedFaculty, setSelectedFaculty] = useState<FacultyWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
-
+  const [showAdd, setShowAdd] = useState<boolean>(false);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -138,12 +139,21 @@ const FacultyTable = () => {
     setFilteredFaculties(result);
   }, [searchTerm, selectedDepartment, faculties]);
 
+  const handleAddFaculty = () => {
+    setShowAdd(true);
+  };
+  const handleAddFacultyClose = () => {
+    setShowAdd(false);
+  };
+
   if (loading) {
     return <div className="p-4 text-center">Loading faculty data...</div>;
   }
 
   return (
     <>
+      {showAdd && <AddFacultyModal isOpen={showAdd} onClose={handleAddFacultyClose} />}
+
       {showModal && selectedFaculty && (
         <FacultyTableModal
           selectedFaculty={selectedFaculty.faculty}
@@ -157,7 +167,13 @@ const FacultyTable = () => {
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Faculty Details</h3>
           </div>
+
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div>
+              <Button size="sm" variant="primary" className="mr-4" onClick={handleAddFaculty}>
+                Add Faculty
+              </Button>
+            </div>
             <div className="w-full sm:w-auto mb-2 sm:mb-0">
               <input
                 type="text"
