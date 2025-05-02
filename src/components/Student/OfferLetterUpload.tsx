@@ -1,9 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import ComponentCard from '@/components/Home/common/ComponentCard';
-import Button from '@/components/Home/ui/button/Button';
 import DropzoneComponent from '@/components/Home/form/form-elements/DropZone';
-// import { toast } from 'sonner';
+import { toast } from '../Home/ui/toast/Toast';
 
 interface OfferLetterUploadProps {
   onComplete: () => void;
@@ -16,32 +15,19 @@ const OfferLetterUpload = ({ onComplete, userId }: OfferLetterUploadProps) => {
   const [hasUploadedFile, setHasUploadedFile] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const localStorageKey = `userData`;
   useEffect(() => {
     const checkUploadStatus = () => {
       try {
-        const localStorageKey = `offerLetterUploaded_${userId}`;
-        const storedStatus = localStorage.getItem(localStorageKey);
+        const storedData = localStorage.getItem(localStorageKey);
 
-        fetchUploadStatus();
-      } catch (err) {
-        console.error('Error checking upload status:', err);
-        setIsLoading(false);
-      }
-    };
-
-    const fetchUploadStatus = async () => {
-      try {
-        const response = await fetch(`/api/student/uploaded-status?userId=${userId}`);
-        const data = await response.json();
-
-        setHasUploadedFile(data.data.offerLetterUploaded);
-
-        if (data.data.offerLetterUploaded) {
-          localStorage.setItem(`offerLetterUploaded_${userId}`, 'true');
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          if (parsedData.profileData.offerLetter !== null) setHasUploadedFile(true);
+          setIsLoading(false);
         }
       } catch (err) {
-        console.error('Error fetching upload status:', err);
-      } finally {
+        console.error('Error checking upload status:', err);
         setIsLoading(false);
       }
     };
@@ -60,12 +46,14 @@ const OfferLetterUpload = ({ onComplete, userId }: OfferLetterUploadProps) => {
     const file = files[0];
 
     if (file.type !== 'application/pdf') {
+      toast.error('Only PDF files are allowed');
       setError('Only PDF files are allowed');
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError('File size must be less than 5MB');
+    if (file.size > 1 * 1024 * 1024) {
+      toast.error('File size must be less than 1MB');
+      setError('File size must be less than 1MB');
       return;
     }
 
@@ -89,12 +77,16 @@ const OfferLetterUpload = ({ onComplete, userId }: OfferLetterUploadProps) => {
       }
 
       setHasUploadedFile(true);
-      localStorage.setItem(`offerLetterUploaded_${userId}`, 'true');
-      // toast.success('Offer letter uploaded successfully');
+      const userData = JSON.parse(localStorage.getItem(localStorageKey) || '{}');
+      userData.profileData = userData.profileData || {};
+      userData.profileData.offerLetter = file.name;
+      localStorage.setItem(localStorageKey, JSON.stringify(userData));
+
+      onComplete();
     } catch (err) {
       console.error('Upload error:', err);
       setError(err instanceof Error ? err.message : 'Failed to upload file');
-      // toast.error('Failed to upload offer letter');
+      toast.error('Failed to upload offer letter');
     } finally {
       setIsUploading(false);
     }
@@ -113,12 +105,6 @@ const OfferLetterUpload = ({ onComplete, userId }: OfferLetterUploadProps) => {
               <DropzoneComponent onDrop={handleFileDrop} isLoading={isUploading} title="" />
             </div>
             {error && <p className="text-sm text-error-500 font-medium">{error}</p>}
-          </div>
-
-          <div className="flex justify-between items-center">
-            <Button onClick={onComplete} disabled={!hasUploadedFile} className="w-full md:w-auto">
-              Continue
-            </Button>
           </div>
         </div>
       )}
