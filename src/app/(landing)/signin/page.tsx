@@ -4,18 +4,17 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { toast } from '@/components/Home/ui/toast/Toast';
 
 const SigninPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
     try {
       const result = await signIn('credentials', {
@@ -25,12 +24,12 @@ const SigninPage = () => {
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        toast.error('Invalid email or password');
       } else {
         router.push('/home');
       }
     } catch (error) {
-      setError('An error occurred during sign in');
+      toast.error('An error occurred during sign in');
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -113,10 +112,6 @@ const SigninPage = () => {
                       </a>
                     </div>
                   </div>
-
-                  {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>
-                  )}
 
                   <div className="mb-6">
                     <button className="shadow-submit dark:shadow-submit-dark flex w-full items-center justify-center rounded-xs bg-primary px-9 py-4 text-base font-medium text-white duration-300 hover:bg-primary/90">

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Document, Page, Text, StyleSheet, pdf, Image } from '@react-pdf/renderer';
 import Button from '@/components/Home/ui/button/Button';
 import ComponentCard from '@/components/Home/common/ComponentCard';
+import { Download } from 'lucide-react';
 
 const styles = StyleSheet.create({
   page: {
@@ -75,7 +76,7 @@ const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: 
       try {
         setIsLoading(true);
 
-        const localStorageKey = `userData_${userId}`;
+        const localStorageKey = `userData`;
         const storedData = localStorage.getItem(localStorageKey);
 
         if (storedData) {
@@ -125,7 +126,7 @@ const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: 
       // Create download link
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${name}_lor.pdf`;
+      link.download = `${name}_LOR.pdf`;
 
       // Track download completion
       let dialogClosed = false;
@@ -177,7 +178,7 @@ const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: 
         </div>
       ) : (
         <div className="flex flex-col md:flex-row gap-4 justify-between">
-          <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90">
+          <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90" startIcon={<Download />}>
             Download LOR PDF
           </Button>
         </div>

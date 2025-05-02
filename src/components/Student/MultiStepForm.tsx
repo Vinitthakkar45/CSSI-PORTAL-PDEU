@@ -46,8 +46,8 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
       'report',
       'certificate',
       'poster',
-      'weekOnePhoto',
-      'weekTwoPhoto',
+      'week_one_photo',
+      'week_two_photo',
       // Progress
       'stage',
     ] as const;
@@ -108,7 +108,7 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
         };
 
         setUserData(updatedUserData);
-        localStorage.setItem(`userData_${userId}`, JSON.stringify(updatedUserData));
+        localStorage.setItem(`userData`, JSON.stringify(updatedUserData));
       }
 
       return { success: true, errors: null };
@@ -152,7 +152,7 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
       const fetchData = async () => {
         try {
           setIsLoading(true);
-          const localStorageKey = `userData_${userId}`;
+          const localStorageKey = `userData`;
           const storedData = localStorage.getItem(localStorageKey);
 
           if (storedData) {
