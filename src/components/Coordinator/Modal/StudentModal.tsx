@@ -11,6 +11,15 @@ import { z } from 'zod';
 import { useSession } from 'next-auth/react';
 import { toast } from '@/components/Home/ui/toast/Toast';
 
+type StudentWithUser = {
+  student: SelectStudent;
+  user: {
+    name: string | null;
+    email: string | null;
+    role: string | null;
+  };
+};
+
 export default function StudentModal({
   isOpen,
   onClose,
@@ -23,12 +32,12 @@ export default function StudentModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  selectedStudent?: SelectStudent;
-  option: 'mentor' | 'evaluator';
+  selectedStudent?: StudentWithUser;
+  option: 'mentor' | 'evaluator' | 'both';
   setMarksToggle: React.Dispatch<React.SetStateAction<boolean>>;
   marksToggle: boolean;
-  students: SelectStudent[];
-  setStudents: React.Dispatch<React.SetStateAction<SelectStudent[]>>;
+  students: StudentWithUser[];
+  setStudents: React.Dispatch<React.SetStateAction<StudentWithUser[]>>;
 }) {
   const { data: session } = useSession(); // Get faculty ID from session
   const [savingMarks, setSavingMarks] = useState(false);
@@ -63,32 +72,32 @@ export default function StudentModal({
     if (selectedStudent) {
       //   setMarks(option === 'mentor' ? selectedStudent.internal_evaluation_marks : selectedStudent.final_evaluation_marks);
       setCertificateUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Certificate/${selectedStudent.userId}.pdf`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Certificate/${selectedStudent.student.userId}.pdf`
       );
       setOfferLetterUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/OfferLetter/${selectedStudent.userId}.pdf`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/OfferLetter/${selectedStudent.student.userId}.pdf`
       );
       setPosterUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Poster/${selectedStudent.userId}.pdf`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Poster/${selectedStudent.student.userId}.pdf`
       );
       setReportUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Report/${selectedStudent.userId}.pdf`
+        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Report/${selectedStudent.student.userId}.pdf`
       );
 
       setMarks({
-        posterOrganization: selectedStudent.posterOrganization || 0,
-        dayToDayActivity: selectedStudent.dayToDayActivity || 0,
-        contributionToWork: selectedStudent.contributionToWork || 0,
-        learningOutcomes: selectedStudent.learningOutcomes || 0,
-        geoTagPhotos: selectedStudent.geotagPhotos || 0,
-        reportOrganization: selectedStudent.reportOrganization || 0,
-        certificate: selectedStudent.hardCopyCertificate || 0,
-        learningExplanation: selectedStudent.learningExplanation || 0,
-        problemIdentification: selectedStudent.problemIndentification || 0,
-        contributionExplanation: selectedStudent.contributionExplanation || 0,
-        proposedSolution: selectedStudent.proposedSolutionExplanation || 0,
-        presentationSkills: selectedStudent.presentationSkill || 0,
-        qnaViva: selectedStudent.qnaMarks || 0,
+        posterOrganization: selectedStudent.student.posterOrganization || 0,
+        dayToDayActivity: selectedStudent.student.dayToDayActivity || 0,
+        contributionToWork: selectedStudent.student.contributionToWork || 0,
+        learningOutcomes: selectedStudent.student.learningOutcomes || 0,
+        geoTagPhotos: selectedStudent.student.geotagPhotos || 0,
+        reportOrganization: selectedStudent.student.reportOrganization || 0,
+        certificate: selectedStudent.student.hardCopyCertificate || 0,
+        learningExplanation: selectedStudent.student.learningExplanation || 0,
+        problemIdentification: selectedStudent.student.problemIndentification || 0,
+        contributionExplanation: selectedStudent.student.contributionExplanation || 0,
+        proposedSolution: selectedStudent.student.proposedSolutionExplanation || 0,
+        presentationSkills: selectedStudent.student.presentationSkill || 0,
+        qnaViva: selectedStudent.student.qnaMarks || 0,
       });
     }
   }, [selectedStudent]);
@@ -142,8 +151,8 @@ export default function StudentModal({
     }
     setSavingMarks(true);
 
-    const typeofmarks = option === 'mentor' ? 'internal' : 'final';
-    const studentid = selectedStudent.id;
+    const typeofmarks = type === 'mentor' ? 'internal' : 'final';
+    const studentid = selectedStudent.student.id;
 
     try {
       const response = await fetch(`/api/coord/evaluate?facultyId=${session?.user.id}`, {
@@ -156,22 +165,22 @@ export default function StudentModal({
       if (!response.ok) throw new Error(result.error || 'Something went wrong');
 
       const updated = students.map((student) => {
-        if (student.id === studentid) {
+        if (student.student.id === studentid) {
           if (typeofmarks === 'internal') {
-            student.posterOrganization = marks.posterOrganization;
-            student.dayToDayActivity = marks.dayToDayActivity;
-            student.contributionToWork = marks.contributionToWork;
-            student.learningOutcomes = marks.learningOutcomes;
-            student.geotagPhotos = marks.geoTagPhotos;
-            student.reportOrganization = marks.reportOrganization;
-            student.hardCopyCertificate = marks.certificate;
+            student.student.posterOrganization = marks.posterOrganization;
+            student.student.dayToDayActivity = marks.dayToDayActivity;
+            student.student.contributionToWork = marks.contributionToWork;
+            student.student.learningOutcomes = marks.learningOutcomes;
+            student.student.geotagPhotos = marks.geoTagPhotos;
+            student.student.reportOrganization = marks.reportOrganization;
+            student.student.hardCopyCertificate = marks.certificate;
           } else if (typeofmarks === 'final') {
-            student.learningExplanation = marks.learningExplanation;
-            student.problemIndentification = marks.problemIdentification;
-            student.contributionExplanation = marks.contributionExplanation;
-            student.proposedSolutionExplanation = marks.proposedSolution;
-            student.presentationSkill = marks.presentationSkills;
-            student.qnaMarks = marks.qnaViva;
+            student.student.learningExplanation = marks.learningExplanation;
+            student.student.problemIndentification = marks.problemIdentification;
+            student.student.contributionExplanation = marks.contributionExplanation;
+            student.student.proposedSolutionExplanation = marks.proposedSolution;
+            student.student.presentationSkill = marks.presentationSkills;
+            student.student.qnaMarks = marks.qnaViva;
           }
         }
         return student;
@@ -188,12 +197,13 @@ export default function StudentModal({
     }
   };
 
-  function savemarks() {
-    if (option === 'mentor') {
-      handleSave('mentor');
-    } else {
-      handleSave('evaluator');
-    }
+  function saveinternalmarks() {
+    handleSave('mentor');
+    setMarksToggle(!marksToggle);
+  }
+
+  function saveexternalmarks() {
+    handleSave('evaluator');
     setMarksToggle(!marksToggle);
   }
 
@@ -223,7 +233,7 @@ export default function StudentModal({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          student_user_id: selectedStudent.userId,
+          student_user_id: selectedStudent.student.userId,
           reason_of_declination: declineReason,
         }),
       });
@@ -306,46 +316,46 @@ export default function StudentModal({
                     width={160}
                     height={160}
                     src={
-                      selectedStudent.profileImage
-                        ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.profileImage}`
+                      selectedStudent.student.profileImage
+                        ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.student.profileImage}`
                         : '/images/user/user-17.jpg'
                     }
-                    alt={selectedStudent.name || ''}
+                    alt={selectedStudent.student.name || ''}
                   />
                 </div>
                 <div className="flex flex-col justify-center">
                   <div className="mb-4">
                     <Label>Name</Label>
-                    <Input type="text" value={selectedStudent.name || ''} disabled />
+                    <Input type="text" value={selectedStudent.student.name || ''} disabled />
                   </div>
                   <div className="mb-4">
                     <Label>Roll Number</Label>
-                    <Input type="text" value={selectedStudent.rollNumber || ''} disabled />
+                    <Input type="text" value={selectedStudent.student.rollNumber || ''} disabled />
                   </div>
                 </div>
               </div>
               <div className="mb-3">
                 <Label>Department</Label>
-                <Input type="text" value={selectedStudent.department || ''} disabled />
+                <Input type="text" value={selectedStudent.student.department || ''} disabled />
               </div>
               <div className="grid grid-cols-2 gap-6 mb-4">
                 <div>
                   <Label>Division</Label>
-                  <Input type="text" value={selectedStudent.division || 'N/A'} disabled />
+                  <Input type="text" value={selectedStudent.student.division || 'N/A'} disabled />
                 </div>
                 <div>
                   <Label>Group</Label>
-                  <Input type="text" value={selectedStudent.groupNumber || 'N/A'} disabled />
+                  <Input type="text" value={selectedStudent.student.groupNumber || 'N/A'} disabled />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-6 mb-4">
                 <div>
                   <Label>Email</Label>
-                  <Input type="text" value={selectedStudent.email || ''} disabled />
+                  <Input type="text" value={selectedStudent.student.email || ''} disabled />
                 </div>
                 <div>
                   <Label>Phone Number</Label>
-                  <Input type="text" value={selectedStudent.contactNumber || 'N/A'} disabled />
+                  <Input type="text" value={selectedStudent.student.contactNumber || 'N/A'} disabled />
                 </div>
               </div>
             </div>
@@ -361,38 +371,38 @@ export default function StudentModal({
               <div className="grid grid-cols-2 gap-6 mb-4">
                 <div>
                   <Label>NGO Name</Label>
-                  <Input type="text" value={selectedStudent.ngoName || 'N/A'} disabled />
+                  <Input type="text" value={selectedStudent.student.ngoName || 'N/A'} disabled />
                 </div>
                 <div>
                   <Label>City</Label>
-                  <Input type="text" value={selectedStudent.ngoCity || 'N/A'} disabled />
+                  <Input type="text" value={selectedStudent.student.ngoCity || 'N/A'} disabled />
                 </div>
               </div>
               <div className="mb-4">
                 <Label>Field of Work</Label>
-                <Input type="text" value={selectedStudent.ngoNatureOfWork || 'N/A'} disabled />
+                <Input type="text" value={selectedStudent.student.ngoNatureOfWork || 'N/A'} disabled />
               </div>
               <div className="mb-4">
                 <Label>Address</Label>
-                <Input type="text" value={selectedStudent.ngoAddress || 'N/A'} disabled />
+                <Input type="text" value={selectedStudent.student.ngoAddress || 'N/A'} disabled />
               </div>
               <div className="grid grid-cols-3 gap-6 mb-4">
                 <div>
                   <Label>District</Label>
-                  <Input type="text" value={selectedStudent.ngoDistrict || 'N/A'} disabled />
+                  <Input type="text" value={selectedStudent.student.ngoDistrict || 'N/A'} disabled />
                 </div>
                 <div>
                   <Label>State</Label>
-                  <Input type="text" value={selectedStudent.ngoState || 'N/A'} disabled />
+                  <Input type="text" value={selectedStudent.student.ngoState || 'N/A'} disabled />
                 </div>
                 <div>
                   <Label>Country</Label>
-                  <Input type="text" value={selectedStudent.ngoCountry || 'N/A'} disabled />
+                  <Input type="text" value={selectedStudent.student.ngoCountry || 'N/A'} disabled />
                 </div>
               </div>
               <div className="mb-6">
                 <Label>NGO Phone Number</Label>
-                <Input type="text" value={selectedStudent.ngoPhone || 'N/A'} disabled />
+                <Input type="text" value={selectedStudent.student.ngoPhone || 'N/A'} disabled />
               </div>
             </div>
           )}
@@ -405,11 +415,11 @@ export default function StudentModal({
               </p>
               <div className="mb-4">
                 <Label> Problem Statement </Label>
-                <Input type="text" value={selectedStudent.problemDefinition || 'N/A'} disabled />
+                <Input type="text" value={selectedStudent.student.problemDefinition || 'N/A'} disabled />
               </div>
               <div className="mb-6">
                 <Label> Approach of Solving Problem </Label>
-                <Input type="text" value={selectedStudent.proposedSolution || 'N/A'} disabled />
+                <Input type="text" value={selectedStudent.student.proposedSolution || 'N/A'} disabled />
               </div>
             </div>
           )}
@@ -423,9 +433,9 @@ export default function StudentModal({
                 <div className="mb-4 ml-6 w-1/2">
                   <Label>Week 1 Photo</Label>
                   <div className="ml-4">
-                    {selectedStudent.week_one_photo ? (
+                    {selectedStudent.student.week_one_photo ? (
                       <Image
-                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.week_one_photo}`}
+                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.student.week_one_photo}`}
                         alt="Week 1 Photo"
                         width={160}
                         height={160}
@@ -439,9 +449,9 @@ export default function StudentModal({
                 <div className="mb-4 ml-6 w-1/2">
                   <Label>Week 2 Photo</Label>
                   <div className="ml-4">
-                    {selectedStudent.week_two_photo ? (
+                    {selectedStudent.student.week_two_photo ? (
                       <Image
-                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.week_two_photo}`}
+                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.student.week_two_photo}`}
                         alt="Week 2 Photo"
                         width={160}
                         height={160}
@@ -456,7 +466,7 @@ export default function StudentModal({
               <div className="mb-4 ml-6">
                 <Label>Offer Letter</Label>
                 <div>
-                  {selectedStudent.offerLetter ? (
+                  {selectedStudent.student.offerLetter ? (
                     <div>
                       <a
                         href={offerLetterUrl}
@@ -517,7 +527,7 @@ export default function StudentModal({
               <div className="mb-4 ml-6">
                 <Label>Report</Label>
                 <p>
-                  {selectedStudent.report ? (
+                  {selectedStudent.student.report ? (
                     <a href={reportUrl} target="_blank" className="flex text-gray-700 dark:text-gray-200 mt-1 ml-4">
                       {' '}
                       View Report <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
@@ -532,7 +542,7 @@ export default function StudentModal({
               <div className="mb-4 ml-6">
                 <Label>Certificate</Label>
                 <p>
-                  {selectedStudent.certificate ? (
+                  {selectedStudent.student.certificate ? (
                     <a
                       href={certificateUrl}
                       target="_blank"
@@ -551,7 +561,7 @@ export default function StudentModal({
               <div className="mb-4 ml-6">
                 <Label>Poster</Label>
                 <p>
-                  {selectedStudent.poster ? (
+                  {selectedStudent.student.poster ? (
                     <a href={posterUrl} target="_blank" className="flex text-gray-700 dark:text-gray-200 mt-1 ml-4">
                       {' '}
                       View Poster <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
@@ -569,8 +579,12 @@ export default function StudentModal({
           {activeTab === 'evaluation' && (
             <div>
               {/* Evaluation */}
-              {option === 'mentor' ? (
+              {(option === 'mentor' || option === 'both') && (
                 <div>
+                  <h2 className="mb-6">
+                    {' '}
+                    <i> Internal Evaluation </i>
+                  </h2>
                   <h3 className="mb-4">Poster Organization</h3>
 
                   <div className="mb-6 grid grid-cols-2 grid-rows-3 gap-6">
@@ -655,7 +669,7 @@ export default function StudentModal({
                   </div>
                   <div>
                     <p>
-                      Total Marks:{' '}
+                      Total Internal Marks:{' '}
                       {marks.posterOrganization +
                         marks.dayToDayActivity +
                         marks.contributionToWork +
@@ -671,14 +685,20 @@ export default function StudentModal({
                     <Button size="sm" variant="outline" onClick={onClose}>
                       Close
                     </Button>
-                    <Button size="sm" onClick={savemarks}>
-                      {savingMarks ? 'Saving...' : 'Save Changes'}
+                    <Button size="sm" onClick={saveinternalmarks}>
+                      {savingMarks ? 'Saving...' : 'Save Internal Marks'}
                     </Button>
                   </div>
                 </div>
-              ) : (
+              )}
+              {(option === 'evaluator' || option === 'both') && (
                 <div>
                   <div>
+                    <h2 className="mb-6">
+                      {' '}
+                      <i> External Evaluation </i>
+                    </h2>
+
                     <h3 className="mb-4">Presentation</h3>
 
                     <div className="mb-6 grid grid-cols-2 grid-rows-3 gap-6">
@@ -753,7 +773,7 @@ export default function StudentModal({
                   </div>
                   <div>
                     <p>
-                      Total Marks:{' '}
+                      Total External Marks:{' '}
                       {marks.learningExplanation +
                         marks.problemIdentification +
                         marks.contributionExplanation +
@@ -767,8 +787,8 @@ export default function StudentModal({
                     <Button size="sm" variant="outline" onClick={onClose}>
                       Close
                     </Button>
-                    <Button size="sm" onClick={savemarks}>
-                      Save Changes
+                    <Button size="sm" onClick={saveexternalmarks}>
+                      {savingMarks ? 'Saving...' : 'Save External Marks'}
                     </Button>
                   </div>
                 </div>

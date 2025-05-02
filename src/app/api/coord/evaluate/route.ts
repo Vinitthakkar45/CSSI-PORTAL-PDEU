@@ -4,6 +4,8 @@ import {
   getEvaluatedStudents,
   updateFinalMarks,
   updateInternalMarks,
+  checkAdmin,
+  checkCoord,
 } from '@/drizzle/facultyQueries';
 
 export async function GET(req: NextRequest) {
@@ -53,11 +55,11 @@ export async function POST(req: NextRequest) {
     const isEvaluator = evaluatedStudents.some((student) => student.id === studentid);
 
     if (typeofmarks === 'internal') {
-      if (!isMentor) {
+      if (!isMentor && !checkCoord(facultyId) && !checkAdmin(facultyId)) {
         return NextResponse.json({ error: 'Unauthorized to update internal marks' }, { status: 403 });
       }
       await updateInternalMarks(studentid, marks);
-    } else if (typeofmarks === 'final') {
+    } else if (typeofmarks === 'final' && !checkCoord(facultyId) && !checkAdmin(facultyId)) {
       if (!isEvaluator) {
         return NextResponse.json({ error: 'Unauthorized to update final marks' }, { status: 403 });
       }

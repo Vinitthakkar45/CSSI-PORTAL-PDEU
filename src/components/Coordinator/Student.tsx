@@ -6,7 +6,7 @@ import { SelectStudent } from '@/drizzle/schema';
 import TableModal from '@/components/Coordinator/StudentTableModal';
 import { useSession } from 'next-auth/react';
 import Button from '../Home/ui/button/Button';
-
+import StudentModal from './Modal/StudentModal';
 type StudentWithUser = {
   student: SelectStudent;
   user: {
@@ -25,6 +25,7 @@ const StudentTable = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<StudentWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [marksToggle, setMarksToggle] = useState<boolean>(false);
 
   // Pagination state
 
@@ -111,11 +112,15 @@ const StudentTable = () => {
   return (
     <>
       {showModal && selectedStudent && (
-        <TableModal
-          selectedStudent={selectedStudent.student}
+        <StudentModal
           isOpen={showModal}
           onClose={handleModalclose}
-          onCloseCross={handleModalclose}
+          selectedStudent={selectedStudent}
+          option="both"
+          setMarksToggle={setMarksToggle}
+          marksToggle={marksToggle}
+          students={students}
+          setStudents={setStudents}
         />
       )}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
