@@ -10,6 +10,7 @@ import Button from '../Home/ui/button/Button';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Download } from 'lucide-react';
+import AddStudentModal from './AddStudentModal';
 type StudentWithUser = {
   student: InferSelectModel<typeof student>;
   user: {
@@ -27,7 +28,7 @@ const StudentTable = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<StudentWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
-
+  const [showAdd, setShowAdd] = useState<boolean>(false);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -133,12 +134,20 @@ const StudentTable = () => {
     }
   };
 
+  const handleAddStudent = () => {
+    setShowAdd(true);
+  };
+  const handleAddStudentClose = () => {
+    setShowAdd(false);
+  };
   if (loading) {
     return <div className="p-4 text-center">Loading student data...</div>;
   }
 
   return (
     <>
+      {showAdd && <AddStudentModal isOpen={showAdd} onClose={handleAddStudentClose} />}
+
       {showModal && selectedStudent && (
         <TableModal
           selectedStudent={selectedStudent.student}
@@ -163,6 +172,11 @@ const StudentTable = () => {
                 onChange={handleSearchChange}
                 className="rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white"
               />
+            </div>
+            <div>
+              <Button size="sm" variant="primary" className="mr-4" onClick={handleAddStudent}>
+                Add Student
+              </Button>
             </div>
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter:</label>

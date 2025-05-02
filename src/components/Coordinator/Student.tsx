@@ -6,6 +6,7 @@ import { SelectStudent } from '@/drizzle/schema';
 import TableModal from '@/components/Coordinator/StudentTableModal';
 import { useSession } from 'next-auth/react';
 import Button from '../Home/ui/button/Button';
+import AddStudentModal from './AddStudentModal';
 
 type StudentWithUser = {
   student: SelectStudent;
@@ -25,7 +26,7 @@ const StudentTable = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<StudentWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
-
+  const [showAdd, setShowAdd] = useState<boolean>(false);
   // Pagination state
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -103,13 +104,19 @@ const StudentTable = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
-
+  const handleAddStudent = () => {
+    setShowAdd(true);
+  };
+  const handleAddStudentClose = () => {
+    setShowAdd(false);
+  };
   if (loading) {
     return <div className="p-4 text-center">Loading student data...</div>;
   }
 
   return (
     <>
+      {showAdd && <AddStudentModal isOpen={showAdd} onClose={handleAddStudentClose} />}
       {showModal && selectedStudent && (
         <TableModal
           selectedStudent={selectedStudent.student}
@@ -124,6 +131,11 @@ const StudentTable = () => {
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Student Details</h3>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div>
+              <Button size="sm" variant="primary" className="mr-4" onClick={handleAddStudent}>
+                Add Student
+              </Button>
+            </div>
             <div className="w-full sm:w-auto mb-2 sm:mb-0">
               <input
                 type="text"

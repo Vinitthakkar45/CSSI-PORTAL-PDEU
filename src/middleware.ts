@@ -31,9 +31,9 @@ export async function middleware(req: NextRequest) {
       origin.includes('cssi-458508.el.r.appspot.com') ||
       referer.includes('cssi-458508.el.r.appspot.com');
 
-    if (!isAllowedDomain) {
-      return NextResponse.redirect(new URL('/not-found', req.url));
-    }
+    // if (!isAllowedDomain) {
+    //   return NextResponse.redirect(new URL('/not-found', req.url));
+    // }
   }
 
   // Redirect authenticated users away from signin/home
