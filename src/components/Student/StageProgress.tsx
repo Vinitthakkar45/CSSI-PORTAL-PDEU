@@ -31,7 +31,6 @@ const StageProgress: React.FC<StageProgressProps> = ({
         body: JSON.stringify({ id, role }),
       });
       const data = await res.json();
-      console.log(data);
       setMentorName(data.mentorname.name);
       setEvalName(data.evalname.name);
     }
@@ -40,13 +39,10 @@ const StageProgress: React.FC<StageProgressProps> = ({
   return (
     <div className="w-full lg:mb-4 mb-2 mx-auto">
       <div className="flex items-center justify-between gap-20">
-        <div className="w-full flex flex-col gap-2">
+        <div className="w-full md:w-[70%] flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <h3 className="text-theme-xl font-normal text-gray-800 dark:text-white/90">Internship Progress</h3>
             <div className="flex gap-2">
-              {/* <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-500">
-                {currentStage < 5 ? `Stage ${currentStage} of ${totalStages}` : 'Completed'}
-              </span> */}
               {maxStageUnlocked < totalStages && (
                 <span className="text-theme-sm font-medium px-3 py-1 rounded-full bg-brand-50 text-brand-500 dark:bg-brand-500/20 dark:text-brand-500">
                   {maxStageUnlocked} Unlocked
@@ -121,19 +117,6 @@ const StageProgress: React.FC<StageProgressProps> = ({
               })}
             </div>
           </div>
-        </div>
-        <div className="hidden md:flex justify-end items-center gap-8">
-          {[
-            { initials: 'Mentor', label: mentorName != '' ? mentorName : 'TBA' },
-            { initials: 'Evaluator', label: evalName != '' ? evalName : 'TBA' },
-          ].map((item, index) => (
-            <div key={index} className="flex flex-col items-center gap-1.5">
-              <div className="w-24 h-24 flex items-center justify-center text-xl font-semibold text-white bg-gray-400 dark:bg-gray-600 rounded-full">
-                {item.initials}
-              </div>
-              <span>{item.label}</span>
-            </div>
-          ))}
         </div>
       </div>
     </div>
