@@ -192,14 +192,14 @@ const StudentTable = () => {
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {filteredStudents.length > 0 ? (
-                filteredStudents.map((item) => (
+                filteredStudents.map((item, index) => (
                   <TableRow
                     key={item.student.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                     onClick={() => handleCellClick(item)}
                   >
                     <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
-                      {item.student.id}
+                      {index + 1}
                     </TableCell>
                     <TableCell className="py-3 px-4">
                       <div className="flex items-center gap-3">

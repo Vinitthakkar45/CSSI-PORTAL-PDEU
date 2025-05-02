@@ -187,7 +187,7 @@ const FacultyTable = () => {
                   isHeader
                   className="py-3 px-4 w-16 md:w-20 text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  ID
+                  NO
                 </TableCell>
                 <TableCell
                   isHeader
@@ -235,55 +235,60 @@ const FacultyTable = () => {
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {filteredFaculties.length > 0 ? (
-                filteredFaculties.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item) => (
-                  <TableRow
-                    key={item.faculty.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
-                    onClick={() => {
-                      handleModalopen(item);
-                    }}
-                  >
-                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                      {item.faculty.id}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 truncate">
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                            {item.faculty.name}
-                          </p>
+                filteredFaculties
+                  .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                  .map((item, index) => (
+                    <TableRow
+                      key={item.faculty.id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
+                      onClick={() => {
+                        handleModalopen(item);
+                      }}
+                    >
+                      <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className="py-3 px-4 truncate">
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                              {item.faculty.name}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                      {item.user.email}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                      {item.faculty.department || 'Not Assigned'}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                      {item.faculty.sitting || 'Not Assigned'}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                      {item.faculty.freeTimeSlots && item.faculty.freeTimeSlots.length > 0
-                        ? item.faculty.freeTimeSlots.join(', ')
-                        : 'No time slots available'}
-                    </TableCell>
-                    <TableCell className="py-3  px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                      <Badge size="sm" color={getMentorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}>
-                        {getMentorStatus(item.faculty.id)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                      <Badge
-                        size="sm"
-                        color={getEvaluatorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}
-                      >
-                        {getEvaluatorStatus(item.faculty.id)}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))
+                      </TableCell>
+                      <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                        {item.user.email}
+                      </TableCell>
+                      <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                        {item.faculty.department || 'Not Assigned'}
+                      </TableCell>
+                      <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                        {item.faculty.sitting || 'Not Assigned'}
+                      </TableCell>
+                      <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                        {item.faculty.freeTimeSlots && item.faculty.freeTimeSlots.length > 0
+                          ? item.faculty.freeTimeSlots.join(', ')
+                          : 'No time slots available'}
+                      </TableCell>
+                      <TableCell className="py-3  px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                        <Badge
+                          size="sm"
+                          color={getMentorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}
+                        >
+                          {getMentorStatus(item.faculty.id)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
+                        <Badge
+                          size="sm"
+                          color={getEvaluatorStatus(item.faculty.id) === 'Assigned' ? 'success' : 'warning'}
+                        >
+                          {getEvaluatorStatus(item.faculty.id)}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))
               ) : (
                 <TableRow>
                   <TableCell colSpan={8} className="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
