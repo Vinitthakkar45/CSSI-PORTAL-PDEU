@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
 import { SelectStudent } from '@/drizzle/schema';
-import TableModal from '@/components/Coordinator/StudentTableModal';
 import { useSession } from 'next-auth/react';
 import Button from '../Home/ui/button/Button';
 import StudentModal from './Modal/StudentModal';

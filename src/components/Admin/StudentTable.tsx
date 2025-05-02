@@ -9,6 +9,7 @@ import TableModal from './tableModal';
 import Button from '../Home/ui/button/Button';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import StudentModal from './Modal/StudentModal';
 
 type StudentWithUser = {
   student: InferSelectModel<typeof student>;
@@ -27,6 +28,8 @@ const StudentTable = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<StudentWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  const [marksToggle, setMarksToggle] = useState<boolean>(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -140,11 +143,15 @@ const StudentTable = () => {
   return (
     <>
       {showModal && selectedStudent && (
-        <TableModal
-          selectedStudent={selectedStudent.student}
+        <StudentModal
           isOpen={showModal}
           onClose={handleModalclose}
-          onCloseCross={handleModalclose}
+          selectedStudent={selectedStudent}
+          option="both"
+          setMarksToggle={setMarksToggle}
+          marksToggle={marksToggle}
+          students={students}
+          setStudents={setStudents}
         />
       )}
 

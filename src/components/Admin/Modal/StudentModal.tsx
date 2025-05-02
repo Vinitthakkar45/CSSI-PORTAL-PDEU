@@ -155,7 +155,7 @@ export default function StudentModal({
     const studentid = selectedStudent.student.id;
 
     try {
-      const response = await fetch(`/api/coord/evaluate?facultyId=${session?.user.id}`, {
+      const response = await fetch(`/api/admin/evaluate?facultyId=${session?.user.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ studentid, typeofmarks, marks }),
@@ -230,7 +230,7 @@ export default function StudentModal({
 
     try {
       const response = await fetch(
-        `/api/coord/decline-offer-letter?facultyId=${session?.user.id}&email=${session?.user.email}`,
+        `/api/admin/decline-offer-letter?facultyId=${session?.user.id}&email=${session?.user.email}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
