@@ -31,7 +31,7 @@ export default function UserInfoCard() {
         setRole(data.role);
         if (data.role === 'admin') {
           setAdminInfo(data as AdminUser);
-        } else if (data.role === 'faculty') {
+        } else if (data.role === 'faculty' || data.role === 'coordinator') {
           setFacultyInfo(data as FacultyUser);
         } else {
           setStudentInfo(data as StudentUser);
@@ -106,7 +106,7 @@ export default function UserInfoCard() {
               </>
             )}
 
-            {role === 'faculty' && facultyInfo && (
+            {(role === 'faculty' || role === 'coordinator') && facultyInfo && (
               <>
                 <div>
                   <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Name</p>

@@ -6,7 +6,7 @@ import StageProgress from './StageProgress';
 import StageCard from './StageCard';
 import { stages } from './utils/stages';
 import Button from '../Home/ui/button/Button';
-import { InfoModal } from './ConfirmationModals';
+import { InfoModal } from '../ConfirmationModals';
 import LoadingOverlay from '../LoadingOverlay';
 
 type StageStatus = 'locked' | 'current' | 'completed';
@@ -29,8 +29,10 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentStage, setCurrentStage] = useState<number>(0);
   const [showModal, setShowModal] = useState(false);
-  const [showMentorModal, setShowMentorModal] = useState(false);
   const [showEvaluatorModal, setShowEvaluatorModal] = useState(false);
+  const [showAllAssignedModal, setShowAllAssignedModal] = useState(false);
+  const [showRemainingModal, setShowRemainingModal] = useState(false);
+  const [remainingStudents, setRemainingStudents] = useState(0);
   const [counts, setCounts] = useState<CountData>({
     students: 0,
     faculty: 0,
@@ -71,52 +73,47 @@ const Dashboard = () => {
   };
 
   const handleAssignMentors = async () => {
-    // Fetch the latest counts before proceeding
+    // First check if all students already have mentors
     const currentCounts = await fetchCounts();
 
-    if (currentCounts && currentCounts.mentors > 0) {
-      // Show confirmation modal if mentors already exist
-      setShowMentorModal(true);
+    if (currentCounts && currentCounts.students === currentCounts.mentors) {
+      // All students already have mentors
+      setShowAllAssignedModal(true);
+      return;
+    }
+
+    // If some students don't have mentors yet
+    if (currentCounts) {
+      const remaining = currentCounts.students - currentCounts.mentors;
+      setRemainingStudents(remaining);
+      setShowRemainingModal(true);
     } else {
-      // Directly assign mentors if none exist
+      // If counts couldn't be fetched, proceed with assignment anyway
       await assignMentors();
     }
   };
 
   const assignMentors = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch('/api/admin/assignmentor', { method: 'POST' });
       const data = await response.json();
 
       if (data.success) {
-        alert('Mentor Assignment Successful!');
-        // Update counts after successful assignment
-        await fetchCounts();
+        alert(`Successfully assigned ${data.assignedCount || 'all remaining'} students to mentors`);
+      } else if (data.allAssigned) {
+        setShowAllAssignedModal(true);
       } else {
-        alert('Error: ' + data.error);
+        alert('Error: ' + (data.error || data.message || 'Unknown error'));
       }
+
+      // Update counts after assignment attempt
+      await fetchCounts();
     } catch (error) {
       console.error('Error calling API:', error);
       alert('Something went wrong.');
-    }
-  };
-
-  const handleReassignMentors = async () => {
-    try {
-      // First delete existing mentor assignments
-      const deleteResponse = await fetch('/api/admin/deletementors', { method: 'DELETE' });
-      if (deleteResponse.ok) {
-        // Then assign new mentors
-        await assignMentors();
-      } else {
-        const errorData = await deleteResponse.json();
-        alert('Failed to delete existing mentor assignments: ' + (errorData.error || ''));
-      }
-    } catch (error) {
-      console.error('Error in reassigning mentors:', error);
-      alert('Something went wrong during mentor reassignment.');
     } finally {
-      setShowMentorModal(false);
+      setIsLoading(false);
     }
   };
 
@@ -212,12 +209,21 @@ const Dashboard = () => {
     setShowModal(false);
   };
 
-  const handleMentorModalClose = () => {
-    setShowMentorModal(false);
-  };
-
   const handleEvaluatorModalClose = () => {
     setShowEvaluatorModal(false);
+  };
+
+  const handleAllAssignedModalClose = () => {
+    setShowAllAssignedModal(false);
+  };
+
+  const handleRemainingModalCross = () => {
+    setShowRemainingModal(false);
+  };
+
+  const handleRemainingModalClose = async () => {
+    setShowRemainingModal(false);
+    await assignMentors();
   };
 
   const getStageStatus = (stageNumber: number): StageStatus => {
@@ -229,6 +235,7 @@ const Dashboard = () => {
   return (
     <>
       {isLoading && <LoadingOverlay />}
+
       {showModal && (
         <InfoModal
           isOpen={showModal}
@@ -240,14 +247,25 @@ const Dashboard = () => {
         />
       )}
 
-      {showMentorModal && (
+      {showRemainingModal && (
         <InfoModal
-          isOpen={showMentorModal}
-          onCloseCross={handleMentorModalClose}
-          onClose={handleReassignMentors}
-          title="Reassign Mentors?"
-          message={`${counts.mentors} mentors are already assigned. Do you want to clear existing assignments and reassign?`}
-          buttonInfo="Yes, Reassign"
+          isOpen={showRemainingModal}
+          onCloseCross={handleRemainingModalCross}
+          onClose={handleRemainingModalClose}
+          title="Assign Remaining Students"
+          message={`${remainingStudents} students don't have mentors yet. Do you want to assign mentors to these remaining students?`}
+          buttonInfo="Yes, Assign Remaining"
+        />
+      )}
+
+      {showAllAssignedModal && (
+        <InfoModal
+          isOpen={showAllAssignedModal}
+          onCloseCross={handleAllAssignedModalClose}
+          onClose={handleAllAssignedModalClose}
+          title="All Students Assigned"
+          message="All students already have mentors assigned. No new assignments needed."
+          buttonInfo="OK"
         />
       )}
 
