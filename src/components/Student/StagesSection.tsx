@@ -1,6 +1,5 @@
 import React from 'react';
 import StageCard from './StageCard';
-// import NGODetailsForm from './NGODetailsForm';
 import MultiStepForm from './MultiStepForm';
 import StageProgress from './StageProgress';
 import { stages } from './data/stages';
@@ -8,6 +7,7 @@ import { useStages } from './hooks/useStages';
 import InternshipProgress from './InternshipProgress';
 import ReportSubmission from './UploadDocs';
 import MentorAssignment from './MentorAssignment';
+import SkeletonLoader from './SkeletonLoader';
 
 const StagesSection: React.FC = () => {
   const {
@@ -37,13 +37,7 @@ const StagesSection: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto">
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-pulse">Loading your internship progress...</div>
-        </div>
-      </div>
-    );
+    return <SkeletonLoader />;
   }
 
   const hasCompletedAvailableStages = currentStage > maxStageUnlocked;

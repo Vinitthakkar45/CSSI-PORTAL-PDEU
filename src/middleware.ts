@@ -27,7 +27,9 @@ export async function middleware(req: NextRequest) {
       origin.includes('cssi.pdpu.ac.in') ||
       referer.includes('cssi.pdpu.ac.in') ||
       origin.includes('localhost') ||
-      referer.includes('localhost');
+      referer.includes('localhost') ||
+      origin.includes('cssi-458508.el.r.appspot.com') ||
+      referer.includes('cssi-458508.el.r.appspot.com');
 
     if (!isAllowedDomain) {
       return NextResponse.redirect(new URL('/not-found', req.url));
