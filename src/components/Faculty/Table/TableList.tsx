@@ -77,7 +77,11 @@ export default function TableList({
                           <Image
                             width={40}
                             height={40}
-                            src={student.profileImage || '/images/user/user-17.jpg'}
+                            src={
+                              student.profileImage
+                                ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${student.profileImage}`
+                                : '/images/user/user-17.jpg'
+                            }
                             alt={student.name || ''}
                           />
                         </div>

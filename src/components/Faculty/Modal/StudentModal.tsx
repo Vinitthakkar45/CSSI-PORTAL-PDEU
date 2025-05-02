@@ -8,6 +8,8 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SelectStudent } from '@/drizzle/schema';
 import { ExternalLink } from 'lucide-react';
 import { z } from 'zod';
+import { useSession } from 'next-auth/react';
+import { toast } from '@/components/Home/ui/toast/Toast';
 
 export default function StudentModal({
   isOpen,
@@ -28,6 +30,11 @@ export default function StudentModal({
   students: SelectStudent[];
   setStudents: React.Dispatch<React.SetStateAction<SelectStudent[]>>;
 }) {
+  const { data: session } = useSession(); // Get faculty ID from session
+  const [savingMarks, setSavingMarks] = useState(false);
+  const [declineReason, setDeclineReason] = useState('');
+  const [isDeclining, setIsDeclining] = useState(false);
+  const [showDeclineInput, setShowDeclineInput] = useState(false);
   const [marks, setMarks] = useState({
     posterOrganization: 0,
     dayToDayActivity: 0,
@@ -130,9 +137,10 @@ export default function StudentModal({
 
   const handleSave = async (type: string) => {
     if (!selectedStudent || !validateMarks()) {
-      alert('Please fix validation errors before saving.');
+      toast.warning('Please fix validation errors before saving.');
       return;
     }
+    setSavingMarks(true);
 
     const typeofmarks = option === 'mentor' ? 'internal' : 'final';
     const studentid = selectedStudent.id;
@@ -168,13 +176,15 @@ export default function StudentModal({
         }
         return student;
       });
+      toast.success('Marks Saved Successfully');
+      setSavingMarks(false);
 
       setStudents(updated);
       setMarksToggle(!marksToggle);
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Failed to save marks');
+      toast.error('Failed to save marks');
     }
   };
 
@@ -188,11 +198,46 @@ export default function StudentModal({
   }
 
   const handleInputChange = (field: keyof typeof marks, value: string, upperlim: number) => {
+    if (value === '') {
+      setMarks((prevMarks) => ({
+        ...prevMarks,
+        [field]: 0,
+      }));
+      return;
+    }
     if (Number(value) <= upperlim && Number(value) >= 0) {
       setMarks((prevMarks) => ({
         ...prevMarks,
         [field]: Number(value),
       }));
+    }
+  };
+
+  const handleDeclineOfferLetter = async () => {
+    if (!selectedStudent || !session?.user?.id) return;
+
+    setIsDeclining(true);
+
+    try {
+      const response = await fetch('/api/faculty/decline-offer-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          student_user_id: selectedStudent.userId,
+          reason_of_declination: declineReason,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to decline offer letter');
+
+      toast.success('Offer letter declined successfully');
+      setShowDeclineInput(false);
+      setDeclineReason('');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to decline offer letter');
+    } finally {
+      setIsDeclining(false);
     }
   };
 
@@ -260,7 +305,11 @@ export default function StudentModal({
                   <Image
                     width={160}
                     height={160}
-                    src={selectedStudent.profileImage || '/images/user/user-17.jpg'}
+                    src={
+                      selectedStudent.profileImage
+                        ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.profileImage}`
+                        : '/images/user/user-17.jpg'
+                    }
                     alt={selectedStudent.name || ''}
                   />
                 </div>
@@ -370,33 +419,117 @@ export default function StudentModal({
               <p className="mb-5 text-gray-400 text-center">
                 <i> Documents Uploaded </i>
               </p>
+              <div className="flex">
+                <div className="mb-4 ml-6">
+                  <Label>Week 1 Photo</Label>
+                  <div className="ml-4">
+                    {selectedStudent.week_one_photo ? (
+                      <Image
+                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.week_one_photo}`}
+                        alt="Week 1 Photo"
+                        width={120}
+                        height={120}
+                        className="w-20 h-20 rounded-lg"
+                      />
+                    ) : (
+                      <span className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
+                        Week 1 Photo is not yet uploaded
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="mb-4 ml-6">
+                  <Label>Week 2 Photo</Label>
+                  <div className="ml-4">
+                    {selectedStudent.week_two_photo ? (
+                      <Image
+                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.week_two_photo}`}
+                        alt="Week 2 Photo"
+                        width={120}
+                        height={120}
+                        className="w-20 h-20 rounded-lg"
+                      />
+                    ) : (
+                      <span className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
+                        Week 2 Photo is not yet uploaded
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
               <div className="mb-4 ml-6">
                 <Label>Offer Letter</Label>
-                <p>
+                <div>
                   {selectedStudent.offerLetter ? (
-                    <a href={offerLetterUrl} target="_blank" className="flex text-gray-200 mt-1 ml-4">
-                      {' '}
-                      View Offer Letter <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
-                    </a>
+                    <div>
+                      <a
+                        href={offerLetterUrl}
+                        target="_blank"
+                        className="flex text-gray-700 dark:text-gray-200 mt-1 ml-4"
+                      >
+                        {' '}
+                        View Offer Letter <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
+                      </a>
+                      {!showDeclineInput && (
+                        <button
+                          className="mt-2 ml-4 px-4 py-2 text-sm font-medium text-white bg-red-900 rounded hover:bg-red-800"
+                          onClick={() => setShowDeclineInput(true)}
+                        >
+                          Decline Offer Letter
+                        </button>
+                      )}
+                      {showDeclineInput && (
+                        <div className="mt-4 ml-4">
+                          <Label>Reason for Declination</Label>
+                          <textarea
+                            className="w-full p-2 mt-2 border border-gray-300 rounded"
+                            rows={3}
+                            value={declineReason}
+                            onChange={(e) => setDeclineReason(e.target.value)}
+                            placeholder="Enter reason for declining the offer letter"
+                          />
+                          <div className="flex items-center gap-3 mt-3">
+                            <button
+                              className={`px-4 py-2 text-sm font-medium text-white rounded ${
+                                declineReason ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'
+                              }`}
+                              onClick={handleDeclineOfferLetter}
+                              disabled={!declineReason || isDeclining}
+                            >
+                              {isDeclining ? 'Sending...' : 'Send'}
+                            </button>
+                            <button
+                              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+                              onClick={() => {
+                                setShowDeclineInput(false);
+                                setDeclineReason('');
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   ) : (
-                    <p className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
+                    <span className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
                       Offer Letter is not yet uploaded by the student
-                    </p>
+                    </span>
                   )}
-                </p>
+                </div>
               </div>
               <div className="mb-4 ml-6">
                 <Label>Report</Label>
                 <p>
                   {selectedStudent.report ? (
-                    <a href={reportUrl} target="_blank" className="flex text-gray-200 mt-1 ml-4">
+                    <a href={reportUrl} target="_blank" className="flex text-gray-700 dark:text-gray-200 mt-1 ml-4">
                       {' '}
                       View Report <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
                     </a>
                   ) : (
-                    <p className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
+                    <span className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
                       Report is not yet uploaded by the student
-                    </p>
+                    </span>
                   )}
                 </p>
               </div>
@@ -404,14 +537,18 @@ export default function StudentModal({
                 <Label>Certificate</Label>
                 <p>
                   {selectedStudent.certificate ? (
-                    <a href={certificateUrl} target="_blank" className="flex text-gray-200 mt-1 ml-4">
+                    <a
+                      href={certificateUrl}
+                      target="_blank"
+                      className="flex text-gray-700 dark:text-gray-200 mt-1 ml-4"
+                    >
                       {' '}
                       View Certificate <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
                     </a>
                   ) : (
-                    <p className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
+                    <span className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
                       Certificate is not yet uploaded by the student
-                    </p>
+                    </span>
                   )}
                 </p>
               </div>
@@ -419,14 +556,14 @@ export default function StudentModal({
                 <Label>Poster</Label>
                 <p>
                   {selectedStudent.poster ? (
-                    <a href={posterUrl} target="_blank" className="flex text-gray-200 mt-1 ml-4">
+                    <a href={posterUrl} target="_blank" className="flex text-gray-700 dark:text-gray-200 mt-1 ml-4">
                       {' '}
                       View Poster <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />{' '}
                     </a>
                   ) : (
-                    <p className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
+                    <span className="text-gray-500 dark:text-gray-300 mt-1 ml-4">
                       Poster is not yet uploaded by the student
-                    </p>
+                    </span>
                   )}
                 </p>
               </div>
@@ -447,7 +584,7 @@ export default function StudentModal({
                         error={marks.posterOrganization < 0 || marks.posterOrganization > 10 ? true : false}
                         id="posterOrganization"
                         name="posterOrganization"
-                        type="number"
+                        type="text"
                         value={marks.posterOrganization || ''}
                         onChange={(e) => handleInputChange('posterOrganization', e.target.value, 10)}
                         placeholder="Marks - out of 10"
@@ -457,7 +594,7 @@ export default function StudentModal({
                       <Label>{'Day To Day Activity'}</Label>
                       <Input
                         error={marks.dayToDayActivity < 0 || marks.dayToDayActivity > 10 ? true : false}
-                        type="number"
+                        type="text"
                         value={marks.dayToDayActivity || ''}
                         onChange={(e) => handleInputChange('dayToDayActivity', e.target.value, 10)}
                         placeholder="Marks - out of 10"
@@ -467,7 +604,7 @@ export default function StudentModal({
                       <Label>{'Contribution to Work'}</Label>
                       <Input
                         error={marks.contributionToWork < 0 || marks.contributionToWork > 5 ? true : false}
-                        type="number"
+                        type="text"
                         value={marks.contributionToWork || ''}
                         onChange={(e) => handleInputChange('contributionToWork', e.target.value, 5)}
                         placeholder="Marks - out of 5"
@@ -477,7 +614,7 @@ export default function StudentModal({
                       <Label>{'Learning Outcomes'}</Label>
                       <Input
                         error={marks.learningOutcomes < 0 || marks.learningOutcomes > 5 ? true : false}
-                        type="number"
+                        type="text"
                         value={marks.learningOutcomes || ''}
                         onChange={(e) => handleInputChange('learningOutcomes', e.target.value, 5)}
                         placeholder="Marks - out of 5"
@@ -487,7 +624,7 @@ export default function StudentModal({
                       <Label>{'GeoTag Photos'}</Label>
                       <Input
                         error={marks.geoTagPhotos < 0 || marks.geoTagPhotos > 5 ? true : false}
-                        type="number"
+                        type="text"
                         value={marks.geoTagPhotos || ''}
                         onChange={(e) => handleInputChange('geoTagPhotos', e.target.value, 5)}
                         placeholder="Marks - out of 5"
@@ -503,7 +640,7 @@ export default function StudentModal({
                       <Label>{'Report Organization'}</Label>
                       <Input
                         error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
-                        type="number"
+                        type="text"
                         value={marks.reportOrganization || ''}
                         onChange={(e) => handleInputChange('reportOrganization', e.target.value, 10)}
                         placeholder="Marks - out of 10"
@@ -513,7 +650,7 @@ export default function StudentModal({
                       <Label>{'Hard Copy Certificate'}</Label>
                       <Input
                         error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
-                        type="number"
+                        type="text"
                         value={marks.certificate || ''}
                         onChange={(e) => handleInputChange('certificate', e.target.value, 5)}
                         placeholder="Marks - out of 5"
@@ -539,7 +676,7 @@ export default function StudentModal({
                       Close
                     </Button>
                     <Button size="sm" onClick={savemarks}>
-                      Save Changes
+                      {savingMarks ? 'Saving...' : 'Save Changes'}
                     </Button>
                   </div>
                 </div>
@@ -553,7 +690,7 @@ export default function StudentModal({
                         <Label>{'Learning Explanation'}</Label>
                         <Input
                           error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
-                          type="number"
+                          type="text"
                           value={marks.learningExplanation || ''}
                           onChange={(e) => handleInputChange('learningExplanation', e.target.value, 5)}
                           placeholder="Marks - out of 5"
@@ -563,7 +700,7 @@ export default function StudentModal({
                         <Label>{'Problem Identification'}</Label>
                         <Input
                           error={marks.problemIdentification < 0 || marks.problemIdentification > 5}
-                          type="number"
+                          type="text"
                           value={marks.problemIdentification || ''}
                           onChange={(e) => handleInputChange('problemIdentification', e.target.value, 5)}
                           placeholder="Marks - out of 5"
@@ -573,7 +710,7 @@ export default function StudentModal({
                         <Label>{'Contribution Explanation'}</Label>
                         <Input
                           error={marks.contributionExplanation < 0 || marks.contributionExplanation > 10}
-                          type="number"
+                          type="text"
                           value={marks.contributionExplanation || ''}
                           onChange={(e) => handleInputChange('contributionExplanation', e.target.value, 10)}
                           placeholder="Marks - out of 10"
@@ -583,7 +720,7 @@ export default function StudentModal({
                         <Label>{'Proposed Solution'}</Label>
                         <Input
                           error={marks.proposedSolution < 0 || marks.proposedSolution > 10}
-                          type="number"
+                          type="text"
                           value={marks.proposedSolution || ''}
                           onChange={(e) => handleInputChange('proposedSolution', e.target.value, 10)}
                           placeholder="Marks - out of 10"
@@ -593,7 +730,7 @@ export default function StudentModal({
                         <Label>{'Presenatation Skills'}</Label>
                         <Input
                           error={marks.presentationSkills < 0 || marks.presentationSkills > 10}
-                          type="number"
+                          type="text"
                           value={marks.presentationSkills || ''}
                           onChange={(e) => handleInputChange('presentationSkills', e.target.value, 10)}
                           placeholder="Marks - out of 10"
@@ -609,7 +746,7 @@ export default function StudentModal({
                         <Label>{'QnA Viva'}</Label>
                         <Input
                           error={marks.qnaViva < 0 || marks.qnaViva > 10}
-                          type="number"
+                          type="text"
                           value={marks.qnaViva || ''}
                           onChange={(e) => handleInputChange('qnaViva', e.target.value, 10)}
                           placeholder="Marks - out of 10"
