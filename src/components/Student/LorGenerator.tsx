@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Document, Page, Text, StyleSheet, pdf, Image } from '@react-pdf/renderer';
 import Button from '@/components/Home/ui/button/Button';
 import ComponentCard from '@/components/Home/common/ComponentCard';
+import { Download } from 'lucide-react';
 
 const styles = StyleSheet.create({
   page: {
@@ -177,7 +178,7 @@ const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: 
         </div>
       ) : (
         <div className="flex flex-col md:flex-row gap-4 justify-between">
-          <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90">
+          <Button onClick={handleDownload} className="bg-primary hover:bg-primary/90" startIcon={<Download />}>
             Download LOR PDF
           </Button>
         </div>

@@ -38,23 +38,26 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    // Determine if this is a PDF document or an image based on folder name
+    const isPdfDocument = ['offerletter', 'report', 'certificate', 'poster'].includes(folderName.toLowerCase());
+
+    // Configure upload options based on file type
+    const uploadOptions = {
+      resource_type: isPdfDocument ? ('raw' as const) : ('image' as const),
+      folder: folderName,
+      format: isPdfDocument ? 'pdf' : undefined,
+      pages: isPdfDocument ? true : undefined,
+      use_filename: true,
+      unique_filename: false,
+      overwrite: true,
+      public_id: userId,
+    };
+
     const result = await new Promise<CloudinaryUploadResponse>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          resource_type: 'raw',
-          folder: folderName,
-          format: 'pdf',
-          pages: true,
-          use_filename: true,
-          unique_filename: false,
-          overwrite: true,
-          public_id: userId,
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result as CloudinaryUploadResponse);
-        }
-      );
+      const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+        if (error) reject(error);
+        else resolve(result as CloudinaryUploadResponse);
+      });
       uploadStream.end(buffer);
     });
 
@@ -63,7 +66,7 @@ export async function POST(req: NextRequest) {
     let columnName = '';
     switch (folderName.toLowerCase()) {
       case 'offerletter':
-        columnName = 'offerLetter';
+        columnName = 'offerletter';
         break;
       case 'report':
         columnName = 'report';
@@ -73,6 +76,15 @@ export async function POST(req: NextRequest) {
         break;
       case 'poster':
         columnName = 'poster';
+        break;
+      case 'weekonephoto':
+        columnName = 'week_one_photo';
+        break;
+      case 'weektwophoto':
+        columnName = 'week_two_photo';
+        break;
+      case 'profileimage':
+        columnName = 'profile_image';
         break;
       default:
         throw new Error('Invalid folder name');

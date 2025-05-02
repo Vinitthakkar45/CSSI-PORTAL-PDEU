@@ -46,8 +46,8 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
       'report',
       'certificate',
       'poster',
-      'weekOnePhoto',
-      'weekTwoPhoto',
+      'week_one_photo',
+      'week_two_photo',
       // Progress
       'stage',
     ] as const;

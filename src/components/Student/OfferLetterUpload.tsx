@@ -24,7 +24,7 @@ const OfferLetterUpload = ({ onComplete, userId }: OfferLetterUploadProps) => {
 
         if (storedData) {
           const parsedData = JSON.parse(storedData);
-          if (parsedData.profileData.offerLetter !== '') setHasUploadedFile(true);
+          if (parsedData.profileData.offerLetter !== null) setHasUploadedFile(true);
           setIsLoading(false);
         }
       } catch (err) {
