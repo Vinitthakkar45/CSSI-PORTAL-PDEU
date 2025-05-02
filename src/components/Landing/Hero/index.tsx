@@ -36,7 +36,7 @@ const Hero = () => {
       ))}
 
       {/* Overlay with diagonal gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br bg-[#FAFAFA] opacity-30 dark:bg-gray-900 dark:opacity-70 z-1"></div>
+      <div className="absolute inset-0 bg-gradient-to-br bg-[#FAFAFA] opacity-30 dark:bg-gray-900 dark:opacity-50 z-1"></div>
 
       {/* Animated diagonal accent lines */}
       <div className="absolute inset-0 z-2 overflow-hidden">
