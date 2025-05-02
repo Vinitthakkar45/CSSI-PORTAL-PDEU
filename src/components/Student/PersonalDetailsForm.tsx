@@ -67,18 +67,6 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
           <div className="w-full">
             <Input
               type="text"
-              name="rollNumber"
-              value={formData.rollNumber}
-              onChange={handleChange}
-              placeholder="Enter roll number"
-              error={errors.rollNumber}
-              required
-            />
-            {errors.rollNumber && <span className="text-red-500 text-sm">{errors.rollNumber}</span>}
-          </div>
-          <div className="w-full">
-            <Input
-              type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
@@ -91,14 +79,14 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
           <div className="w-full">
             <Input
               type="text"
-              name="department"
-              value={formData.department}
+              name="rollNumber"
+              value={formData.rollNumber}
               onChange={handleChange}
-              placeholder="Enter department"
-              error={errors.department}
+              placeholder="Enter roll number"
+              error={errors.rollNumber}
               required
             />
-            {errors.department && <span className="text-red-500 text-sm">{errors.department}</span>}
+            {errors.rollNumber && <span className="text-red-500 text-sm">{errors.rollNumber}</span>}
           </div>
           <div className="w-full">
             <Input
@@ -126,6 +114,18 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
           </div>
           <div className="w-full">
             <Input
+              type="text"
+              name="department"
+              value={formData.department}
+              onChange={handleChange}
+              placeholder="Enter department"
+              error={errors.department}
+              required
+            />
+            {errors.department && <span className="text-red-500 text-sm">{errors.department}</span>}
+          </div>
+          <div className="w-full">
+            <Input
               type="tel"
               name="contactNumber"
               value={formData.contactNumber}
@@ -138,7 +138,7 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
           </div>
 
           <div className="col-span-full">
-            <Button className="w-full" size="sm" disabled={isSubmitting}>
+            <Button className="w-full" size="nm" disabled={isSubmitting}>
               {isSubmitting ? 'Saving...' : 'Save & Continue'}
             </Button>
           </div>

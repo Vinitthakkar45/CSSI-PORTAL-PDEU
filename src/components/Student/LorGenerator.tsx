@@ -75,7 +75,7 @@ const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: 
       try {
         setIsLoading(true);
 
-        const localStorageKey = `userData_${userId}`;
+        const localStorageKey = `userData`;
         const storedData = localStorage.getItem(localStorageKey);
 
         if (storedData) {
@@ -125,7 +125,7 @@ const LORGenerator = ({ onComplete, userId }: { onComplete: () => void; userId: 
       // Create download link
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${name}_lor.pdf`;
+      link.download = `${name}_LOR.pdf`;
 
       // Track download completion
       let dialogClosed = false;
