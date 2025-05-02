@@ -19,6 +19,7 @@ export interface MarksType {
 }
 
 export const getMentoredStudents = async (facultyId: number) => {
+  console.log('Faculty ID:', facultyId); // Log the faculty ID for debugging
   // Fetch the faculty ID based on the user ID
   const fac_id_result = await db.select({ id: faculty.id }).from(faculty).where(eq(faculty.userId, facultyId)).limit(1);
 

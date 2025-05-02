@@ -146,7 +146,7 @@ export default function StudentModal({
     const studentid = selectedStudent.id;
 
     try {
-      const response = await fetch('/api/faculty', {
+      const response = await fetch(`/api/coord/evaluate?facultyId=${session?.user.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ studentid, typeofmarks, marks }),

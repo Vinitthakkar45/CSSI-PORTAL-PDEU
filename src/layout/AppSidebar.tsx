@@ -48,6 +48,11 @@ const AppSidebar: React.FC = () => {
           name: 'Faculties',
           path: '/home/coordinator/facultyTable',
           icon: <BookOpen size={22} />,
+        },
+        {
+          name: 'Conduct Evaluation',
+          path: '/home/coordinator/evaluation',
+          icon: <BookOpen size={22} />,
         }
       );
     }
