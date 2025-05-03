@@ -57,9 +57,9 @@ const Hero = () => {
                   LEARN, GROW, SERVE: <br />
                   <span className="text-[#3045c9]">THE CSSI INTERNSHIP PORTAL</span>
                 </h1>
-                <p className="mb-8 font-semibold text-base leading-relaxed text-[#101238] dark:text-white md:text-xl sm:text-xl">
-                  A portal to simplify and streamline the internship journey, making it easier for students and faculty
-                  to manage the process, striving towards a more efficient and productive experience.
+                <p className="mb-8 font-semibold text-sm leading-relaxed text-[#101238] dark:text-white md:text-xl sm:text-xl">
+                  A portal to simplify the internship journey, making it easier for students and faculty to manage the
+                  process, striving towards a productive experience.
                 </p>
                 <div className="flex flex-row items-center space-x-4">
                   <Link

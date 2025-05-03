@@ -14,7 +14,7 @@ const GuidelinesPage = () => {
         pageName="Guidelines"
         description="Following content contains the guidelines for the CSSI internship as provided by Pandit Deendayal Energy University (PDEU), 2025."
       />
-      <section className="pb-[120px] pt-[90px]">
+      <section className="pb-[120px] pt-[30px]">
         <div className="container">
           <GuidelinesContent />
         </div>

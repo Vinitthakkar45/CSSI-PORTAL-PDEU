@@ -3,7 +3,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/context/SidebarContext';
-import { BarChart, UserCog, Ellipsis, LayoutGrid, CircleUserRound, GraduationCap, BookOpen } from 'lucide-react';
+import {
+  BarChart,
+  UserCog,
+  Ellipsis,
+  LayoutGrid,
+  CircleUserRound,
+  GraduationCap,
+  BookOpen,
+  BookOpenCheck,
+  ScrollText,
+} from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 type NavItem = {
@@ -40,12 +50,17 @@ const AppSidebar: React.FC = () => {
     if (role === 'student') {
       navItems.push({
         name: 'Assignees',
-        path: '/home/assignees',
+        path: '/home/student/assignees',
         icon: <GraduationCap size={22} />,
       });
     }
     if (role === 'coordinator') {
       navItems.push(
+        {
+          name: 'Conduct Evaluation',
+          path: '/home/coordinator/evaluation',
+          icon: <BookOpenCheck size={22} />,
+        },
         {
           name: 'Students',
           path: '/home/coordinator/studentTable',
@@ -59,12 +74,7 @@ const AppSidebar: React.FC = () => {
         {
           name: 'Roles/Guidelines',
           path: '/home/coordinator/roles',
-          icon: <BookOpen size={22} />,
-        },
-        {
-          name: 'Conduct Evaluation',
-          path: '/home/coordinator/evaluation',
-          icon: <BookOpen size={22} />,
+          icon: <ScrollText size={22} />,
         }
       );
     }
@@ -96,7 +106,7 @@ const AppSidebar: React.FC = () => {
       navItems.push({
         name: 'Roles/Guidelines',
         path: '/home/faculty/guidelines',
-        icon: <BookOpen size={22} />,
+        icon: <ScrollText size={22} />,
       });
     }
   }

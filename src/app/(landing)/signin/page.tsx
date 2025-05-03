@@ -42,7 +42,7 @@ const SigninPage = () => {
         <div className="container">
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4">
-              <div className="shadow-three mx-auto max-w-[500px] rounded-sm bg-white dark:bg-dark sm:p-[60px]">
+              <div className="shadow-three mx-auto max-w-[500px] rounded-sm bg-white dark:bg-dark p-10">
                 <h3 className="mb-2 text-center text-2xl font-bold text-black dark:text-white sm:text-3xl">
                   Sign in to your account
                 </h3>
@@ -107,7 +107,7 @@ const SigninPage = () => {
                       </label>
                     </div>
                     <div>
-                      <a href="#0" className="text-sm font-medium text-primary hover:underline">
+                      <a href="/contact" className="text-sm font-medium text-primary hover:underline">
                         Forgot Password?
                       </a>
                     </div>
@@ -121,8 +121,8 @@ const SigninPage = () => {
                 </form>
                 <p className="text-center text-base font-medium text-body-color">
                   Don’t you have an account?{' '}
-                  <Link href="/signup" className="text-primary hover:underline">
-                    Sign up
+                  <Link href="/contact" className="text-primary hover:underline">
+                    Contact
                   </Link>
                 </p>
               </div>

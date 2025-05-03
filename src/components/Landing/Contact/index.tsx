@@ -1,4 +1,5 @@
 'use client';
+import { toast } from '@/components/Home/ui/toast/Toast';
 import { useState } from 'react';
 
 const Contact = () => {
@@ -27,15 +28,15 @@ const Contact = () => {
       });
 
       if (res.ok) {
-        // toast.success('Message successfully submitted!');
+        toast.success('Message successfully submitted!');
         setFormData({ name: '', email: '', message: '' });
         setSubmitted(true);
         setTimeout(() => setSubmitted(false), 10000);
       } else {
-        // toast.error('Something went wrong. Please try again.');
+        toast.error('Something went wrong. Please try again.');
       }
     } catch (err) {
-      // toast.error('Error while submitting the form.');
+      toast.error('Error while submitting the form.');
       console.log(err);
     } finally {
       setLoading(false);
@@ -43,7 +44,7 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="overflow-hidden py-16 md:py-20 lg:py-28">
+    <section id="contact" className="overflow-hidden px-4 md:px-20 lg:px-28 p-8">
       <div className="container">
         <div className="-mx-4 flex flex-wrap">
           <div className="w-full px-4">

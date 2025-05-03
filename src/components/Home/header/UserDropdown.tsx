@@ -63,7 +63,7 @@ export default function UserDropdown() {
               <Image
                 width={44}
                 height={44}
-                src="/images/user/DefaultProfile_dark.png"
+                src="/images/user/DefaultProfile_Light.png"
                 alt="avatar"
                 className="hidden dark:block"
               />

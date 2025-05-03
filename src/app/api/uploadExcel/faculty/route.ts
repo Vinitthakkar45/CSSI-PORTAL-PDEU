@@ -61,8 +61,6 @@ function standardizeDepartment(departmentName: string | null): string | null {
     computer: 'CSE',
     'computer science': 'CSE',
     'computer science and engineering': 'CSE',
-    cs: 'CSE',
-    cse: 'CSE',
 
     // Information Technology related
     'information technology': 'ICT',
@@ -70,19 +68,20 @@ function standardizeDepartment(departmentName: string | null): string | null {
     ict: 'ICT',
     'information and communication technology': 'ICT',
 
+    // Mechanical related
+    mechanical: 'MECH',
+    'mechanical engineering': 'MECH',
+    mech: 'MECH',
+    'mech engineering': 'MECH',
+
     // Electronics related
     electronics: 'ECE',
     'electronics and communication': 'ECE',
     'electronics & communication': 'ECE',
     'electronics and communication engineering': 'ECE',
     ece: 'ECE',
+    ec: 'ECE',
     electronic: 'ECE',
-
-    // Mechanical related
-    mechanical: 'MECH',
-    'mechanical engineering': 'MECH',
-    mech: 'MECH',
-    'mech engineering': 'MECH',
 
     // Civil related
     civil: 'CIVIL',

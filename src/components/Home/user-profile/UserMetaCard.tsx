@@ -78,7 +78,7 @@ export default function UserMetaCard() {
                     width={100}
                     height={30}
                     className="hidden dark:block"
-                    src="/images/user/DefaultProfile_dark.png"
+                    src="/images/user/DefaultProfile_Light.png"
                     alt="Default Profile Dark"
                   />
                 </>
@@ -94,7 +94,7 @@ export default function UserMetaCard() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">{userData?.info?.department || 'Department'}</p>
               </div>
             </div>
-            <div className="flex items-center order-2 gap-2 grow xl:order-3 xl:justify-end">
+            {/* <div className="flex items-center order-2 gap-2 grow xl:order-3 xl:justify-end">
               <a
                 href="https://www.linkedin.com/company/pimjo"
                 target="_blank"
@@ -115,9 +115,9 @@ export default function UserMetaCard() {
                   />
                 </svg>
               </a>
-            </div>
+            </div> */}
           </div>
-          <button
+          {/* <button
             onClick={openModal}
             className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 lg:inline-flex lg:w-auto"
           >
@@ -137,7 +137,7 @@ export default function UserMetaCard() {
               />
             </svg>
             Edit
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -149,7 +149,7 @@ export default function UserMetaCard() {
         </div>
       )}
 
-      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">
+      {/* <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">
         <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
           <div className="px-2 pr-14">
             <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">Edit Personal Information</h4>
@@ -207,7 +207,7 @@ export default function UserMetaCard() {
             </div>
           </form>
         </div>
-      </Modal>
+      </Modal> */}
     </>
   );
 }

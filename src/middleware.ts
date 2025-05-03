@@ -8,7 +8,9 @@ const roleProtectedRoutes: { prefix: string; role: string }[] = [
   { prefix: '/api/student', role: 'student' },
   { prefix: '/home/admin', role: 'admin' },
   { prefix: '/home/coordinator', role: 'coordinator' },
-  { prefix: '/home/assignees', role: 'student' },
+  { prefix: '/home/student/assignees', role: 'student' },
+  { prefix: '/home/faculty/roles', role: 'faculty' },
+  { prefix: '/home/coordinator/roles', role: 'coordinator' },
 ];
 
 const publicRoutes = ['/', '/signin'];
@@ -75,6 +77,8 @@ export const config = {
     '/admin/:path*',
     '/coordinator/:path*',
     '/api/:path*',
-    '/assignees/:path*',
+    '/student/assignees/:path*',
+    '/faculty/roles/:path*',
+    '/coordinator/roles/:path*',
   ],
 };
