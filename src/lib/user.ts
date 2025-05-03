@@ -3,8 +3,8 @@ import { user, student, faculty } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { SelectStudent, SelectFaculty } from '@/drizzle/schema';
 
-export async function getUserDetails(userId: number): Promise<{
-  id: number;
+export async function getUserDetails(userId: string): Promise<{
+  id: string;
   email: string;
   role: string;
   profileData: SelectStudent | SelectFaculty | null;

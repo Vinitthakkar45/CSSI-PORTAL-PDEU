@@ -34,14 +34,6 @@ export async function PUT(req: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: 'User ID not found in session' }, { status: 400 });
     }
-
-    // Ensure userId is a number
-    const userIdNum = typeof userId === 'string' ? parseInt(userId, 10) : userId;
-
-    if (isNaN(userIdNum)) {
-      return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 });
-    }
-
     // Update different tables based on role
     if (role === 'faculty' || role === 'coordinator') {
       // For faculty, update sitting and freeTimeSlots
@@ -53,7 +45,7 @@ export async function PUT(req: NextRequest) {
       }
 
       // Find faculty by userId
-      const facultyResult = await db.select().from(faculty).where(eq(faculty.userId, userIdNum));
+      const facultyResult = await db.select().from(faculty).where(eq(faculty.userId, userId));
 
       if (!facultyResult || facultyResult.length === 0) {
         return NextResponse.json({ error: 'Faculty not found' }, { status: 404 });
@@ -86,7 +78,7 @@ export async function PUT(req: NextRequest) {
       }
 
       // Find student by userId
-      const studentResult = await db.select().from(student).where(eq(student.userId, userIdNum));
+      const studentResult = await db.select().from(student).where(eq(student.userId, userId));
 
       if (!studentResult || studentResult.length === 0) {
         return NextResponse.json({ error: 'Student not found' }, { status: 404 });

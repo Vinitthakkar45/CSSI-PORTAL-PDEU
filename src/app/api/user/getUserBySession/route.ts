@@ -7,7 +7,7 @@ import { eq } from 'drizzle-orm';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  const currentUser = session?.user as { id: number; email: string; role: string } | undefined;
+  const currentUser = session?.user as { id: string; email: string; role: string } | undefined;
 
   if (!currentUser) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
