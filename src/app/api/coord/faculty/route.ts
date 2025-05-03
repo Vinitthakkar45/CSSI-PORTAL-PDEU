@@ -5,9 +5,14 @@ import { eq } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
   try {
-    const { id } = await req.json();
-    const uid = Number(id);
-    const department = await db.select({ department: faculty.department }).from(faculty).where(eq(faculty.userId, uid));
+    const body = await req.json();
+    const id = body?.id;
+
+    if (!id) {
+      return NextResponse.json({ message: 'Invalid or missing ID' }, { status: 400 });
+    }
+
+    const department = await db.select({ department: faculty.department }).from(faculty).where(eq(faculty.userId, id));
     const userdep = department[0]?.department;
 
     if (!userdep) {
@@ -28,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(facultyList, { status: 200 });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
