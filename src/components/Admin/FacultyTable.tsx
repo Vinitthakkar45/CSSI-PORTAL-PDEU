@@ -16,8 +16,9 @@ import { toast } from '@/components/Home/ui/toast/Toast';
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
   user: {
+    id: string;
     email: string | null;
-    role: string | null;
+    role: string;
   };
 };
 
@@ -45,6 +46,7 @@ export default function FacultyTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredFaculties.length / itemsPerPage);
+  const [hasEdited, setHasEdited] = useState<boolean>(false);
 
   const handleUploadSuccess = async () => {
     // Refresh the faculty list
@@ -94,7 +96,7 @@ export default function FacultyTable() {
     }
 
     fetchFaculties();
-  }, []);
+  }, [hasEdited]);
 
   useEffect(() => {
     async function checkRecordsAndFetchAssignments() {
@@ -211,7 +213,8 @@ export default function FacultyTable() {
 
       {showModal && selectedFaculty && (
         <FacultyTableModal
-          selectedFaculty={selectedFaculty.faculty}
+          setHasEdit={setHasEdited}
+          selectedFaculty={selectedFaculty}
           isOpen={showModal}
           onClose={handleModalclose}
           onCloseCross={handleModalclose}

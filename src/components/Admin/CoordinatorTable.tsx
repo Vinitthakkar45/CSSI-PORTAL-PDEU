@@ -8,8 +8,9 @@ import FacultyTableModal from './FacultyTableModal';
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
   user: {
+    id: string;
     email: string | null;
-    role: string | null;
+    role: string;
   };
 };
 
@@ -27,6 +28,7 @@ const CoordinatorTable = () => {
   const [loading, setLoading] = useState(true);
   const [selectedFaculty, setSelectedFaculty] = useState<FacultyWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [hasEdited, setHasEdited] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchFaculties() {
@@ -44,7 +46,7 @@ const CoordinatorTable = () => {
     }
 
     fetchFaculties();
-  }, []);
+  }, [hasEdited]);
 
   const handleModalclose = () => {
     setShowModal(false);
@@ -89,7 +91,8 @@ const CoordinatorTable = () => {
     <>
       {showModal && selectedFaculty && (
         <FacultyTableModal
-          selectedFaculty={selectedFaculty.faculty}
+          setHasEdit={setHasEdited}
+          selectedFaculty={selectedFaculty}
           isOpen={showModal}
           onClose={handleModalclose}
           onCloseCross={handleModalclose}
