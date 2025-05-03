@@ -1,8 +1,5 @@
-'use client';
-import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Check, Lock, CircleAlert } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 
 interface StageProgressProps {
   currentStage: number;
@@ -18,24 +15,7 @@ const StageProgress: React.FC<StageProgressProps> = ({
   maxStageUnlocked = currentStage,
 }) => {
   const stageLabels = ['Select', 'Internship', 'Uploads', 'Grade'];
-  const [mentorName, setMentorName] = useState('');
-  const [evalName, setEvalName] = useState('');
-  const session = useSession();
-  useEffect(() => {
-    if (!session.data?.user?.id) return;
-    async function fetchME() {
-      const id = session.data?.user.id;
-      const role = session.data?.user.role;
-      const res = await fetch('/api/mentorandevaluator', {
-        method: 'POST',
-        body: JSON.stringify({ id, role }),
-      });
-      const data = await res.json();
-      setMentorName(data.mentorname.name);
-      setEvalName(data.evalname.name);
-    }
-    fetchME();
-  }, [session.data?.user?.id]);
+
   return (
     <div className="w-full lg:mb-4 mb-2 mx-auto">
       <div className="flex items-center justify-between gap-20">

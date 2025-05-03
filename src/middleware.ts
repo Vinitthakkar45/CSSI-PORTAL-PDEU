@@ -8,6 +8,7 @@ const roleProtectedRoutes: { prefix: string; role: string }[] = [
   { prefix: '/api/student', role: 'student' },
   { prefix: '/home/admin', role: 'admin' },
   { prefix: '/home/coordinator', role: 'coordinator' },
+  { prefix: '/home/assignees', role: 'student' },
 ];
 
 const publicRoutes = ['/', '/signin'];
@@ -31,9 +32,9 @@ export async function middleware(req: NextRequest) {
       origin.includes('cssi-458508.el.r.appspot.com') ||
       referer.includes('cssi-458508.el.r.appspot.com');
 
-    // if (!isAllowedDomain) {
-    //   return NextResponse.redirect(new URL('/not-found', req.url));
-    // }
+    if (!isAllowedDomain) {
+      return NextResponse.redirect(new URL('/not-found', req.url));
+    }
   }
 
   // Redirect authenticated users away from signin/home
@@ -66,5 +67,14 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/signin', '/home', '/home/:path*', '/admin/:path*', '/coordinator/:path*', '/api/:path*'],
+  matcher: [
+    '/',
+    '/signin',
+    '/home',
+    '/home/:path*',
+    '/admin/:path*',
+    '/coordinator/:path*',
+    '/api/:path*',
+    '/assignees/:path*',
+  ],
 };
