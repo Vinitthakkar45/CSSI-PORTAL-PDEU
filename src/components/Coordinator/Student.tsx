@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
 import { SelectStudent } from '@/drizzle/schema';
@@ -7,6 +7,8 @@ import TableModal from '@/components/Coordinator/StudentTableModal';
 import { useSession } from 'next-auth/react';
 import Button from '../Home/ui/button/Button';
 import AddStudentModal from './AddStudentModal';
+import { RefreshCw } from 'lucide-react';
+import { toast } from '@/components/Home/ui/toast/Toast';
 
 type StudentWithUser = {
   student: SelectStudent;
@@ -17,51 +19,155 @@ type StudentWithUser = {
   };
 };
 
+// Helper function to get cache key for a specific coordinator
+const getCacheKey = (id: string) => `coord_students_cache_${id}`;
+const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+// Helper function to get cached data
+const getCachedStudents = (id: string): { data: StudentWithUser[]; timestamp: number } | null => {
+  try {
+    const CACHE_KEY = getCacheKey(id);
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    if (!cachedData) return null;
+
+    const parsed = JSON.parse(cachedData);
+    return parsed;
+  } catch (error) {
+    console.error('Error parsing cached student data:', error);
+    return null;
+  }
+};
+
+// Helper function to set cached data
+const setCachedStudents = (id: string, data: StudentWithUser[]) => {
+  try {
+    const CACHE_KEY = getCacheKey(id);
+    const now = Date.now();
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({
+        data,
+        timestamp: now,
+      })
+    );
+    return now;
+  } catch (error) {
+    console.error('Error caching student data:', error);
+    return Date.now();
+  }
+};
+
 const StudentTable = () => {
   const session = useSession();
   const [students, setStudents] = useState<StudentWithUser[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<StudentWithUser[]>([]);
-  const [selectedDepartment, setSelectedDepartment] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<StudentWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAdd, setShowAdd] = useState<boolean>(false);
+  const [lastFetched, setLastFetched] = useState<number>(0);
+
   // Pagination state
-
   const [currentPage, setCurrentPage] = useState(1);
-
   const itemsPerPage = 6;
-
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
 
-  const paginatedStudents = filteredStudents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
+  // Initialize from cache immediately
   useEffect(() => {
-    async function fetchStudents() {
+    const userId = session.data?.user?.id;
+    if (userId) {
+      const cached = getCachedStudents(userId);
+      if (cached) {
+        setStudents(cached.data);
+        setFilteredStudents(cached.data);
+        setLastFetched(cached.timestamp);
+        setLoading(false);
+      }
+    }
+  }, [session.data?.user?.id]);
+
+  const fetchStudents = useCallback(
+    async (forceRefresh = false) => {
+      const userId = session.data?.user?.id;
+      if (!userId) return;
+
       try {
         setLoading(true);
-        const id = session.data?.user.id;
-        console.log(id);
+
+        // Check if we have cached data
+        const cached = getCachedStudents(userId);
+        const now = Date.now();
+
+        // Use cache if available and not forced refresh and not expired
+        if (!forceRefresh && cached && now - cached.timestamp < CACHE_EXPIRY) {
+          setStudents(cached.data);
+          setFilteredStudents(cached.data);
+          setLastFetched(cached.timestamp);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch fresh data
         const res = await fetch('/api/coord/students', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ id }),
+          body: JSON.stringify({ id: userId }),
         });
+
         const data = await res.json();
+
+        // Update state with new data
         setStudents(data);
-        setFilteredStudents(data); // initialize with all
+        setFilteredStudents(data);
+
+        // Cache the new data
+        const timestamp = setCachedStudents(userId, data);
+        setLastFetched(timestamp);
       } catch (error) {
         console.error('Error fetching student data:', error);
+
+        // Fallback to cache on error
+        if (userId) {
+          const cached = getCachedStudents(userId);
+          if (cached) {
+            setStudents(cached.data);
+            setFilteredStudents(cached.data);
+            toast.error('Failed to fetch fresh data. Using cached data.');
+          } else {
+            toast.error('Failed to load student data.');
+          }
+        }
       } finally {
         setLoading(false);
       }
-    }
+    },
+    [session.data?.user?.id]
+  );
 
-    fetchStudents();
-  }, []);
+  useEffect(() => {
+    const userId = session.data?.user?.id;
+    if (!userId) return;
+
+    // Only fetch if we don't have data from cache
+    if (students.length === 0) {
+      fetchStudents();
+    } else {
+      // If we have data but it might be stale, refresh in background
+      const cached = getCachedStudents(userId);
+      const now = Date.now();
+      if (cached && now - cached.timestamp > CACHE_EXPIRY) {
+        fetchStudents();
+      }
+    }
+  }, [fetchStudents, students.length, session.data?.user?.id]);
+
+  // Add a refresh function that can be called manually
+  const refreshData = () => {
+    fetchStudents(true);
+  };
 
   const handleModalclose = () => {
     setShowModal(false);
@@ -72,45 +178,23 @@ const StudentTable = () => {
     setShowModal(true);
   };
 
-  const handleFilter = () => {
-    let result = students;
-
-    // Apply department filter
-    if (selectedDepartment !== 'ALL') {
-      result = result.filter((student) => student.student.department === selectedDepartment);
-    }
-
-    // Apply search filter
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase().trim();
-      result = result.filter(
-        (student) =>
-          (student.student.rollNumber && student.student.rollNumber.toLowerCase().includes(term)) ||
-          (student.user.email && student.user.email.toLowerCase().includes(term)) ||
-          (student.student.name && student.student.name.toLowerCase().includes(term))
-      );
-    }
-
-    setFilteredStudents(result);
-  };
-
-  // Run filter when either search or department changes
-  useEffect(() => {
-    handleFilter();
-  }, [searchTerm, selectedDepartment]);
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filteredStudents]);
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
+
   const handleAddStudent = () => {
     setShowAdd(true);
   };
+
   const handleAddStudentClose = () => {
     setShowAdd(false);
   };
-  if (loading) {
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredStudents]);
+
+  if (loading && students.length === 0) {
     return <div className="p-4 text-center">Loading student data...</div>;
   }
 
@@ -127,8 +211,20 @@ const StudentTable = () => {
       )}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
         <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+          <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Student Details</h3>
+            <button
+              onClick={refreshData}
+              className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              title="Refresh data"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            {lastFetched > 0 && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                Last updated: {new Date(lastFetched).toLocaleTimeString()}
+              </span>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <div>
@@ -142,7 +238,7 @@ const StudentTable = () => {
                 placeholder="Search by roll number or email"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white"
+                className="w-full rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white"
               />
             </div>
           </div>
