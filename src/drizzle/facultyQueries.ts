@@ -134,3 +134,17 @@ export const updateFinalMarks = async (studentId: number, marks: MarksType) => {
     .where(eq(student.id, studentId));
   return { success: true };
 };
+
+export const checkAdmin = async (facultyId: string) => {
+  const adminids = await db.select({ id: user.id }).from(user).where(eq(user.role, 'admin'));
+
+  const isAdmin = adminids.some((admin) => admin.id === facultyId);
+  return isAdmin;
+};
+
+export const checkCoord = async (facultyId: string) => {
+  const coordids = await db.select({ id: user.id }).from(user).where(eq(user.role, 'coordinator'));
+
+  const isCoord = coordids.some((coord) => coord.id === facultyId);
+  return isCoord;
+};

@@ -3,13 +3,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
 import { SelectStudent } from '@/drizzle/schema';
-import TableModal from '@/components/Coordinator/StudentTableModal';
 import { useSession } from 'next-auth/react';
 import Button from '../Home/ui/button/Button';
 import AddStudentModal from './AddStudentModal';
 import { RefreshCw } from 'lucide-react';
 import { toast } from '@/components/Home/ui/toast/Toast';
-
+import StudentModal from './Modal/StudentModal';
 type StudentWithUser = {
   student: SelectStudent;
   user: {
@@ -67,6 +66,7 @@ const StudentTable = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAdd, setShowAdd] = useState<boolean>(false);
   const [lastFetched, setLastFetched] = useState<number>(0);
+  const [marksToggle, setMarksToggle] = useState<boolean>(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -202,11 +202,15 @@ const StudentTable = () => {
     <>
       {showAdd && <AddStudentModal isOpen={showAdd} onClose={handleAddStudentClose} />}
       {showModal && selectedStudent && (
-        <TableModal
-          selectedStudent={selectedStudent.student}
+        <StudentModal
           isOpen={showModal}
           onClose={handleModalclose}
-          onCloseCross={handleModalclose}
+          selectedStudent={selectedStudent}
+          option="both"
+          setMarksToggle={setMarksToggle}
+          marksToggle={marksToggle}
+          students={students}
+          setStudents={setStudents}
         />
       )}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">

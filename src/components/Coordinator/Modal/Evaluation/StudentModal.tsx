@@ -146,7 +146,7 @@ export default function StudentModal({
     const studentid = selectedStudent.id;
 
     try {
-      const response = await fetch('/api/faculty', {
+      const response = await fetch(`/api/coord/evaluate?facultyId=${session?.user.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ studentid, typeofmarks, marks }),
@@ -219,14 +219,17 @@ export default function StudentModal({
     setIsDeclining(true);
 
     try {
-      const response = await fetch('/api/faculty/decline-offer-letter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          student_user_id: selectedStudent.userId,
-          reason_of_declination: declineReason,
-        }),
-      });
+      const response = await fetch(
+        `/api/coord/decline-offer-letter?facultyId=${session?.user.id}&email=${session?.user.email}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            student_user_id: selectedStudent.userId,
+            reason_of_declination: declineReason,
+          }),
+        }
+      );
 
       if (!response.ok) throw new Error('Failed to decline offer letter');
 
@@ -466,7 +469,7 @@ export default function StudentModal({
                         {' '}
                         View Offer Letter <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
                       </a>
-                      {!showDeclineInput && (
+                      {!showDeclineInput && option === 'mentor' && (
                         <button
                           className="mt-2 ml-4 px-4 py-2 text-sm font-medium text-white bg-red-900 rounded hover:bg-red-800"
                           onClick={() => setShowDeclineInput(true)}
@@ -474,7 +477,7 @@ export default function StudentModal({
                           Decline Offer Letter
                         </button>
                       )}
-                      {showDeclineInput && (
+                      {showDeclineInput && option === 'mentor' && (
                         <div className="mt-4 ml-4">
                           <Label>Reason for Declination</Label>
                           <textarea

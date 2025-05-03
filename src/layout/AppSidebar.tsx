@@ -60,6 +60,11 @@ const AppSidebar: React.FC = () => {
           name: 'Roles/Guidelines',
           path: '/home/coordinator/roles',
           icon: <BookOpen size={22} />,
+        },
+        {
+          name: 'Conduct Evaluation',
+          path: '/home/coordinator/evaluation',
+          icon: <BookOpen size={22} />,
         }
       );
     }
