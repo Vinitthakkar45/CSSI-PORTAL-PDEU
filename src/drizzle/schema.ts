@@ -1,23 +1,23 @@
 import { sql } from 'drizzle-orm';
-import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, text, uuid } from 'drizzle-orm/pg-core';
 import { boolean } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   email: text('email').notNull().unique(),
-  password: text('password').notNull(),
+  password: text('password'),
   role: text('role').notNull(),
 });
 
 export const sessionuser = pgTable('user', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey(),
   email: text('email').notNull().unique(),
   role: text('role').notNull(),
 });
 
 export const student = pgTable('student', {
   id: serial('id').primaryKey(),
-  userId: integer('user_id')
+  userId: uuid('user_id')
     .notNull()
     .unique()
     .references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
@@ -86,7 +86,7 @@ export const student = pgTable('student', {
 
 export const faculty = pgTable('faculty', {
   id: serial('id').primaryKey(),
-  userId: integer('user_id')
+  userId: uuid('user_id')
     .notNull()
     .unique()
     .references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),

@@ -43,6 +43,13 @@
       "when": 1746259850353,
       "tag": "0005_aromatic_iceman",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1746273688565,
+      "tag": "0006_daffy_imperial_guard",
+      "breakpoints": true
     }
   ]
 }
