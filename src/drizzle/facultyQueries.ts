@@ -18,7 +18,7 @@ export interface MarksType {
   qnaViva: number;
 }
 
-export const getMentoredStudents = async (facultyId: number) => {
+export const getMentoredStudents = async (facultyId: string) => {
   // Fetch the faculty ID based on the user ID
   const fac_id_result = await db.select({ id: faculty.id }).from(faculty).where(eq(faculty.userId, facultyId)).limit(1);
 
@@ -48,7 +48,7 @@ export const getMentoredStudents = async (facultyId: number) => {
   return students_data;
 };
 
-export const getEvaluatedStudents = async (facultyId: number) => {
+export const getEvaluatedStudents = async (facultyId: string) => {
   // Fetch the faculty ID based on the user ID
   const fac_id_result = await db.select({ id: faculty.id }).from(faculty).where(eq(faculty.userId, facultyId)).limit(1);
 

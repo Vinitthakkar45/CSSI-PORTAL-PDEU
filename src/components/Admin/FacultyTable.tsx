@@ -7,6 +7,11 @@ import { InferSelectModel } from 'drizzle-orm';
 import FacultyTableModal from './FacultyTableModal';
 import Button from '../Home/ui/button/Button';
 import AddFacultyModal from './AddFacultyModal';
+import { Modal } from '@/components/Home/ui/modal';
+import { useModal } from '@/hooks/useModal';
+import UploadExcel from '@/components/UploadExcel';
+import LoadingOverlay from '../LoadingOverlay';
+import { toast } from '@/components/Home/ui/toast/Toast';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -22,34 +27,67 @@ type AssignmentItem = {
   evaluatorAssigned: number;
 };
 
-const FacultyTable = () => {
+export default function FacultyTable() {
   const [faculties, setFaculties] = useState<FacultyWithUser[]>([]);
   const [filteredFaculties, setFilteredFaculties] = useState<FacultyWithUser[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
+  const [selectedFaculty, setSelectedFaculty] = useState<FacultyWithUser | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showAdd, setShowAdd] = useState<boolean>(false);
+  const { isOpen: isUploadModalOpen, openModal: openUploadModal, closeModal: closeUploadModal } = useModal();
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
   const [hasMentors, setHasMentors] = useState(false);
   const [hasEvaluators, setHasEvaluators] = useState(false);
   const [assignmentsLoaded, setAssignmentsLoaded] = useState(false);
-  const [selectedFaculty, setSelectedFaculty] = useState<FacultyWithUser | null>(null);
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [showAdd, setShowAdd] = useState<boolean>(false);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredFaculties.length / itemsPerPage);
 
+  const handleUploadSuccess = async () => {
+    // Refresh the faculty list
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/faculty');
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || 'Failed to refresh faculty list');
+      }
+
+      const data = await res.json();
+      setFaculties(data);
+      setFilteredFaculties(data);
+      closeUploadModal();
+      toast.success('Faculty list refreshed successfully');
+    } catch (error) {
+      console.error('Error fetching faculty data:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to refresh faculty list');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch faculties on component mount
   useEffect(() => {
     async function fetchFaculties() {
       try {
         setLoading(true);
         const res = await fetch('/api/admin/faculty');
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          throw new Error(errorData?.error || 'Failed to fetch faculty data');
+        }
+
         const data = await res.json();
         setFaculties(data);
         setFilteredFaculties(data); // initialize with all
       } catch (error) {
         console.error('Error fetching faculty data:', error);
+        toast.error(error instanceof Error ? error.message : 'Failed to fetch faculty data');
       } finally {
         setLoading(false);
       }
@@ -62,6 +100,12 @@ const FacultyTable = () => {
     async function checkRecordsAndFetchAssignments() {
       try {
         const res = await fetch('/api/admin/countrecords');
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          throw new Error(errorData?.error || 'Failed to check records');
+        }
+
         const data = await res.json();
 
         const mentorCount = data.mentors;
@@ -71,14 +115,21 @@ const FacultyTable = () => {
         setHasEvaluators(evaluatorCount > 0);
 
         if (mentorCount > 0 || evaluatorCount > 0) {
-          const res = await fetch('/api/admin/checkassignment');
-          const data = await res.json();
-          setAssignments(data);
+          const assignRes = await fetch('/api/admin/checkassignment');
+
+          if (!assignRes.ok) {
+            const errorData = await assignRes.json().catch(() => null);
+            throw new Error(errorData?.error || 'Failed to fetch assignment data');
+          }
+
+          const assignData = await assignRes.json();
+          setAssignments(assignData);
         }
 
         setAssignmentsLoaded(true);
       } catch (error) {
         console.error('Error checking records or fetching assignment data:', error);
+        toast.error(error instanceof Error ? error.message : 'Failed to load assignment data');
         setAssignmentsLoaded(true);
       }
     }
@@ -146,6 +197,10 @@ const FacultyTable = () => {
     setShowAdd(false);
   };
 
+  const handleUploadExcel = () => {
+    openUploadModal();
+  };
+
   if (loading) {
     return <div className="p-4 text-center">Loading faculty data...</div>;
   }
@@ -160,8 +215,16 @@ const FacultyTable = () => {
           isOpen={showModal}
           onClose={handleModalclose}
           onCloseCross={handleModalclose}
-        ></FacultyTableModal>
+        />
       )}
+
+      <Modal isOpen={isUploadModalOpen} onClose={closeUploadModal} className="md:max-w-4xl">
+        <div className="p-10">
+          <UploadExcel onSuccess={handleUploadSuccess} type="faculty" />
+        </div>
+      </Modal>
+
+      {loading && <LoadingOverlay />}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
         <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -169,11 +232,6 @@ const FacultyTable = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <div>
-              <Button size="sm" variant="primary" className="mr-4" onClick={handleAddFaculty}>
-                Add Faculty
-              </Button>
-            </div>
             <div className="w-full sm:w-auto mb-2 sm:mb-0">
               <input
                 type="text"
@@ -182,6 +240,15 @@ const FacultyTable = () => {
                 onChange={handleSearchChange}
                 className="rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white w-full"
               />
+            </div>
+
+            <div>
+              <Button size="sm" variant="primary" className="mr-4" onClick={handleAddFaculty}>
+                Add Single Faculty
+              </Button>
+              <Button size="sm" variant="primary" className="mr-4" onClick={handleUploadExcel}>
+                Upload Excel
+              </Button>
             </div>
 
             <div className="flex items-center gap-3">
@@ -200,7 +267,7 @@ const FacultyTable = () => {
             </div>
           </div>
         </div>
-        <div className="max-w-full overflow-x-auto">
+        <div className="max-w-full overflow-x-hidden">
           <Table>
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
@@ -232,13 +299,13 @@ const FacultyTable = () => {
                   isHeader
                   className="py-3 px-4 w-32 md:w-40  whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Sitting Location
+                  Sitting
                 </TableCell>
                 <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Available Time Slots
+                  Free Slots
                 </TableCell>
                 <TableCell
                   isHeader
@@ -282,15 +349,15 @@ const FacultyTable = () => {
                         {item.user.email}
                       </TableCell>
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                        {item.faculty.department || 'Not Assigned'}
+                        {item.faculty.department || 'N/A'}
                       </TableCell>
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                        {item.faculty.sitting || 'Not Assigned'}
+                        {item.faculty.sitting || 'N/A'}
                       </TableCell>
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                         {item.faculty.freeTimeSlots && item.faculty.freeTimeSlots.length > 0
                           ? item.faculty.freeTimeSlots.join(', ')
-                          : 'No time slots available'}
+                          : 'Not specified'}
                       </TableCell>
                       <TableCell className="py-3  px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                         <Badge
@@ -346,6 +413,4 @@ const FacultyTable = () => {
       </div>
     </>
   );
-};
-
-export default FacultyTable;
+}
