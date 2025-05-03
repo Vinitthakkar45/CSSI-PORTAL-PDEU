@@ -8,7 +8,11 @@ import Button from '../Home/ui/button/Button';
 import AddStudentModal from './AddStudentModal';
 import { RefreshCw } from 'lucide-react';
 import { toast } from '@/components/Home/ui/toast/Toast';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import { Download } from 'lucide-react';
 import StudentModal from './Modal/StudentModal';
+
 type StudentWithUser = {
   student: SelectStudent;
   user: {
@@ -198,6 +202,46 @@ const StudentTable = () => {
     return <div className="p-4 text-center">Loading student data...</div>;
   }
 
+  const handleCSVDownload = () => {
+    try {
+      const flattenedData = filteredStudents.map((item) => {
+        return {
+          'Roll Number': item.student.rollNumber,
+          Name: item.student.name,
+          Department: item.student.department,
+          Division: item.student.division,
+          'Group Number': item.student.groupNumber,
+          'Contact Number': item.student.contactNumber,
+          Email: item.student.email || item.user.email,
+          'NGO Name': item.student.ngoName,
+          'NGO City': item.student.ngoCity,
+          'NGO District': item.student.ngoDistrict,
+          'NGO State': item.student.ngoState,
+          'NGO Country': item.student.ngoCountry,
+          'NGO Address': item.student.ngoAddress,
+          'Nature of Work (NGO)': item.student.ngoNatureOfWork,
+          'NGO Email': item.student.ngoEmail,
+          'NGO Phone': item.student.ngoPhone,
+          'Problem Definition': item.student.problemDefinition,
+          'Proposed Solution': item.student.proposedSolution,
+          'Internal Evaluation Marks': item.student.internal_evaluation_marks,
+          'Final Evaluation Marks': item.student.final_evaluation_marks,
+        };
+      });
+
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(flattenedData);
+      const columnCount = Object.keys(flattenedData[0]).length;
+      worksheet['!cols'] = new Array(columnCount).fill({ wch: 25 });
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Student Data');
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array', cellStyles: true });
+      const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+      saveAs(blob, 'student-data.xlsx');
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <>
       {showAdd && <AddStudentModal isOpen={showAdd} onClose={handleAddStudentClose} />}
@@ -245,6 +289,12 @@ const StudentTable = () => {
                 className="w-full rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white"
               />
             </div>
+            <Button size="sm" variant="primary" className="mr-4" onClick={handleCSVDownload}>
+              <span className="hidden sm:inline">Download CSV</span>
+              <span className="inline sm:hidden">
+                <Download className="w-4 h-4" />
+              </span>
+            </Button>
           </div>
         </div>
 

@@ -9,6 +9,7 @@ export async function GET() {
       .select({
         faculty: faculty,
         user: {
+          id: user.id,
           email: user.email,
           role: user.role,
         },

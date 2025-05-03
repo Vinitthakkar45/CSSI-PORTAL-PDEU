@@ -11,8 +11,6 @@ type TableModalProps = {
   onClose: () => void;
 };
 
-const departments = ['CSE', 'ECE', 'ICT', 'MATHS'];
-
 export default function AddStudentModal({ isOpen, onClose }: TableModalProps) {
   const session = useSession();
   const [formData, setFormData] = useState({

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/context/SidebarContext';
-import { UserCog, Ellipsis, LayoutGrid, CircleUserRound, GraduationCap, BookOpen } from 'lucide-react';
+import { BarChart, UserCog, Ellipsis, LayoutGrid, CircleUserRound, GraduationCap, BookOpen } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 type NavItem = {
@@ -84,6 +84,11 @@ const AppSidebar: React.FC = () => {
           name: 'Coordinators',
           path: '/home/admin/coordTable',
           icon: <UserCog size={22} />,
+        },
+        {
+          name: 'Analytics',
+          path: '/home/admin/analytics',
+          icon: <BarChart size={22} />,
         }
       );
     }

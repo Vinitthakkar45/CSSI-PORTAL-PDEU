@@ -7,8 +7,7 @@ import StageCard from './StageCard';
 import { stages } from './utils/stages';
 import Button from '../Home/ui/button/Button';
 import { InfoModal } from '../ConfirmationModals';
-import LoadingOverlay from '../LoadingOverlay';
-
+import DashboardSkeleton from './skeletons/DashBoardSkele';
 type StageStatus = 'locked' | 'current' | 'completed';
 
 interface CountData {
@@ -234,75 +233,83 @@ const Dashboard = () => {
 
   return (
     <>
-      {isLoading && <LoadingOverlay />}
-
-      {showModal && (
-        <InfoModal
-          isOpen={showModal}
-          onCloseCross={handleModalCross}
-          onClose={handleModalClose}
-          title="Information Alert!"
-          message="You are about to update the Students about the next stage unlock Via email, proceed cautiously"
-          buttonInfo="Ok Got It"
-        />
-      )}
-
-      {showRemainingModal && (
-        <InfoModal
-          isOpen={showRemainingModal}
-          onCloseCross={handleRemainingModalCross}
-          onClose={handleRemainingModalClose}
-          title="Assign Remaining Students"
-          message={`${remainingStudents} students don't have mentors yet. Do you want to assign mentors to these remaining students?`}
-          buttonInfo="Yes, Assign Remaining"
-        />
-      )}
-
-      {showAllAssignedModal && (
-        <InfoModal
-          isOpen={showAllAssignedModal}
-          onCloseCross={handleAllAssignedModalClose}
-          onClose={handleAllAssignedModalClose}
-          title="All Students Assigned"
-          message="All students already have mentors assigned. No new assignments needed."
-          buttonInfo="OK"
-        />
-      )}
-
-      {showEvaluatorModal && (
-        <InfoModal
-          isOpen={showEvaluatorModal}
-          onCloseCross={handleEvaluatorModalClose}
-          onClose={handleReassignEvaluators}
-          title="Reassign Evaluators?"
-          message={`${counts.evaluators} evaluators are already assigned. Do you want to clear existing assignments and reassign?`}
-          buttonInfo="Yes, Reassign"
-        />
-      )}
-
-      <div className="container pb-4 mx-auto">
-        <StageProgress currentStage={currentStage} totalStages={stages.length} handleButtonClick={handleUnlockStage} />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stages.map((stage) => (
-            <StageCard
-              key={stage.number}
-              number={stage.number}
-              title={stage.title}
-              description={stage.description}
-              status={getStageStatus(stage.number)}
+      {isLoading ? (
+        <DashboardSkeleton />
+      ) : (
+        <>
+          {showModal && (
+            <InfoModal
+              isOpen={showModal}
+              onCloseCross={handleModalCross}
+              onClose={handleModalClose}
+              title="Information Alert!"
+              message="You are about to update the Students about the next stage unlock Via email, proceed cautiously"
+              buttonInfo="Ok Got It"
             />
-          ))}
-        </div>
-      </div>
-      <div>
-        <Button size="md" variant="primary" className="mr-4" onClick={handleAssignMentors}>
-          Assign Mentor
-        </Button>
-        <Button size="md" variant="primary" onClick={handleAssignEvaluators}>
-          Assign Evaluator
-        </Button>
-      </div>
+          )}
+
+          {showRemainingModal && (
+            <InfoModal
+              isOpen={showRemainingModal}
+              onCloseCross={handleRemainingModalCross}
+              onClose={handleRemainingModalClose}
+              title="Assign Remaining Students"
+              message={`${remainingStudents} students don't have mentors yet. Do you want to assign mentors to these remaining students?`}
+              buttonInfo="Yes, Assign Remaining"
+            />
+          )}
+
+          {showAllAssignedModal && (
+            <InfoModal
+              isOpen={showAllAssignedModal}
+              onCloseCross={handleAllAssignedModalClose}
+              onClose={handleAllAssignedModalClose}
+              title="All Students Assigned"
+              message="All students already have mentors assigned. No new assignments needed."
+              buttonInfo="OK"
+            />
+          )}
+
+          {showEvaluatorModal && (
+            <InfoModal
+              isOpen={showEvaluatorModal}
+              onCloseCross={handleEvaluatorModalClose}
+              onClose={handleReassignEvaluators}
+              title="Reassign Evaluators?"
+              message={`${counts.evaluators} evaluators are already assigned. Do you want to clear existing assignments and reassign?`}
+              buttonInfo="Yes, Reassign"
+            />
+          )}
+
+          <div className="container pb-4 mx-auto">
+            <StageProgress
+              currentStage={currentStage}
+              totalStages={stages.length}
+              handleButtonClick={handleUnlockStage}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {stages.map((stage) => (
+                <StageCard
+                  key={stage.number}
+                  number={stage.number}
+                  title={stage.title}
+                  description={stage.description}
+                  status={getStageStatus(stage.number)}
+                />
+              ))}
+            </div>
+          </div>
+          <div>
+            <Button size="md" variant="primary" className="mr-4" onClick={handleAssignMentors}>
+              Assign Mentor
+            </Button>
+            <Button size="md" variant="primary" onClick={handleAssignEvaluators}>
+              Assign Evaluator
+            </Button>
+          </div>
+        </>
+      )}
     </>
   );
 };
