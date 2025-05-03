@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import { faculty } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import FacultyTableModal from './FacultyTableModal';
+import CoordinatorTableSkeleton from './skeletons/CoordinatorTableSkele';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -84,7 +85,7 @@ const CoordinatorTable = () => {
   }, [searchTerm, selectedDepartment, faculties]);
 
   if (loading) {
-    return <div className="p-4 text-center">Loading faculty data...</div>;
+    return <CoordinatorTableSkeleton />;
   }
 
   return (

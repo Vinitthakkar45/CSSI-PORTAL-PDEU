@@ -15,6 +15,7 @@ import UploadExcel from '@/components/UploadExcel';
 import { Modal } from '@/components/Home/ui/modal';
 import { useModal } from '@/hooks/useModal';
 import { toast } from '@/components/Home/ui/toast/Toast';
+import StudentTableSkeleton from './skeletons/StudentTableSkele';
 
 type StudentWithUser = {
   student: InferSelectModel<typeof student>;
@@ -264,7 +265,7 @@ const StudentTable = () => {
   };
 
   if (loading) {
-    return <div className="p-4 text-center">Loading student data...</div>;
+    return <StudentTableSkeleton />;
   }
 
   return (

@@ -12,6 +12,7 @@ import { useModal } from '@/hooks/useModal';
 import UploadExcel from '@/components/UploadExcel';
 import LoadingOverlay from '../LoadingOverlay';
 import { toast } from '@/components/Home/ui/toast/Toast';
+import FacultyTableSkeleton from './skeletons/FacultyTableSkele';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -204,7 +205,7 @@ export default function FacultyTable() {
   };
 
   if (loading) {
-    return <div className="p-4 text-center">Loading faculty data...</div>;
+    return <FacultyTableSkeleton />;
   }
 
   return (
