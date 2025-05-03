@@ -48,6 +48,11 @@ const AppSidebar: React.FC = () => {
           name: 'Faculties',
           path: '/home/coordinator/facultyTable',
           icon: <BookOpen size={22} />,
+        },
+        {
+          name: 'Roles/Guidelines',
+          path: '/home/coordinator/roles',
+          icon: <BookOpen size={22} />,
         }
       );
     }
@@ -69,6 +74,13 @@ const AppSidebar: React.FC = () => {
           icon: <UserCog size={22} />,
         }
       );
+    }
+    if (role === 'faculty') {
+      navItems.push({
+        name: 'Roles/Guidelines',
+        path: '/home/faculty/guidelines',
+        icon: <BookOpen size={22} />,
+      });
     }
   }
 
