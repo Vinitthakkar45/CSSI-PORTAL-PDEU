@@ -264,9 +264,12 @@ export default function FacultyTable() {
               >
                 <option value="ALL">All</option>
                 <option value="CSE">CSE</option>
-                <option value="CIVIL">CIVIL</option>
+                <option value="CSBS">CSBS</option>
                 <option value="ECE">ECE</option>
                 <option value="ICT">ICT</option>
+                <option value="MECH">MECH</option>
+                <option value="BSC-DS">BSC-DS</option>
+                <option value="CIVIL">CIVIL</option>
               </select>
             </div>
           </div>
