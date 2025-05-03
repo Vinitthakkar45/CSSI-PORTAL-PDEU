@@ -61,8 +61,6 @@ export async function POST(req: NextRequest) {
       uploadStream.end(buffer);
     });
 
-    const userIdNum = parseInt(userId, 10);
-
     let columnName = '';
     switch (folderName.toLowerCase()) {
       case 'offerletter':
@@ -93,7 +91,7 @@ export async function POST(req: NextRequest) {
     await db
       .update(student)
       .set({ [columnName]: result.public_id })
-      .where(eq(student.userId, userIdNum));
+      .where(eq(student.userId, userId));
 
     return NextResponse.json({ publicId: result.public_id }, { status: 200 });
   } catch (error) {

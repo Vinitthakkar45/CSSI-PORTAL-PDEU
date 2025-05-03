@@ -2,6 +2,7 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { Phone, Mail, Clock, User } from 'lucide-react';
+import Image from 'next/image';
 
 type Faculty = {
   id: number;
@@ -137,7 +138,7 @@ export default function AssigneesPage() {
         <div className="flex flex-col md:flex-row gap-6">
           <div className="relative h-20 w-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
             {faculty.profileImage ? (
-              <img src={faculty.profileImage} alt={faculty.name} className="h-full w-full object-cover" />
+              <Image src={faculty.profileImage} alt={faculty.name} className="h-full w-full object-cover" />
             ) : (
               <span className="text-lg font-semibold text-gray-500 dark:text-gray-400">
                 {faculty.name?.substring(0, 2).toUpperCase()}

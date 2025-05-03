@@ -1,5 +1,4 @@
 import React from 'react';
-import SectionTitle from '../Common/SectionTitle';
 
 const GuidelinesContent = () => {
   return (
