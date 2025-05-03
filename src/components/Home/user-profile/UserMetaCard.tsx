@@ -29,7 +29,6 @@ export default function UserMetaCard() {
 
   const handleSave = () => {
     // Handle save logic here
-    console.log('Saving changes...');
     closeModal();
   };
 
@@ -41,7 +40,6 @@ export default function UserMetaCard() {
           throw new Error("Can't fetch user data");
         }
         const data = await res.json();
-        // console.log('user info from the meta component: ', data);
         setUserData(data as UserData);
       } catch (error) {
         console.error(error);
@@ -55,7 +53,6 @@ export default function UserMetaCard() {
 
   return (
     <>
-      {loading && <LoadingOverlay />}
       <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
@@ -168,7 +165,7 @@ export default function UserMetaCard() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div>
                     <Label>Linkedin</Label>
-                    <Input type="text" defaultValue="https://www.linkedin.com/company/pimjo" />
+                    <Input type="text" defaultValue="https://www.linkedin.com/in/vinitthakkar45/" />
                   </div>
                 </div>
               </div>

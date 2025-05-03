@@ -46,8 +46,8 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
       'report',
       'certificate',
       'poster',
-      'weekOnePhoto',
-      'weekTwoPhoto',
+      'week_one_photo',
+      'week_two_photo',
       // Progress
       'stage',
     ] as const;
@@ -108,7 +108,7 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
         };
 
         setUserData(updatedUserData);
-        localStorage.setItem(`userData_${userId}`, JSON.stringify(updatedUserData));
+        localStorage.setItem(`userData`, JSON.stringify(updatedUserData));
       }
 
       return { success: true, errors: null };
@@ -152,7 +152,7 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
       const fetchData = async () => {
         try {
           setIsLoading(true);
-          const localStorageKey = `userData_${userId}`;
+          const localStorageKey = `userData`;
           const storedData = localStorage.getItem(localStorageKey);
 
           if (storedData) {
@@ -262,19 +262,14 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
     };
 
     return (
-      <div className="relative w-full">
-        <div
-          key={currentStep}
-          className={`w-full transform ${slideDirection === 'left' ? 'slide-left' : 'slide-right'}`}
-        >
-          <CurrentStepComponent />
-        </div>
+      <div key={currentStep} className={`w-full transform ${slideDirection === 'left' ? 'slide-left' : 'slide-right'}`}>
+        <CurrentStepComponent />
       </div>
     );
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md dark:bg-gray-900 overflow-hidden">
+    <div>
       <div className="flex justify-between items-center m-3">
         <button
           onClick={handlePrevStep}
@@ -295,15 +290,15 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
         </button>
       </div>
 
-      <div className="relative mb-6">
+      <div className="mb-6">
         <div className="overflow-x-auto hide-scrollbar">
-          <nav className="flex whitespace-nowrap min-w-full p-2 gap-2">
+          <nav className="flex whitespace-nowrap min-w-full md:p-2 gap-1 md:gap-2">
             {steps.map((step, index) => (
               <button
                 key={step.id}
                 onClick={() => goToStep(step.id)}
                 className={`
-                    relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 gap-2
+                    px-2 md:px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 gap-2
                     ${
                       currentStep === step.id
                         ? 'bg-brand-500 text-white'
@@ -317,7 +312,7 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
                 <div className="flex items-center gap-2">
                   <div
                     className={`
-                      w-6 h-6 rounded-full flex items-center justify-center text-xs
+                      w-4 h-4 rounded-full flex items-center justify-center text-xs
                       ${
                         currentStep === step.id
                           ? 'bg-white text-brand-500'
@@ -335,18 +330,9 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
             ))}
           </nav>
         </div>
-
-        <div className="absolute left-0 -bottom-2 w-full">
-          <div className="absolute h-[2px] w-full bg-gray-200 dark:bg-gray-700">
-            <div
-              className="h-full bg-brand-500 transition-all duration-300 ease-out"
-              style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
-            />
-          </div>
-        </div>
       </div>
 
-      <div className="relative overflow-hidden">{renderCurrentStep()}</div>
+      <div>{renderCurrentStep()}</div>
     </div>
   );
 }

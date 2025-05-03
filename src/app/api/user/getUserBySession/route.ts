@@ -7,7 +7,7 @@ import { eq } from 'drizzle-orm';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  const currentUser = session?.user as { id: number; email: string; role: string } | undefined;
+  const currentUser = session?.user as { id: string; email: string; role: string } | undefined;
 
   if (!currentUser) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -21,7 +21,7 @@ export async function GET() {
       return NextResponse.json({ role, info: result[0] || null });
     }
 
-    if (role === 'faculty') {
+    if (role === 'faculty' || role === 'coordinator') {
       const result = await db.select().from(faculty).where(eq(faculty.userId, id)).limit(1);
       let info = null;
       if (result[0]) {

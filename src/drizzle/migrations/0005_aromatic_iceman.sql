@@ -1,0 +1,1 @@
+DROP TABLE "coordinator_faculty" CASCADE;

@@ -88,7 +88,7 @@ export default function NGODetailsForm({ onComplete, userData }: NGOFormProps) {
               name="ngoCity"
               value={formData.ngoCity}
               onChange={handleChange}
-              placeholder="Enter city"
+              placeholder="Enter NGO city"
               error={errors.ngoCity}
               required
             />
@@ -100,7 +100,7 @@ export default function NGODetailsForm({ onComplete, userData }: NGOFormProps) {
               name="ngoDistrict"
               value={formData.ngoDistrict}
               onChange={handleChange}
-              placeholder="Enter district"
+              placeholder="Enter NGO district"
               error={errors.ngoDistrict}
               required
             />
@@ -112,7 +112,7 @@ export default function NGODetailsForm({ onComplete, userData }: NGOFormProps) {
               name="ngoState"
               value={formData.ngoState}
               onChange={handleChange}
-              placeholder="Enter state"
+              placeholder="Enter NGO state"
               error={errors.ngoState}
               required
             />
@@ -124,7 +124,7 @@ export default function NGODetailsForm({ onComplete, userData }: NGOFormProps) {
               name="ngoCountry"
               value={formData.ngoCountry}
               onChange={handleChange}
-              placeholder="Enter country"
+              placeholder="Enter NGO country"
               error={errors.ngoCountry}
               required
             />
@@ -136,7 +136,7 @@ export default function NGODetailsForm({ onComplete, userData }: NGOFormProps) {
               name="ngoNatureOfWork"
               value={formData.ngoNatureOfWork}
               onChange={handleChange}
-              placeholder="Describe nature of work"
+              placeholder="Describe NGO nature of work"
               error={errors.ngoNatureOfWork}
               required
             />
@@ -172,7 +172,7 @@ export default function NGODetailsForm({ onComplete, userData }: NGOFormProps) {
               name="ngoAddress"
               value={formData.ngoAddress}
               onChange={handleChange}
-              placeholder="Enter complete address"
+              placeholder="Enter NGO complete address"
               error={errors.ngoAddress}
               required
             />
@@ -184,7 +184,7 @@ export default function NGODetailsForm({ onComplete, userData }: NGOFormProps) {
               name="problemDefinition"
               value={formData.problemDefinition}
               onChange={handleChange}
-              placeholder="Enter problem definition"
+              placeholder="Enter NGO problem definition"
               error={errors.problemDefinition}
               required
             />
@@ -196,7 +196,7 @@ export default function NGODetailsForm({ onComplete, userData }: NGOFormProps) {
               name="proposedSolution"
               value={formData.proposedSolution}
               onChange={handleChange}
-              placeholder="Enter proposed solution"
+              placeholder="Enter NGO proposed solution"
               error={errors.proposedSolution}
               required
             />
@@ -204,7 +204,7 @@ export default function NGODetailsForm({ onComplete, userData }: NGOFormProps) {
           </div>
 
           <div className="col-span-1 md:col-span-2">
-            <Button className="w-full" size="sm" disabled={isSubmitting}>
+            <Button className="w-full" size="nm" disabled={isSubmitting}>
               {isSubmitting ? 'Submitting...' : 'Save & Continue'}
             </Button>
           </div>

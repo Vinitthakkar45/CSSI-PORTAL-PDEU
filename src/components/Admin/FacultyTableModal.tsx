@@ -5,6 +5,7 @@ import Button from '../Home/ui/button/Button';
 import { faculty } from '@/drizzle/schema';
 import Label from '@/components/Home/form/Label';
 import Input from '../Home/form/input/InputField';
+import Image from 'next/image';
 
 type FacultyTableModalProps = {
   isOpen: boolean;
@@ -19,33 +20,34 @@ export default function FacultyTableModal({ selectedFaculty, isOpen, onClose, on
       <Modal isOpen={isOpen} onClose={onClose} className="max-w-[600px] p-5 lg:p-10">
         <h4 className="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">Faculty Details</h4>
         <br />
-        <div className="w-40 h-40 overflow-hidden rounded-full">
-          {/* <Image
-                width={160}
-                height={160}
-                src={selectedFaculty.profileImage ? selectedFaculty.profileImage : ''}
-                alt={selectedFaculty.name ? selectedFaculty.name : ''}
-              /> */}
-        </div>
-        <div className="flex flex-col justify-center">
-          <div className="mb-4">
-            <Label>Name</Label>
-            <Input type="text" value={selectedFaculty.name || ''} disabled />
+        <div className="flex justify-center gap-20 mb-5">
+          <div className="w-40 h-40 overflow-hidden rounded-full">
+            <Image
+              width={160}
+              height={160}
+              // src={selectedStudent.profileImage ? selectedStudent.profileImage : ''}
+              src="/images/user/DefaultProfile_light.png"
+              alt={selectedFaculty.name ? selectedFaculty.name : ''}
+            />
+          </div>
+          <div className="flex flex-col justify-center">
+            <div className="mb-4">
+              <Label>Name</Label>
+              <Input type="text" value={selectedFaculty.name || ''} disabled />
+            </div>
+            <div className="mb-4">
+              <Label>Department</Label>
+              <Input type="text" value={selectedFaculty.department || ''} disabled />
+            </div>
           </div>
         </div>
-
         <div className="mb-3">
-          <Label>Department</Label>
-          <Input type="text" value={selectedFaculty.department || ''} disabled />
-        </div>
-
-        <div className="mb-3">
-          <Label>Sittting</Label>
+          <Label>Sitting</Label>
           <Input type="text" value={selectedFaculty.sitting || ''} disabled />
         </div>
         <div className="mb-3">
           <Label>Free Time Slots</Label>
-          <div className="p-2  rounded  text-gray-800 dark:text-white/90">
+          <div className="rounded p-1 text-gray-800 dark:text-white/90">
             {Array.isArray(selectedFaculty.freeTimeSlots)
               ? selectedFaculty.freeTimeSlots.map((slot, index) => (
                   <div key={index} className="mb-1">

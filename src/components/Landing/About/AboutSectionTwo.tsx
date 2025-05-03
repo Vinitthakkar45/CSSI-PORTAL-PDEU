@@ -6,7 +6,8 @@ const AboutSectionTwo = () => {
     <section className="py-16 md:py-20 lg:py-28">
       <div className="container">
         <div className="-mx-4 flex flex-wrap items-center">
-          <div className="w-full px-4 lg:w-1/2">
+          {/* Image for medium screens and up (md+) */}
+          <div className="hidden w-full px-4 md:block lg:w-1/2">
             <div className="relative mx-auto mb-12 aspect-25/24 max-w-[500px] text-center lg:m-0" data-wow-delay=".15s">
               <Image
                 src="/images/about/presentation.svg"
@@ -22,6 +23,8 @@ const AboutSectionTwo = () => {
               />
             </div>
           </div>
+
+          {/* Content section (always visible) */}
           <div className="w-full px-4 lg:w-1/2">
             <div className="max-w-[570px]">
               <div className="mb-9">
@@ -31,6 +34,24 @@ const AboutSectionTwo = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Image for small screens only (visible on sm, hidden on md+) */}
+          <div className="block w-full px-4 md:hidden">
+            <div className="relative mx-auto mb-12 aspect-25/24 max-w-[500px] text-center" data-wow-delay=".15s">
+              <Image
+                src="/images/about/presentation.svg"
+                alt="about-image"
+                fill
+                className="mx-auto max-w-full drop-shadow-three dark:hidden dark:drop-shadow-none"
+              />
+              <Image
+                src="/images/about/presentation.svg"
+                alt="about-image"
+                fill
+                className="mx-auto hidden max-w-full drop-shadow-three dark:block dark:drop-shadow-none"
+              />
             </div>
           </div>
         </div>

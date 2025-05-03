@@ -10,7 +10,7 @@ import {
 
 export async function GET(req: NextRequest) {
   try {
-    const facultyId = Number(req.nextUrl.searchParams.get('facultyId'));
+    const facultyId = req.nextUrl.searchParams.get('facultyId');
     if (!facultyId) {
       return NextResponse.json({ error: 'Faculty ID is required' }, { status: 400 });
     }
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const facultyId = Number(req.nextUrl.searchParams.get('facultyId'));
+    const facultyId = req.nextUrl.searchParams.get('facultyId');
     if (!facultyId) {
       return NextResponse.json({ error: 'Faculty ID is required' }, { status: 400 });
     }
@@ -63,8 +63,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized to update internal marks' }, { status: 403 });
       }
       await updateInternalMarks(studentid, marks);
-    } else if (typeofmarks === 'final' && !checkCoord(facultyId) && !checkAdmin(facultyId)) {
-      if (!isEvaluator) {
+    } else if (typeofmarks === 'final') {
+      if (!isEvaluator && !checkCoord(facultyId) && !checkAdmin(facultyId)) {
         return NextResponse.json({ error: 'Unauthorized to update final marks' }, { status: 403 });
       }
       await updateFinalMarks(studentid, marks);

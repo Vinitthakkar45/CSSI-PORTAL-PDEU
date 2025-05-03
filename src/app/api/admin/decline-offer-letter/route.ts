@@ -5,7 +5,7 @@ import { student } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
-  const faculty_user_id = Number(req.nextUrl.searchParams.get('facultyId'));
+  const faculty_user_id = req.nextUrl.searchParams.get('facultyId');
   const faculty_mail = req.nextUrl.searchParams.get('email');
   if (!faculty_mail) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

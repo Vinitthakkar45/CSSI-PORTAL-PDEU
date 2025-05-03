@@ -10,13 +10,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
-    const userId = parseInt(userIdParam, 10);
-
-    if (isNaN(userId)) {
-      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
-    }
-
-    const userDetails = await getUserDetails(userId);
+    const userDetails = await getUserDetails(userIdParam);
 
     if (!userDetails) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });

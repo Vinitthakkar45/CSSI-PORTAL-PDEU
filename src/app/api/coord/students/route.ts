@@ -6,8 +6,7 @@ import { eq } from 'drizzle-orm';
 export async function POST(req: NextRequest) {
   try {
     const { id } = await req.json();
-    const uid = Number(id);
-    const department = await db.select({ department: faculty.department }).from(faculty).where(eq(faculty.userId, uid));
+    const department = await db.select({ department: faculty.department }).from(faculty).where(eq(faculty.userId, id));
     const userdep = department[0]?.department;
 
     if (!userdep) {
