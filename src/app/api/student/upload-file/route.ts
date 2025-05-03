@@ -38,27 +38,28 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    // Determine if this is a PDF document or an image based on folder name
+    const isPdfDocument = ['offerletter', 'report', 'certificate', 'poster'].includes(folderName.toLowerCase());
+
+    // Configure upload options based on file type
+    const uploadOptions = {
+      resource_type: isPdfDocument ? ('raw' as const) : ('image' as const),
+      folder: folderName,
+      format: isPdfDocument ? 'pdf' : undefined,
+      pages: isPdfDocument ? true : undefined,
+      use_filename: true,
+      unique_filename: false,
+      overwrite: true,
+      public_id: userId,
+    };
+
     const result = await new Promise<CloudinaryUploadResponse>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          resource_type: 'raw',
-          folder: folderName,
-          format: 'pdf',
-          pages: true,
-          use_filename: true,
-          unique_filename: false,
-          overwrite: true,
-          public_id: userId,
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result as CloudinaryUploadResponse);
-        }
-      );
+      const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+        if (error) reject(error);
+        else resolve(result as CloudinaryUploadResponse);
+      });
       uploadStream.end(buffer);
     });
-
-    const userIdNum = parseInt(userId, 10);
 
     let columnName = '';
     switch (folderName.toLowerCase()) {
@@ -74,6 +75,15 @@ export async function POST(req: NextRequest) {
       case 'poster':
         columnName = 'poster';
         break;
+      case 'weekonephoto':
+        columnName = 'week_one_photo';
+        break;
+      case 'weektwophoto':
+        columnName = 'week_two_photo';
+        break;
+      case 'profileimage':
+        columnName = 'profile_image';
+        break;
       default:
         throw new Error('Invalid folder name');
     }
@@ -81,7 +91,7 @@ export async function POST(req: NextRequest) {
     await db
       .update(student)
       .set({ [columnName]: result.public_id })
-      .where(eq(student.userId, userIdNum));
+      .where(eq(student.userId, userId));
 
     return NextResponse.json({ publicId: result.public_id }, { status: 200 });
   } catch (error) {

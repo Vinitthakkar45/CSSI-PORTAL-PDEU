@@ -45,7 +45,7 @@ const studentProgressSchema = z.object({
 });
 
 const studentUpdateSchema = z.object({
-  userId: z.union([z.string(), z.number()]).transform((val) => Number(val)),
+  userId: z.string(),
   data: z
     .object({
       ...personalDetailsSchema.shape,

@@ -24,10 +24,19 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [selectedToggle, setSelectedToggle] = useState<'mentor' | 'evaluator'>('mentor'); // Toggler state
   const [marksToggle, setMarksToggle] = useState<boolean>(false); // Toggler state
+  const [currentStage, setCurrentStage] = useState<number>(0);
 
   // Fetch Faculty Student Data
   useEffect(() => {
     const fetchStudentData = async () => {
+      try {
+        const response = await fetch('/api/stage', { method: 'GET' });
+        const data = await response.json();
+        setCurrentStage(data.stage[0].stage);
+      } catch (error) {
+        console.log(error);
+      }
+
       try {
         const response = await fetch('/api/faculty');
         if (!response.ok) {
@@ -46,22 +55,16 @@ const Dashboard = () => {
     fetchStudentData();
   }, [marksToggle]);
 
-  if (status === 'loading' || loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
-
   const getStageStatus = (stageNumber: number): StageStatus => {
-    return 'current';
+    if (stageNumber < currentStage) return 'completed';
+    if (stageNumber === currentStage) return 'current';
+    return 'locked';
   };
 
   return (
     <>
       <div className="container pb-4 mx-auto">
-        <StageProgress totalStages={stages.length} />
+        <StageProgress currentStage={currentStage} totalStages={stages.length} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stages.map((stage) => (
@@ -70,7 +73,6 @@ const Dashboard = () => {
               number={stage.number}
               title={stage.title}
               description={stage.description}
-              long_description={stage.long_description}
               status={getStageStatus(stage.number)}
             />
           ))}
@@ -101,8 +103,14 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {(selectedToggle === 'mentor' && mentoredStudents.length > 0) ||
-      (selectedToggle != 'mentor' && evaluatedStudents.length > 0) ? (
+      {status === 'loading' || loading || error ? (
+        error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <p>Loading...</p>
+        )
+      ) : (selectedToggle === 'mentor' && mentoredStudents.length > 0) ||
+        (selectedToggle != 'mentor' && evaluatedStudents.length > 0) ? (
         <TableList
           students={selectedToggle === 'mentor' ? mentoredStudents : evaluatedStudents}
           option={selectedToggle}

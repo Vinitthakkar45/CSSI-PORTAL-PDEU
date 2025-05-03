@@ -2,23 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/Home/ui/button/Button';
 import DropzoneComponent from '@/components/Home/form/form-elements/DropZone';
+import { toast } from '../Home/ui/toast/Toast';
+import { useSession } from 'next-auth/react';
 
 interface UploadDocsProps {
   onComplete: () => void;
 }
 
 const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
-  const [userId, setUserId] = useState<string | null>(null);
-  useEffect(() => {
-    const fetchSession = async () => {
-      const sessionResponse = await fetch('/api/auth/session');
-      const sessionData = await sessionResponse.json();
-      setUserId(sessionData.user.id.toString());
-    };
-
-    fetchSession();
-  }, []);
-
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({
     Report: false,
@@ -31,45 +24,20 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
 
   useEffect(() => {
     if (userId) {
-      const fetchStatusLocalStorage = () => {
+      const checkUploadStatus = () => {
         try {
-          const localStorageKey = `docsStatus_${userId}`;
-          const storedData = localStorage.getItem(localStorageKey);
-
+          const storedData = localStorage.getItem('userData');
           if (storedData) {
             const parsedData = JSON.parse(storedData);
-            setReportUploaded(parsedData.reportUploaded);
-            setCertificateUploaded(parsedData.certificateUploaded);
-            setPosterUploaded(parsedData.posterUploaded);
-            return true;
+            setReportUploaded(!!parsedData.profileData?.report);
+            setCertificateUploaded(!!parsedData.profileData?.certificate);
+            setPosterUploaded(!!parsedData.profileData?.poster);
           }
-          return false;
         } catch (err) {
-          console.error('Error fetching uploaded status from local Storage:', err);
-          return false;
+          console.error('Error checking upload status:', err);
         }
       };
-      const fetchUploadedStatus = async () => {
-        try {
-          const response = await fetch(`/api/student/uploaded-status?userId=${userId}`);
-          const data = await response.json();
-          setReportUploaded(data.data.reportUploaded);
-          setCertificateUploaded(data.data.certificateUploaded);
-          setPosterUploaded(data.data.posterUploaded);
-          localStorage.setItem(
-            `docsStatus_${userId}`,
-            JSON.stringify({
-              reportUploaded: data.data.reportUploaded,
-              certificateUploaded: data.data.certificateUploaded,
-              posterUploaded: data.data.posterUploaded,
-            })
-          );
-        } catch (err) {
-          console.error('Error fetching uploaded status:', err);
-        }
-      };
-      if (fetchStatusLocalStorage()) return;
-      fetchUploadedStatus();
+      checkUploadStatus();
     }
   }, [userId]);
 
@@ -78,13 +46,30 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
     file: File,
     setUploaded: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
+    if (!userId) {
+      setError('User ID not found. Please try logging in again.');
+      return;
+    }
+
+    if (file.type !== 'application/pdf') {
+      toast.error('Only PDF files are allowed');
+      setError('Only PDF files are allowed');
+      return;
+    }
+
+    if (file.size > 1 * 1024 * 1024) {
+      toast.error('File size must be less than 1MB');
+      setError('File size must be less than 1MB');
+      return;
+    }
+
     setError(null);
     setIsLoading({ ...isLoading, [folderName]: true });
 
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('userId', userId!);
+      formData.append('userId', userId);
       formData.append('folderName', folderName);
 
       const response = await fetch(`/api/student/upload-file`, {
@@ -96,34 +81,55 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
         const errorData = await response.json();
         throw new Error(errorData.message || `API responded with status: ${response.status}`);
       }
+
+      // Update local state
       setUploaded(true);
-      // toast.success(`${folderName} uploaded successfully!`);
+
+      // Update localStorage
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      userData.profileData = userData.profileData || {};
+      userData.profileData[folderName.toLowerCase()] = `${folderName}/${userId}.pdf`;
+      localStorage.setItem('userData', JSON.stringify(userData));
+
+      toast.success(`${folderName} uploaded successfully!`);
+
+      // Check if all documents are now uploaded
+      const allUploaded =
+        (folderName === 'Report' ? true : reportUploaded) &&
+        (folderName === 'Certificate' ? true : certificateUploaded) &&
+        (folderName === 'Poster' ? true : posterUploaded);
+
+      if (allUploaded) {
+        onComplete();
+      }
     } catch (err) {
       console.error(`${folderName} upload error:`, err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      toast.error(`Failed to upload ${folderName}`);
     } finally {
       setIsLoading({ ...isLoading, [folderName]: false });
     }
   };
 
   const handleReportDrop = (files: File[]) => {
-    handleFileUpload('Report', files[0], setReportUploaded);
+    if (files && files.length > 0) {
+      handleFileUpload('Report', files[0], setReportUploaded);
+    }
   };
 
   const handleCertificateDrop = (files: File[]) => {
-    handleFileUpload('Certificate', files[0], setCertificateUploaded);
+    if (files && files.length > 0) {
+      handleFileUpload('Certificate', files[0], setCertificateUploaded);
+    }
   };
 
   const handlePosterDrop = (files: File[]) => {
-    handleFileUpload('Poster', files[0], setPosterUploaded);
+    if (files && files.length > 0) {
+      handleFileUpload('Poster', files[0], setPosterUploaded);
+    }
   };
 
   const handleSubmit = () => {
-    // if (!reportUploaded || !certificateUploaded || !posterUploaded) {
-    // toast.error("Please upload all required documents!");
-    //   return;
-    // }
-
     onComplete();
   };
 
@@ -138,7 +144,6 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
             <DropzoneComponent onDrop={handleReportDrop} isLoading={isLoading.Report} title="" />
           </div>
           {reportUploaded && <p className="text-sm text-success-500 font-medium">Report uploaded successfully!</p>}
-          {error && <p className="text-sm text-error-500 font-medium">{error}</p>}
         </div>
 
         <div className="space-y-2">
@@ -162,6 +167,8 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
           </div>
           {posterUploaded && <p className="text-sm text-success-500 font-medium">Poster uploaded successfully!</p>}
         </div>
+
+        {error && <p className="text-sm text-error-500 font-medium">{error}</p>}
 
         <div className="border-t border-gray-200 pt-4 dark:border-gray-800">
           <Button

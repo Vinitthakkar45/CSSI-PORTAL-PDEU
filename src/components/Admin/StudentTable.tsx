@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
 import { student } from '@/drizzle/schema';
@@ -9,6 +9,14 @@ import TableModal from './tableModal';
 import Button from '../Home/ui/button/Button';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { Download, RefreshCw } from 'lucide-react';
+import AddStudentModal from './AddStudentModal';
+import UploadExcel from '@/components/UploadExcel';
+import { Modal } from '@/components/Home/ui/modal';
+import { useModal } from '@/hooks/useModal';
+import { toast } from '@/components/Home/ui/toast/Toast';
+import StudentTableSkeleton from './skeletons/StudentTableSkele';
+import StudentModal from './Modal/StudentModal';
 
 type StudentWithUser = {
   student: InferSelectModel<typeof student>;
@@ -19,6 +27,42 @@ type StudentWithUser = {
   };
 };
 
+// Cache key for localStorage
+const CACHE_KEY = 'admin_students_cache';
+const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+// Helper function to get cached data
+const getCachedStudents = (): { data: StudentWithUser[]; timestamp: number } | null => {
+  try {
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    if (!cachedData) return null;
+
+    const parsed = JSON.parse(cachedData);
+    return parsed;
+  } catch (error) {
+    console.error('Error parsing cached student data:', error);
+    return null;
+  }
+};
+
+// Helper function to set cached data
+const setCachedStudents = (data: StudentWithUser[]) => {
+  try {
+    const now = Date.now();
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({
+        data,
+        timestamp: now,
+      })
+    );
+    return now;
+  } catch (error) {
+    console.error('Error caching student data:', error);
+    return Date.now();
+  }
+};
+
 const StudentTable = () => {
   const [students, setStudents] = useState<StudentWithUser[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<StudentWithUser[]>([]);
@@ -27,30 +71,91 @@ const StudentTable = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<StudentWithUser | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showAdd, setShowAdd] = useState<boolean>(false);
+  const [lastFetched, setLastFetched] = useState<number>(0);
+  const { isOpen: isUploadModalOpen, openModal: openUploadModal, closeModal: closeUploadModal } = useModal();
+  const [marksToggle, setMarksToggle] = useState<boolean>(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
   const paginatedStudents = filteredStudents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+  // Initialize from cache immediately
   useEffect(() => {
-    async function fetchStudents() {
-      try {
-        setLoading(true);
-        const res = await fetch('/api/admin/students');
-        const data = await res.json();
-        setStudents(data);
-        setFilteredStudents(data); // initialize with all
-      } catch (error) {
-        console.error('Error fetching student data:', error);
-      } finally {
+    const cached = getCachedStudents();
+    if (cached) {
+      setStudents(cached.data);
+      setFilteredStudents(cached.data);
+      setLastFetched(cached.timestamp);
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchStudents = useCallback(async (forceRefresh = false) => {
+    try {
+      setLoading(true);
+
+      // Check if we have cached data
+      const cached = getCachedStudents();
+      const now = Date.now();
+
+      // Use cache if available and not forced refresh and not expired
+      if (!forceRefresh && cached && now - cached.timestamp < CACHE_EXPIRY) {
+        setStudents(cached.data);
+        setFilteredStudents(cached.data);
+        setLastFetched(cached.timestamp);
         setLoading(false);
+        return;
+      }
+
+      // Fetch fresh data
+      const res = await fetch('/api/admin/students');
+      const data = await res.json();
+
+      // Update state with new data
+      setStudents(data);
+      setFilteredStudents(data);
+
+      // Cache the new data
+      const timestamp = setCachedStudents(data);
+      setLastFetched(timestamp);
+    } catch (error) {
+      console.error('Error fetching student data:', error);
+
+      // Fallback to cache on error
+      const cached = getCachedStudents();
+      if (cached) {
+        setStudents(cached.data);
+        setFilteredStudents(cached.data);
+        toast.error('Failed to fetch fresh data. Using cached data.');
+      } else {
+        toast.error('Failed to load student data.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Only fetch if we don't have data from cache
+    if (students.length === 0) {
+      fetchStudents();
+    } else {
+      // If we have data but it might be stale, refresh in background
+      const cached = getCachedStudents();
+      const now = Date.now();
+      if (cached && now - cached.timestamp > CACHE_EXPIRY) {
+        fetchStudents();
       }
     }
+  }, [fetchStudents, students.length]);
 
-    fetchStudents();
-  }, []);
+  // Add a refresh function that can be called manually
+  const refreshData = () => {
+    fetchStudents(true);
+  };
 
   const handleModalclose = () => {
     setShowModal(false);
@@ -61,8 +166,10 @@ const StudentTable = () => {
     setShowModal(true);
   };
 
-  const handleFilter = () => {
-    let result = students;
+  const handleFilter = useCallback(() => {
+    if (!students.length) return;
+
+    let result = [...students]; // Create a copy to avoid mutation issues
 
     if (selectedDepartment !== 'ALL') {
       result = result.filter((student) => student.student.department === selectedDepartment);
@@ -79,11 +186,11 @@ const StudentTable = () => {
     }
 
     setFilteredStudents(result);
-  };
+  }, [students, selectedDepartment, searchTerm]);
 
   useEffect(() => {
     handleFilter();
-  }, [searchTerm, selectedDepartment]);
+  }, [handleFilter, searchTerm, selectedDepartment, students]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -133,26 +240,77 @@ const StudentTable = () => {
     }
   };
 
+  const handleAddStudent = () => {
+    setShowAdd(true);
+  };
+  const handleAddStudentClose = () => {
+    setShowAdd(false);
+  };
+  const handleUploadExcel = () => {
+    openUploadModal();
+  };
+
+  const handleUploadSuccess = async () => {
+    // Refresh the student list
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/students');
+      const data = await res.json();
+      setStudents(data);
+      setFilteredStudents(data);
+      closeUploadModal();
+    } catch (error) {
+      console.error('Error fetching student data:', error);
+      toast.error('Failed to refresh student list');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
-    return <div className="p-4 text-center">Loading student data...</div>;
+    return <StudentTableSkeleton />;
   }
 
   return (
     <>
+      {showAdd && <AddStudentModal isOpen={showAdd} onClose={handleAddStudentClose} />}
+
       {showModal && selectedStudent && (
-        <TableModal
-          selectedStudent={selectedStudent.student}
+        <StudentModal
           isOpen={showModal}
           onClose={handleModalclose}
-          onCloseCross={handleModalclose}
+          selectedStudent={selectedStudent}
+          option="both"
+          setMarksToggle={setMarksToggle}
+          marksToggle={marksToggle}
+          students={students}
+          setStudents={setStudents}
         />
       )}
+
+      <Modal isOpen={isUploadModalOpen} onClose={closeUploadModal} className="md:max-w-4xl">
+        <div className="p-10">
+          <UploadExcel onSuccess={handleUploadSuccess} type="student" />
+        </div>
+      </Modal>
 
       {loading && <LoadingOverlay />}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
         <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+          <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Student Details</h3>
+            <button
+              onClick={refreshData}
+              className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              title="Refresh data"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            {lastFetched > 0 && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                Last updated: {new Date(lastFetched).toLocaleTimeString()}
+              </span>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <div className="w-full sm:w-auto mb-2 sm:mb-0">
@@ -164,6 +322,14 @@ const StudentTable = () => {
                 className="rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white"
               />
             </div>
+            <div>
+              <Button size="sm" variant="primary" className="mr-4" onClick={handleAddStudent}>
+                Add Single Student
+              </Button>
+              <Button size="sm" variant="primary" className="mr-4" onClick={handleUploadExcel}>
+                Upload Excel
+              </Button>
+            </div>
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter:</label>
               <select
@@ -173,14 +339,20 @@ const StudentTable = () => {
               >
                 <option value="ALL">All</option>
                 <option value="CSE">CSE</option>
-                <option value="MATHS">MATHS</option>
+                <option value="CIVIL">CIVIL</option>
                 <option value="ECE">ECE</option>
                 <option value="ICT">ICT</option>
+                <option value="MECH">MECH</option>
+                <option value="CSBS">CSBS</option>
+                <option value="BSC-DS">BSC-DS</option>
               </select>
+              <Button size="sm" variant="primary" className="mr-4" onClick={handleCSVDownload}>
+                <span className="hidden sm:inline">Download CSV</span>
+                <span className="inline sm:hidden">
+                  <Download className="w-4 h-4" />
+                </span>
+              </Button>
             </div>
-            <Button size="sm" variant="primary" className="mr-4" onClick={handleCSVDownload}>
-              Download CSV
-            </Button>
           </div>
         </div>
 
@@ -189,7 +361,7 @@ const StudentTable = () => {
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>
                 <TableCell isHeader className="py-3 px-4 w-16 md:w-20 text-gray-500 text-start dark:text-gray-400">
-                  ID
+                  No
                 </TableCell>
                 <TableCell isHeader className="py-3 px-4 w-32 md:w-40 text-gray-500 text-start dark:text-gray-400">
                   Name
@@ -216,13 +388,13 @@ const StudentTable = () => {
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {paginatedStudents.length > 0 ? (
-                paginatedStudents.map((item) => (
+                paginatedStudents.map((item, index) => (
                   <TableRow
                     key={item.student.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                     onClick={() => handleCellClick(item)}
                   >
-                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">{item.student.id}</TableCell>
+                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">{index + 1}</TableCell>
                     <TableCell className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <div>
