@@ -14,7 +14,7 @@ const rolesList = [
   'Collect both hard copies and soft copies of evaluation reports signed by examiners.',
 ];
 
-const FacultyRoles = () => {
+const CoordinatorRoles = () => {
   return (
     <section id="roles" className="py-5 md:py-7 lg:py-10">
       <div className="container mx-auto px-4">
@@ -43,4 +43,4 @@ const FacultyRoles = () => {
   );
 };
 
-export default FacultyRoles;
+export default CoordinatorRoles;

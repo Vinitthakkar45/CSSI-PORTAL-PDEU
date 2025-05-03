@@ -1,9 +1,9 @@
-import FacultyRoles from '@/components/Faculty/roles';
+import CoordinatorRoles from '@/components/Coordinator/roles';
 
 const GuidelinesPage = () => {
   return (
     <>
-      <FacultyRoles />
+      <CoordinatorRoles />
     </>
   );
 };
