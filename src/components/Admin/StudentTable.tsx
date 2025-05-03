@@ -16,6 +16,7 @@ import { Modal } from '@/components/Home/ui/modal';
 import { useModal } from '@/hooks/useModal';
 import { toast } from '@/components/Home/ui/toast/Toast';
 import StudentTableSkeleton from './skeletons/StudentTableSkele';
+import StudentModal from './Modal/StudentModal';
 
 type StudentWithUser = {
   student: InferSelectModel<typeof student>;
@@ -73,6 +74,8 @@ const StudentTable = () => {
   const [showAdd, setShowAdd] = useState<boolean>(false);
   const [lastFetched, setLastFetched] = useState<number>(0);
   const { isOpen: isUploadModalOpen, openModal: openUploadModal, closeModal: closeUploadModal } = useModal();
+  const [marksToggle, setMarksToggle] = useState<boolean>(false);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -273,11 +276,15 @@ const StudentTable = () => {
       {showAdd && <AddStudentModal isOpen={showAdd} onClose={handleAddStudentClose} />}
 
       {showModal && selectedStudent && (
-        <TableModal
-          selectedStudent={selectedStudent.student}
+        <StudentModal
           isOpen={showModal}
           onClose={handleModalclose}
-          onCloseCross={handleModalclose}
+          selectedStudent={selectedStudent}
+          option="both"
+          setMarksToggle={setMarksToggle}
+          marksToggle={marksToggle}
+          students={students}
+          setStudents={setStudents}
         />
       )}
 

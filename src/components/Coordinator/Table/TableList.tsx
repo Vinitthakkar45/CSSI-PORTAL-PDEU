@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../../Home/ui/badge/Badge';
 import Image from 'next/image';
 import { useModal } from '@/hooks/useModal';
-import StudentModal from '../Modal/StudentModal';
+import StudentModal from '../Modal/Evaluation/StudentModal';
 import { SelectStudent } from '@/drizzle/schema';
 
 export default function TableList({

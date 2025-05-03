@@ -3,20 +3,10 @@ import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import TableList from './Table/TableList';
-import StageProgress from './Stages/StageProgress';
-import StageCard from './Stages/StageCard';
-import { stages, Stage } from './utils/stages';
 import { SelectStudent } from '@/drizzle/schema';
 
-type StageStatus = 'locked' | 'current' | 'completed';
-
 const Dashboard = () => {
-  const { status } = useSession({
-    required: true,
-    onUnauthenticated() {
-      redirect('/signin');
-    },
-  });
+  const session = useSession();
 
   const [mentoredStudents, setMentoredStudents] = useState<SelectStudent[]>([]);
   const [evaluatedStudents, setEvaluatedStudents] = useState<SelectStudent[]>([]);
@@ -24,21 +14,14 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [selectedToggle, setSelectedToggle] = useState<'mentor' | 'evaluator'>('mentor'); // Toggler state
   const [marksToggle, setMarksToggle] = useState<boolean>(false); // Toggler state
-  const [currentStage, setCurrentStage] = useState<number>(0);
 
   // Fetch Faculty Student Data
   useEffect(() => {
+    console.log('Hello');
     const fetchStudentData = async () => {
       try {
-        const response = await fetch('/api/stage', { method: 'GET' });
-        const data = await response.json();
-        setCurrentStage(data.stage[0].stage);
-      } catch (error) {
-        console.log(error);
-      }
-
-      try {
-        const response = await fetch('/api/faculty');
+        console.log('Hello ' + session.data?.user.role);
+        const response = await fetch(`/api/coord/evaluate?facultyId=${session?.data?.user.id}`); // Replace with actual faculty ID
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
@@ -53,32 +36,10 @@ const Dashboard = () => {
     };
 
     fetchStudentData();
-  }, [marksToggle]);
-
-  const getStageStatus = (stageNumber: number): StageStatus => {
-    if (stageNumber < currentStage) return 'completed';
-    if (stageNumber === currentStage) return 'current';
-    return 'locked';
-  };
+  }, []);
 
   return (
     <>
-      <div className="container pb-4 mx-auto">
-        <StageProgress currentStage={currentStage} totalStages={stages.length} />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stages.map((stage) => (
-            <StageCard
-              key={stage.number}
-              number={stage.number}
-              title={stage.title}
-              description={stage.description}
-              status={getStageStatus(stage.number)}
-            />
-          ))}
-        </div>
-      </div>
-
       {/* <div> */}
       <div className="flex mb-2">
         <button
@@ -103,7 +64,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {status === 'loading' || loading || error ? (
+      {loading || error ? (
         error ? (
           <p className="text-red-500">{error}</p>
         ) : (
