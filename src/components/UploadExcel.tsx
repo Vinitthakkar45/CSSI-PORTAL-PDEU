@@ -68,7 +68,7 @@ export default function UploadExcel({ onSuccess, type = 'student', title }: Uplo
 
       // Show error summary in a separate toast if there are errors
       if (result.errorSummary) {
-        toast.info(result.errorSummary);
+        toast.error(result.errorSummary);
       }
 
       setFileName(null);

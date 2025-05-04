@@ -8,6 +8,7 @@ import { stages } from './utils/stages';
 import Button from '../Home/ui/button/Button';
 import { InfoModal } from '../ConfirmationModals';
 import DashboardSkeleton from './skeletons/DashBoardSkele';
+import { toast } from '../Home/ui/toast/Toast';
 type StageStatus = 'locked' | 'current' | 'completed';
 
 interface CountData {
@@ -26,6 +27,8 @@ const Dashboard = () => {
   });
 
   const [isLoading, setIsLoading] = useState(true);
+  const [mentorLoading, setMentorLoading] = useState(false);
+  const [evaluatorLoading, setEvaluatorLoading] = useState(false);
   const [currentStage, setCurrentStage] = useState<number>(0);
   const [showModal, setShowModal] = useState(false);
   const [showEvaluatorModal, setShowEvaluatorModal] = useState(false);
@@ -93,26 +96,26 @@ const Dashboard = () => {
   };
 
   const assignMentors = async () => {
-    setIsLoading(true);
+    setMentorLoading(true);
     try {
       const response = await fetch('/api/admin/assignmentor', { method: 'POST' });
       const data = await response.json();
 
       if (data.success) {
-        alert(`Successfully assigned ${data.assignedCount || 'all remaining'} students to mentors`);
+        toast.success(`Successfully assigned ${data.assignedCount || 'all remaining'} students to mentors`);
       } else if (data.allAssigned) {
         setShowAllAssignedModal(true);
       } else {
-        alert('Error: ' + (data.error || data.message || 'Unknown error'));
+        toast.error('Error: ' + (data.error || data.message || 'Unknown error'));
       }
 
       // Update counts after assignment attempt
       await fetchCounts();
     } catch (error) {
       console.error('Error calling API:', error);
-      alert('Something went wrong.');
+      toast.error('Something went wrong.');
     } finally {
-      setIsLoading(false);
+      setMentorLoading(false);
     }
   };
 
@@ -130,20 +133,23 @@ const Dashboard = () => {
   };
 
   const assignEvaluators = async () => {
+    setEvaluatorLoading(true);
     try {
       const response = await fetch('/api/admin/assignevaluator', { method: 'POST' });
       const data = await response.json();
 
       if (data.success) {
-        alert('Evaluator Assignment Successful!');
+        toast.success('Evaluator Assignment Successful!');
         // Update counts after successful assignment
         await fetchCounts();
       } else {
-        alert('Error: ' + data.error);
+        toast.error('Error: ' + data.error);
       }
     } catch (error) {
       console.error('Error calling API:', error);
-      alert('Something went wrong.');
+      toast.error('Something went wrong.');
+    } finally {
+      setEvaluatorLoading(false);
     }
   };
 
@@ -156,11 +162,11 @@ const Dashboard = () => {
         await assignEvaluators();
       } else {
         const errorData = await deleteResponse.json();
-        alert('Failed to delete existing evaluator assignments: ' + (errorData.error || ''));
+        toast.error('Failed to delete existing evaluator assignments: ' + (errorData.error || ''));
       }
     } catch (error) {
       console.error('Error in reassigning evaluators:', error);
-      alert('Something went wrong during evaluator reassignment.');
+      toast.error('Something went wrong during evaluator reassignment.');
     } finally {
       setShowEvaluatorModal(false);
     }
@@ -235,6 +241,28 @@ const Dashboard = () => {
     <>
       {isLoading ? (
         <DashboardSkeleton />
+      ) : mentorLoading ? (
+        <div className="flex flex-col items-center justify-center py-12 px-4">
+          <div className="w-16 h-16 border-t-4 border-b-4 border-primary rounded-full animate-spin mb-6"></div>
+          <h3 className="text-xl font-semibold mb-2">Assigning Mentors</h3>
+          <p className="text-gray-500 text-center max-w-md">
+            This may take a while as we efficiently match faculty to students based on departments and availability.
+          </p>
+          <div className="mt-8 w-full max-w-md bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div className="bg-primary h-2.5 rounded-full animate-pulse w-3/4"></div>
+          </div>
+        </div>
+      ) : evaluatorLoading ? (
+        <div className="flex flex-col items-center justify-center py-12 px-4">
+          <div className="w-16 h-16 border-t-4 border-b-4 border-primary rounded-full animate-spin mb-6"></div>
+          <h3 className="text-xl font-semibold mb-2">Assigning Evaluators</h3>
+          <p className="text-gray-500 text-center max-w-md">
+            Please wait while we distribute students evenly among faculty evaluators for fair assessment.
+          </p>
+          <div className="mt-8 w-full max-w-md bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div className="bg-primary h-2.5 rounded-full animate-pulse w-3/4"></div>
+          </div>
+        </div>
       ) : (
         <>
           {showModal && (

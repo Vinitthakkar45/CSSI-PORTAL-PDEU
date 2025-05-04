@@ -228,7 +228,7 @@ export default function FacultyTable() {
         </div>
       </Modal>
 
-      {loading && <LoadingOverlay />}
+      {loading}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
         <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -264,14 +264,17 @@ export default function FacultyTable() {
               >
                 <option value="ALL">All</option>
                 <option value="CSE">CSE</option>
-                <option value="CIVIL">CIVIL</option>
+                <option value="CSBS">CSBS</option>
                 <option value="ECE">ECE</option>
                 <option value="ICT">ICT</option>
+                <option value="MECH">MECH</option>
+                <option value="BSC-DS">BSC-DS</option>
+                <option value="CIVIL">CIVIL</option>
               </select>
             </div>
           </div>
         </div>
-        <div className="max-w-full overflow-x-hidden">
+        <div className="max-w-full overflow-x-auto">
           <Table>
             <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
               <TableRow>

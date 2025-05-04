@@ -25,6 +25,12 @@ const menuData: Menu[] = [
     path: '/contact',
     newTab: false,
   },
+  {
+    id: 3,
+    title: 'Creators',
+    path: '/creators',
+    newTab: false,
+  },
   // {
   //   id: 4,
   //   title: 'Pages',

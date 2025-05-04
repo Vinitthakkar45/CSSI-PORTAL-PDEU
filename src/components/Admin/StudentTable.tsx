@@ -17,6 +17,7 @@ import { useModal } from '@/hooks/useModal';
 import { toast } from '@/components/Home/ui/toast/Toast';
 import StudentTableSkeleton from './skeletons/StudentTableSkele';
 import StudentModal from './Modal/StudentModal';
+import { InfoModal } from '../ConfirmationModals';
 
 type StudentWithUser = {
   student: InferSelectModel<typeof student>;
@@ -75,6 +76,8 @@ const StudentTable = () => {
   const [lastFetched, setLastFetched] = useState<number>(0);
   const { isOpen: isUploadModalOpen, openModal: openUploadModal, closeModal: closeUploadModal } = useModal();
   const [marksToggle, setMarksToggle] = useState<boolean>(false);
+  const [isSendingPasswords, setIsSendingPasswords] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -250,20 +253,45 @@ const StudentTable = () => {
     openUploadModal();
   };
 
-  const handleUploadSuccess = async () => {
-    // Refresh the student list
+  const handleUploadSuccess = () => {
+    refreshData();
+    closeUploadModal();
+  };
+
+  const handleSendPasswordsClick = () => {
+    setShowPasswordConfirm(true);
+  };
+
+  const handleSendPasswords = async () => {
     try {
-      setLoading(true);
-      const res = await fetch('/api/admin/students');
-      const data = await res.json();
-      setStudents(data);
-      setFilteredStudents(data);
-      closeUploadModal();
+      setIsSendingPasswords(true);
+      toast.info('Generating and sending passwords. This may take a while...');
+
+      const response = await fetch('/api/admin/generatePassword', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        if (result.count === 0) {
+          toast.info(result.message);
+        } else {
+          toast.success(`Successfully sent ${result.count} emails. Failed: ${result.failed}.`);
+        }
+      } else {
+        toast.error(result.message || 'Failed to send passwords');
+      }
     } catch (error) {
-      console.error('Error fetching student data:', error);
-      toast.error('Failed to refresh student list');
+      console.error('Error sending passwords:', error);
+      toast.error('An error occurred while sending passwords');
     } finally {
-      setLoading(false);
+      setIsSendingPasswords(false);
+      setShowPasswordConfirm(false);
     }
   };
 
@@ -322,12 +350,21 @@ const StudentTable = () => {
                 className="rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-white"
               />
             </div>
-            <div>
+            <div className="flex items-center gap-3">
               <Button size="sm" variant="primary" className="mr-4" onClick={handleAddStudent}>
                 Add Single Student
               </Button>
               <Button size="sm" variant="primary" className="mr-4" onClick={handleUploadExcel}>
                 Upload Excel
+              </Button>
+              <Button
+                size="sm"
+                variant="primary"
+                className="mr-4"
+                onClick={handleSendPasswordsClick}
+                disabled={isSendingPasswords}
+              >
+                {isSendingPasswords ? 'Sending...' : 'Send Passwords'}
               </Button>
             </div>
             <div className="flex items-center gap-3">
@@ -347,8 +384,8 @@ const StudentTable = () => {
                 <option value="BSC-DS">BSC-DS</option>
               </select>
               <Button size="sm" variant="primary" className="mr-4" onClick={handleCSVDownload}>
-                <span className="hidden sm:inline">Download CSV</span>
-                <span className="inline sm:hidden">
+                <span className="inline">Download</span>
+                <span className="inline">
                   <Download className="w-4 h-4" />
                 </span>
               </Button>
@@ -466,6 +503,16 @@ const StudentTable = () => {
           </Button>
         </div>
       </div>
+      {showPasswordConfirm && (
+        <InfoModal
+          isOpen={showPasswordConfirm}
+          onCloseCross={() => setShowPasswordConfirm(false)}
+          onClose={handleSendPasswords}
+          title="Send Passwords"
+          message="This will generate and send passwords to all users with null passwords. Do you want to continue?"
+          buttonInfo="Yes, Send Passwords"
+        />
+      )}
     </>
   );
 };
