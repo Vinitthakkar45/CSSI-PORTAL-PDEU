@@ -427,13 +427,18 @@ export default function StudentModal({
                   <Label>Week 1 Photo</Label>
                   <div className="ml-4">
                     {selectedStudent.week_one_photo ? (
-                      <Image
-                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.week_one_photo}`}
-                        alt="Week 1 Photo"
-                        width={160}
-                        height={160}
-                        className=" rounded-lg"
-                      />
+                      <a
+                        href={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.week_one_photo}`}
+                        target="_blank"
+                      >
+                        <Image
+                          src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.week_one_photo}`}
+                          alt="Week 1 Photo"
+                          width={160}
+                          height={160}
+                          className=" rounded-lg"
+                        />
+                      </a>
                     ) : (
                       <span className="text-gray-500 dark:text-gray-300 mt-1 ml-4">Not yet uploaded</span>
                     )}
@@ -443,13 +448,18 @@ export default function StudentModal({
                   <Label>Week 2 Photo</Label>
                   <div className="ml-4">
                     {selectedStudent.week_two_photo ? (
-                      <Image
-                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.week_two_photo}`}
-                        alt="Week 2 Photo"
-                        width={160}
-                        height={160}
-                        className="rounded-lg"
-                      />
+                      <a
+                        href={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.week_two_photo}`}
+                        target="_blank"
+                      >
+                        <Image
+                          src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.week_two_photo}`}
+                          alt="Week 2 Photo"
+                          width={160}
+                          height={160}
+                          className="rounded-lg"
+                        />
+                      </a>
                     ) : (
                       <span className="text-gray-500 dark:text-gray-300 mt-1 ml-4">Not yet uploaded</span>
                     )}
