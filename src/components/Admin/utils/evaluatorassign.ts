@@ -4,42 +4,13 @@ import { eq, inArray } from 'drizzle-orm';
 
 export async function evaluatorAssignment() {
   try {
-    // Fetch all students with their department
-    const allStudents = await db.select({ id: student.id, department: student.department }).from(student);
+    // Fetch all students with their department and sort by id (for sequence)
+    const allStudents = await db
+      .select({ id: student.id, department: student.department })
+      .from(student)
+      .orderBy(student.id);
 
-    // Fetch all faculty with their department and user role (to identify coordinators)
-    const allFaculty = await db
-      .select({
-        id: faculty.id,
-        department: faculty.department,
-        userId: faculty.userId,
-      })
-      .from(faculty);
-
-    // Get the user IDs of all faculty members
-    const userIds = allFaculty.map((f) => f.userId);
-
-    // Fetch roles for all faculty users
-    const facultyRoles = await db
-      .select({
-        id: user.id,
-        role: user.role,
-      })
-      .from(user)
-      .where(inArray(user.id, userIds));
-
-    // Create a map of userId to role
-    const roleMap = new Map();
-    facultyRoles.forEach((fr) => roleMap.set(fr.id, fr.role));
-
-    // Enhance faculty data with roles
-    const facultyWithRoles = allFaculty.map((f) => ({
-      ...f,
-      role: roleMap.get(f.userId) || 'faculty', // Default to 'faculty' if role not found
-      isCoordinator: roleMap.get(f.userId) === 'coordinator',
-    }));
-
-    // Group students by department
+    // Group students by department and maintain sequence
     const studentsByDept = new Map<string | null, Array<{ id: number; department: string | null }>>();
     allStudents.forEach((s) => {
       if (!studentsByDept.has(s.department)) {
@@ -48,7 +19,29 @@ export async function evaluatorAssignment() {
       studentsByDept.get(s.department)!.push({ id: s.id, department: s.department });
     });
 
-    // Group faculty by department, separating coordinators and regular faculty
+    // Fetch all faculty with their department
+    const allFaculty = await db
+      .select({
+        id: faculty.id,
+        department: faculty.department,
+        userId: faculty.userId,
+      })
+      .from(faculty);
+
+    // Get faculty roles
+    const userIds = allFaculty.map((f) => f.userId);
+    const facultyRoles = await db.select({ id: user.id, role: user.role }).from(user).where(inArray(user.id, userIds));
+
+    // Create role map and enhance faculty data
+    const roleMap = new Map();
+    facultyRoles.forEach((fr) => roleMap.set(fr.id, fr.role));
+
+    const facultyWithRoles = allFaculty.map((f) => ({
+      ...f,
+      isCoordinator: roleMap.get(f.userId) === 'coordinator',
+    }));
+
+    // Group faculty by department
     const facultyByDept = new Map<
       string | null,
       Array<{ id: number; department: string | null; isCoordinator: boolean }>
@@ -64,18 +57,20 @@ export async function evaluatorAssignment() {
       });
     });
 
-    // Create a map to track faculty load
+    // Clear existing assignments for a fresh start
+    await db.delete(evaluatorStudent);
+
+    // Track faculty load
     const facultyLoad = new Map<number, number>();
     facultyWithRoles.forEach((f) => facultyLoad.set(f.id, 0));
 
-    // List of all departments
+    // Process each department's students in batches
     const departments = Array.from(studentsByDept.keys());
 
-    // For each department's students, assign them to faculty from other departments
     for (const department of departments) {
       const studentsInDept = studentsByDept.get(department) || [];
 
-      // Get faculty from all OTHER departments
+      // Get faculty from OTHER departments
       const eligibleFaculty = facultyWithRoles.filter((f) => f.department !== department);
 
       if (eligibleFaculty.length === 0) {
@@ -83,132 +78,50 @@ export async function evaluatorAssignment() {
         continue;
       }
 
-      // Separate coordinators and regular faculty
-      const coordinators = eligibleFaculty.filter((f) => f.isCoordinator);
-      const regularFaculty = eligibleFaculty.filter((f) => !f.isCoordinator);
-
-      // Count total faculty (both coordinators and regular)
-      const totalFaculty = eligibleFaculty.length;
-
-      // Calculate the total student assignment "slots" where coordinators get half load
-      // If we have n total faculty with c coordinators, and coordinators get half load,
-      // then total slots = (n - c) + (c/2) = n - c/2
-      const totalSlots = totalFaculty - coordinators.length / 2;
-
-      // Calculate base students per slot
-      const baseStudentsPerSlot = Math.floor(studentsInDept.length / totalSlots);
-      const remainingStudents = studentsInDept.length % totalSlots;
-
-      // Assign students to both coordinators and regular faculty
-      let assignedCount = 0;
-
-      // First, assign to coordinators (half load)
-      for (const coordinator of coordinators) {
-        // Coordinators get half the regular load (rounded down)
-        const coordSlots = 0.5; // Half slot per coordinator
-        const studentsForCoord = Math.floor(baseStudentsPerSlot * coordSlots);
-
-        // Assign students to this coordinator
-        for (let i = 0; i < studentsForCoord && assignedCount < studentsInDept.length; i++) {
-          const studentId = studentsInDept[assignedCount].id;
-
-          await db.insert(evaluatorStudent).values({
-            evaluatorId: coordinator.id,
-            studentId: studentId,
-          });
-
-          facultyLoad.set(coordinator.id, (facultyLoad.get(coordinator.id) || 0) + 1);
-          assignedCount++;
-        }
-      }
-
-      // Then, distribute remaining students to regular faculty
-      // Sort faculty to maintain sequence across departments
-      const sortedRegularFaculty = [...regularFaculty].sort((a, b) => {
-        if (a.department === b.department) return 0;
-        return (a.department || '') < (b.department || '') ? -1 : 1;
+      // Sort faculty by current load to ensure even distribution
+      const sortedFaculty = [...eligibleFaculty].sort((a, b) => {
+        const loadA = facultyLoad.get(a.id) || 0;
+        const loadB = facultyLoad.get(b.id) || 0;
+        // Coordinators get half the weight
+        const adjustedLoadA = loadA / (a.isCoordinator ? 0.5 : 1);
+        const adjustedLoadB = loadB / (b.isCoordinator ? 0.5 : 1);
+        return adjustedLoadA - adjustedLoadB;
       });
 
-      // Distribute remaining students evenly among regular faculty
-      const remainingStudentsCount = studentsInDept.length - assignedCount;
-      const regularFacultyCount = sortedRegularFaculty.length;
+      // Batch process students (process in chunks to maintain sequence)
+      const batchSize = 10; // Adjust based on your needs
+      for (let i = 0; i < studentsInDept.length; i += batchSize) {
+        const batch = studentsInDept.slice(i, i + batchSize);
 
-      if (regularFacultyCount > 0) {
-        const studentsPerRegularFaculty = Math.floor(remainingStudentsCount / regularFacultyCount);
-        const extraStudents = remainingStudentsCount % regularFacultyCount;
+        // Find faculty with lowest load
+        const leastLoadedFaculty = sortedFaculty[0];
 
-        for (let i = 0; i < sortedRegularFaculty.length; i++) {
-          const facultyId = sortedRegularFaculty[i].id;
-          const studentsToAssign = studentsPerRegularFaculty + (i < extraStudents ? 1 : 0);
+        // Assign batch to this faculty
+        for (const student of batch) {
+          await db.insert(evaluatorStudent).values({
+            evaluatorId: leastLoadedFaculty.id,
+            studentId: student.id,
+          });
 
-          for (let j = 0; j < studentsToAssign && assignedCount < studentsInDept.length; j++) {
-            const studentId = studentsInDept[assignedCount].id;
-
-            await db.insert(evaluatorStudent).values({
-              evaluatorId: facultyId,
-              studentId: studentId,
-            });
-
-            facultyLoad.set(facultyId, (facultyLoad.get(facultyId) || 0) + 1);
-            assignedCount++;
-          }
+          // Update faculty load
+          const loadIncrement = leastLoadedFaculty.isCoordinator ? 0.5 : 1;
+          facultyLoad.set(leastLoadedFaculty.id, (facultyLoad.get(leastLoadedFaculty.id) || 0) + loadIncrement);
         }
-      }
 
-      // Handle any edge case where we still have unassigned students
-      while (assignedCount < studentsInDept.length) {
-        // Find the faculty with the least load
-        const sortedByLoad = [...eligibleFaculty].sort(
-          (a, b) => (facultyLoad.get(a.id) || 0) - (facultyLoad.get(b.id) || 0)
-        );
-
-        const leastLoadedFacultyId = sortedByLoad[0].id;
-        const studentId = studentsInDept[assignedCount].id;
-
-        await db.insert(evaluatorStudent).values({
-          evaluatorId: leastLoadedFacultyId,
-          studentId: studentId,
+        // Re-sort faculty by load for next batch
+        sortedFaculty.sort((a, b) => {
+          const loadA = facultyLoad.get(a.id) || 0;
+          const loadB = facultyLoad.get(b.id) || 0;
+          const adjustedLoadA = loadA / (a.isCoordinator ? 0.5 : 1);
+          const adjustedLoadB = loadB / (b.isCoordinator ? 0.5 : 1);
+          return adjustedLoadA - adjustedLoadB;
         });
-
-        facultyLoad.set(leastLoadedFacultyId, (facultyLoad.get(leastLoadedFacultyId) || 0) + 1);
-        assignedCount++;
-      }
-    }
-
-    // Check if any faculty has significantly more students than others
-    const loadValues = Array.from(facultyLoad.values());
-    const maxLoad = Math.max(...loadValues);
-    const minLoad = Math.min(...loadValues);
-    const loadDifference = maxLoad - minLoad;
-
-    // If load difference is significant, rebalance
-    if (loadDifference > 5) {
-      console.log(`Load imbalance detected (${minLoad}-${maxLoad}). Rebalancing...`);
-
-      // Get all evaluator-student assignments
-      const assignments = await db.select().from(evaluatorStudent);
-
-      // Sort faculty by load descending
-      const overloadedFaculty = Array.from(facultyLoad.entries())
-        .sort((a, b) => b[1] - a[1])
-        .filter(([_, load]) => load > minLoad + 2)
-        .map(([id]) => id);
-
-      // Sort faculty by load ascending
-      const underloadedFaculty = Array.from(facultyLoad.entries())
-        .sort((a, b) => a[1] - b[1])
-        .filter(([_, load]) => load < maxLoad - 2)
-        .map(([id]) => id);
-
-      // Attempt to rebalance by moving some assignments
-      if (overloadedFaculty.length > 0 && underloadedFaculty.length > 0) {
-        // Implementation of rebalancing logic would go here
-        // This would require updating existing assignments
       }
     }
 
     console.log('Evaluator assignment completed. Faculty load distribution:');
     console.log(Object.fromEntries(facultyLoad));
+    return { success: true };
   } catch (error) {
     console.error('Error in evaluator assignment:', error);
     throw error;
