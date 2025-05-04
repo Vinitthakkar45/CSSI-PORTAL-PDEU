@@ -311,7 +311,7 @@ export default function StudentModal({
                     src={
                       selectedStudent.profileImage
                         ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.profileImage}`
-                        : '/images/user/user-17.jpg'
+                        : '/images/user/DefaultProfile_Light.png'
                     }
                     alt={selectedStudent.name || ''}
                   />

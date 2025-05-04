@@ -57,6 +57,13 @@ function standardizeDepartment(departmentName: string | null): string | null {
 
   // Map of full department names to standard abbreviations
   const departmentMap: Record<string, string> = {
+    // CSBS related
+    csbs: 'CSBS',
+    'computer science and business systems': 'CSBS',
+    'computer science & business systems': 'CSBS',
+    'cs&bs': 'CSBS',
+    'cs and bs': 'CSBS',
+
     // Computer Science related
     computer: 'CSE',
     'computer science': 'CSE',
@@ -86,13 +93,6 @@ function standardizeDepartment(departmentName: string | null): string | null {
     // Civil related
     civil: 'CIVIL',
     'civil engineering': 'CIVIL',
-
-    // CSBS related
-    csbs: 'CSBS',
-    'computer science and business systems': 'CSBS',
-    'computer science & business systems': 'CSBS',
-    'cs&bs': 'CSBS',
-    'cs and bs': 'CSBS',
 
     // BSC-DS related
     bsc: 'BSC-DS',

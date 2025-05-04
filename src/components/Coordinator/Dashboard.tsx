@@ -11,7 +11,7 @@ import { InfoModal } from '../ConfirmationModals';
 import LoadingOverlay from '../LoadingOverlay';
 import { faculty, SelectStudent } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
-
+import DashboardSkeleton from './Skeletons/DashBoardSkele';
 type StageStatus = 'locked' | 'current' | 'completed';
 
 type FacultyWithUser = {
@@ -53,11 +53,14 @@ const Dashboard = () => {
   useEffect(() => {
     async function fetchStage() {
       try {
+        setIsLoading(true);
         const response = await fetch('/api/stage', { method: 'GET' });
         const data = await response.json();
         setCurrentStage(data.stage[0].stage);
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -168,57 +171,61 @@ const Dashboard = () => {
 
   return (
     <>
-      {isLoading && <LoadingOverlay />}
-
-      {showMentorModal && (
-        <InfoModal
-          isOpen={showMentorModal}
-          onCloseCross={() => setShowMentorModal(false)}
-          onClose={confirmAssignMentors}
-          title="Confirm Mentor Assignment"
-          message={`You are about to assign ${faculties.length} faculty members as mentors to ${students.length} students. This action cannot be undone. Do you want to proceed?`}
-          buttonInfo="Yes, Assign Mentors"
-        />
-      )}
-
-      {showErrorModal && (
-        <InfoModal
-          isOpen={showErrorModal}
-          onCloseCross={() => setShowErrorModal(false)}
-          onClose={() => setShowErrorModal(false)}
-          title="Error"
-          message={errorMessage}
-          buttonInfo="OK"
-        />
-      )}
-
-      {showSuccessModal && (
-        <InfoModal
-          isOpen={showSuccessModal}
-          onCloseCross={() => setShowSuccessModal(false)}
-          onClose={() => setShowSuccessModal(false)}
-          title="Success"
-          message={successMessage}
-          buttonInfo="OK"
-        />
-      )}
-
-      <div className="container pb-4 mx-auto">
-        <StageProgress currentStage={currentStage} totalStages={stages.length} />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stages.map((stage) => (
-            <StageCard
-              key={stage.number}
-              number={stage.number}
-              title={stage.title}
-              description={stage.description}
-              status={getStageStatus(stage.number)}
+      {isLoading ? (
+        <DashboardSkeleton />
+      ) : (
+        <>
+          {showMentorModal && (
+            <InfoModal
+              isOpen={showMentorModal}
+              onCloseCross={() => setShowMentorModal(false)}
+              onClose={confirmAssignMentors}
+              title="Confirm Mentor Assignment"
+              message={`You are about to assign ${faculties.length} faculty members as mentors to ${students.length} students. This action cannot be undone. Do you want to proceed?`}
+              buttonInfo="Yes, Assign Mentors"
             />
-          ))}
-        </div>
-      </div>
-      <Button onClick={handleAssignMentors}>Assign Mentors</Button>
+          )}
+
+          {showErrorModal && (
+            <InfoModal
+              isOpen={showErrorModal}
+              onCloseCross={() => setShowErrorModal(false)}
+              onClose={() => setShowErrorModal(false)}
+              title="Error"
+              message={errorMessage}
+              buttonInfo="OK"
+            />
+          )}
+
+          {showSuccessModal && (
+            <InfoModal
+              isOpen={showSuccessModal}
+              onCloseCross={() => setShowSuccessModal(false)}
+              onClose={() => setShowSuccessModal(false)}
+              title="Success"
+              message={successMessage}
+              buttonInfo="OK"
+            />
+          )}
+
+          <div className="container pb-4 mx-auto">
+            <StageProgress currentStage={currentStage} totalStages={stages.length} />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {stages.map((stage) => (
+                <StageCard
+                  key={stage.number}
+                  number={stage.number}
+                  title={stage.title}
+                  description={stage.description}
+                  status={getStageStatus(stage.number)}
+                />
+              ))}
+            </div>
+          </div>
+          <Button onClick={handleAssignMentors}>Assign Mentors</Button>
+        </>
+      )}
     </>
   );
 };

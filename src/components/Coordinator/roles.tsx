@@ -1,4 +1,5 @@
 import React from 'react';
+import { CheckCircle } from 'lucide-react';
 
 const rolesList = [
   'Facilitate the issuance of Letters of Recommendation (LOR) to students.',
@@ -23,18 +24,26 @@ const CoordinatorRoles = () => {
             <h2 className="mb-8 text-3xl font-bold text-dark dark:text-white sm:text-4xl">
               Roles of Department Coordinator of CSSI
             </h2>
+            <p className="mb-10 text-lg text-gray-600 dark:text-gray-300 max-w-3xl">
+              Department Coordinators play a crucial role in ensuring the smooth operation of the CSSI program, serving
+              as the bridge between students, faculty mentors, and the institution.
+            </p>
           </div>
         </div>
         <div className="flex flex-wrap">
           <div className="w-full">
-            <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
-              <ul className="list-disc space-y-4 pl-6 text-lg text-body-color dark:text-body-color-dark">
+            <div className="rounded-xl bg-white p-8 shadow-lg dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {rolesList.map((role, index) => (
-                  <li key={index} className="pb-2">
-                    {role}
-                  </li>
+                  <div
+                    key={index}
+                    className="flex items-start space-x-3 p-4 rounded-lg transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                  >
+                    <CheckCircle className="h-6 w-6 text-brand-500 dark:text-brand-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700 dark:text-gray-300">{role}</span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
         </div>
