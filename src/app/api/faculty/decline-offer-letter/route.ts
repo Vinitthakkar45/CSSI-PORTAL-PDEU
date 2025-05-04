@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   if (!session || !session.user || !session.user.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  const faculty_user_id = Number(session.user.id);
+  const faculty_user_id = session.user.id;
   const faculty_mail = session.user.email;
   if (!faculty_mail) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

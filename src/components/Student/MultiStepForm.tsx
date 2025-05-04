@@ -208,9 +208,11 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
 
       setSlideDirection('left');
       setCurrentStep(nextStep);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       toast.success('Registration process completed!');
       onComplete();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
