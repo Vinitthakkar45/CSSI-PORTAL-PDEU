@@ -22,8 +22,6 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: '2mb',
     },
-    // Add memory optimization
-    optimizeCss: true,
   },
 };
 
