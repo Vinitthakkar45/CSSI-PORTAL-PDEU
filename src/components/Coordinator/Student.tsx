@@ -12,6 +12,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Download } from 'lucide-react';
 import StudentModal from './Modal/StudentModal';
+import StudentTableSkeleton from './Skeletons/StudentTableSkele';
 
 type StudentWithUser = {
   student: SelectStudent;
@@ -199,7 +200,7 @@ const StudentTable = () => {
   }, [filteredStudents]);
 
   if (loading && students.length === 0) {
-    return <div className="p-4 text-center">Loading student data...</div>;
+    return <StudentTableSkeleton />;
   }
 
   const handleCSVDownload = () => {

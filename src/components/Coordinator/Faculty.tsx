@@ -8,6 +8,7 @@ import FacultyTableModal from '@/components/Coordinator/FacultyTableModal';
 import { useSession } from 'next-auth/react';
 import Button from '../Home/ui/button/Button';
 import AddFacultyModal from './AddFacultyModal';
+import FacultyTableSkeleton from './Skeletons/FacultyTableSkele';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -156,7 +157,7 @@ const FacultyTable = () => {
     setShowAdd(false);
   };
   if (loading) {
-    return <div className="p-4 text-center">Loading faculty data...</div>;
+    return <FacultyTableSkeleton />;
   }
 
   return (
