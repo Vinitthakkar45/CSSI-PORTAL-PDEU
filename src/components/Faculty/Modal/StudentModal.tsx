@@ -308,7 +308,7 @@ export default function StudentModal({
                     src={
                       selectedStudent.profileImage
                         ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.profileImage}`
-                        : '/images/user/user-17.jpg'
+                        : '/images/user/DefaultProfile_Light.png'
                     }
                     alt={selectedStudent.name || ''}
                   />
@@ -466,7 +466,7 @@ export default function StudentModal({
                         {' '}
                         View Offer Letter <ExternalLink className="ml-1 mt-1" size={16} strokeWidth={2.5} />
                       </a>
-                      {!showDeclineInput && (
+                      {!showDeclineInput && option === 'mentor' && (
                         <button
                           className="mt-2 ml-4 px-4 py-2 text-sm font-medium text-white bg-red-900 rounded hover:bg-red-800"
                           onClick={() => setShowDeclineInput(true)}
@@ -474,7 +474,7 @@ export default function StudentModal({
                           Decline Offer Letter
                         </button>
                       )}
-                      {showDeclineInput && (
+                      {showDeclineInput && option === 'mentor' && (
                         <div className="mt-4 ml-4">
                           <Label>Reason for Declination</Label>
                           <textarea
