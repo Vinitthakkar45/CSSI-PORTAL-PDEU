@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import TableList from './Table/TableList';
 import { SelectStudent } from '@/drizzle/schema';
+import EvalSekele from './Skeletons/Evaluation';
 
 const Dashboard = () => {
   const session = useSession();
@@ -68,7 +69,7 @@ const Dashboard = () => {
         error ? (
           <p className="text-red-500">{error}</p>
         ) : (
-          <p>Loading...</p>
+          <EvalSekele />
         )
       ) : (selectedToggle === 'mentor' && mentoredStudents.length > 0) ||
         (selectedToggle != 'mentor' && evaluatedStudents.length > 0) ? (

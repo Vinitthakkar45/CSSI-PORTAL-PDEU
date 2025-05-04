@@ -58,7 +58,7 @@ export default function EnrollmentChart() {
       <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Enrollment Statistics</h2>
 
       <div className="overflow-x-auto">
-        <div className="flex justify-center">
+        <div style={{ minWidth: chartWidth + 80 }}>
           {loading ? (
             <div className="w-full max-w-5xl animate-pulse">
               <div className="h-6 bg-gray-700 rounded w-48 mb-6 mx-auto" />
@@ -131,7 +131,7 @@ export default function EnrollmentChart() {
                         y={chartHeight + 10 - activeHeight}
                         width={barWidth}
                         height={activeHeight}
-                        className="fill-indigo-500"
+                        className="fill-indigo-400 dark:fill-indigo-500"
                         rx="2"
                       />
                       <text
@@ -149,7 +149,7 @@ export default function EnrollmentChart() {
                         y={chartHeight + 10 - remainingHeight}
                         width={barWidth}
                         height={remainingHeight}
-                        className="fill-gray-400"
+                        className="fill-slate-400 dark:fill-slate-500"
                         rx="2"
                       />
                       <text
@@ -193,11 +193,11 @@ export default function EnrollmentChart() {
       {!loading && (
         <div className="flex justify-center items-center mt-4 gap-6">
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-indigo-600 rounded mr-2"></div>
+            <div className="w-4 h-4 bg-indigo-500 rounded mr-2"></div>
             <span className="text-sm text-gray-300">Enrolled</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-gray-400 rounded mr-2"></div>
+            <div className="w-4 h-4 bg-slate-400 rounded mr-2"></div>
             <span className="text-sm text-gray-300">Not Enrolled</span>
           </div>
         </div>
