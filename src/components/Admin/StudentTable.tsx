@@ -250,21 +250,9 @@ const StudentTable = () => {
     openUploadModal();
   };
 
-  const handleUploadSuccess = async () => {
-    // Refresh the student list
-    try {
-      setLoading(true);
-      const res = await fetch('/api/admin/students');
-      const data = await res.json();
-      setStudents(data);
-      setFilteredStudents(data);
-      closeUploadModal();
-    } catch (error) {
-      console.error('Error fetching student data:', error);
-      toast.error('Failed to refresh student list');
-    } finally {
-      setLoading(false);
-    }
+  const handleUploadSuccess = () => {
+    refreshData();
+    closeUploadModal();
   };
 
   if (loading) {

@@ -38,11 +38,11 @@ const SigninPage = () => {
 
   return (
     <>
-      <section className="relative z-10 overflow-hidden pb-16 pt-36 md:pb-20 lg:pb-28 lg:pt-[100px]">
+      <section className="relative z-10 overflow-hidden pb-16 pt-24 md:pb-20 lg:pb-28 md:pt-32">
         <div className="container">
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4">
-              <div className="shadow-three mx-auto max-w-[500px] rounded-sm bg-white dark:bg-dark p-10">
+              <div className="shadow-three mx-auto max-w-[500px] rounded-lg bg-white dark:bg-dark p-10">
                 <h3 className="mb-2 text-center text-2xl font-bold text-black dark:text-white sm:text-3xl">
                   Sign in to your account
                 </h3>
