@@ -2,7 +2,7 @@ import React from 'react';
 
 const GuidelinesContent = () => {
   return (
-    <main className="max-w-5xl mx-auto px-6 py-12 bg-white dark:bg-gray-900 rounded-lg shadow-md">
+    <main className="max-w-5xl mx-auto px-6 py-12 bg-white dark:bg-gray-900 rounded-lg shadow-md text-justify">
       {/* Preface Section */}
       <section className="text-gray-700 dark:text-gray-300 mb-12">
         <h2 className="p-4 mb-6 bg-gray-100 border-l-4 border-blue-500 dark:bg-gray-800 dark:text-white text-xl font-bold text-gray-800 sm:text-2xl lg:text-xl xl:text-2xl rounded-r-lg shadow-sm">

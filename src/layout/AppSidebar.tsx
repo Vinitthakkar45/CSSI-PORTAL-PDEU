@@ -1,6 +1,5 @@
 'use client';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/context/SidebarContext';
 import {
@@ -13,8 +12,10 @@ import {
   BookOpen,
   BookOpenCheck,
   ScrollText,
+  FileText,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 type NavItem = {
   name: string;
@@ -110,6 +111,11 @@ const AppSidebar: React.FC = () => {
       });
     }
   }
+  navItems.push({
+    name: 'Docs Format',
+    path: '/home/docsformat',
+    icon: <FileText size={22} />,
+  });
 
   const isActive = (path: string) => pathname === path;
 

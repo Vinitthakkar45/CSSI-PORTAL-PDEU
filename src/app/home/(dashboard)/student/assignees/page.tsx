@@ -248,7 +248,7 @@ export default function AssigneesPage() {
               />
             ))}
 
-            {mentor && <FacultyCard title="Internal Faculty (Mentor)" faculty={mentor} />}
+            {mentor && <FacultyCard title="Internal Evaluator" faculty={mentor} />}
             {evaluator && <FacultyCard title="External Evaluator" faculty={evaluator} />}
           </>
         ) : (
