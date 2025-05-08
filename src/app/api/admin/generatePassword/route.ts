@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/drizzle/db';
 import { user, student, faculty } from '@/drizzle/schema';
-import nodemailer from 'nodemailer';
 import { eq, isNull, sql } from 'drizzle-orm';
-
+import transporter from '@/lib/transporter';
 export async function POST(request: NextRequest) {
   try {
     const usersToUpdate = await db
@@ -32,14 +31,6 @@ export async function POST(request: NextRequest) {
         count: 0,
       });
     }
-
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
 
     let successCount = 0;
     let failCount = 0;
@@ -75,9 +66,10 @@ export async function POST(request: NextRequest) {
         `;
 
         // Send email first
+        // Send email first
         await transporter.sendMail({
-          from: 'CSSI@sot.pdpu.ac.in',
-          to: 'vinit.tce22@sot.pdpu.ac.in',
+          from: process.env.EMAIL,
+          to: userData.email,
           subject: subject,
           html: personalizedBody,
         });

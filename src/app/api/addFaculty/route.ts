@@ -1,9 +1,8 @@
 import { db } from '@/drizzle/db';
 import { faculty, user } from '@/drizzle/schema';
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
-import { eq } from 'drizzle-orm';
-
+import { eq, sql } from 'drizzle-orm';
+import transporter from '@/lib/transporter';
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
@@ -25,18 +24,10 @@ export async function POST(req: NextRequest) {
         .returning({ id: user.id });
 
       const name = firstname + ' ' + lastname;
-      const fac = await db.insert(faculty).values({
+      await db.insert(faculty).values({
         name: name,
         userId: insertedUsers[0].id,
         department: department,
-      });
-
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASS,
-        },
       });
 
       const subject = 'Welcome to CSSI Portal Your Account Details';
@@ -104,18 +95,10 @@ export async function POST(req: NextRequest) {
         })
         .returning({ id: user.id });
       const name = firstname + ' ' + lastname;
-      const fac = await db.insert(faculty).values({
+      await db.insert(faculty).values({
         name: name,
         userId: insertedUsers[0].id,
         department: department,
-      });
-
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASS,
-        },
       });
 
       const subject = 'Welcome to CSSI Portal Your Account Details';
@@ -154,7 +137,7 @@ export async function POST(req: NextRequest) {
   </div>
 `;
 
-      const mail = await transporter.sendMail({
+      await transporter.sendMail({
         from: process.env.EMAIL,
         to: email,
         subject: subject,

@@ -1,10 +1,9 @@
 import { user, student, faculty } from '@/drizzle/schema';
 import { db } from '@/drizzle/db';
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
 import { generateStageChangeNotifications } from './mailTemplate';
 import { eq } from 'drizzle-orm';
-
+import transporter from '@/lib/transporter';
 async function getUserName(email: string, role: string): Promise<string> {
   if (role === 'student') {
     const result = await db
@@ -28,14 +27,6 @@ async function getUserName(email: string, role: string): Promise<string> {
 
 async function sendBulkMails(rec: string[], subject: string, bodyTemplate: string, role: string) {
   if (rec.length === 0) return;
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
 
   const batchSize = 50;
   const delayBetweenBatches = 6000;
