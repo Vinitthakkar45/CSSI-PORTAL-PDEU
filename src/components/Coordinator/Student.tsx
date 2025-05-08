@@ -169,6 +169,21 @@ const StudentTable = () => {
     }
   }, [fetchStudents, students.length, session.data?.user?.id]);
 
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredStudents(students);
+    } else {
+      const lowerSearch = searchTerm.toLowerCase();
+      const filtered = students.filter(({ student, user }) => {
+        return (
+          student.rollNumber?.toLowerCase().includes(lowerSearch) ||
+          (user.email?.toLowerCase() || '').includes(lowerSearch)
+        );
+      });
+      setFilteredStudents(filtered);
+    }
+  }, [searchTerm, students]);
+
   // Add a refresh function that can be called manually
   const refreshData = () => {
     fetchStudents(true);
