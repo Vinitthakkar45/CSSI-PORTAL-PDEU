@@ -6,6 +6,7 @@ import { eq, and, inArray } from 'drizzle-orm';
 export async function POST(req: NextRequest) {
   try {
     const { id, role } = await req.json();
+
     if (role === 'student') {
       // Get student details including department
       const studentData = await db.select().from(student).where(eq(student.userId, id)).limit(1);
@@ -96,24 +97,34 @@ export async function POST(req: NextRequest) {
         { status: 200 }
       );
     } else {
+      // 🔧 FIX: Convert userId (UUID) to studentId (INT) before querying
+      const studentData = await db.select().from(student).where(eq(student.userId, id)).limit(1);
+      if (!studentData.length) {
+        return NextResponse.json({ error: 'Student not found' }, { status: 404 });
+      }
+
+      const studentId = studentData[0].id;
+
       const [mentorResult, evaluatorResult] = await Promise.all([
-        db.select().from(mentorStudent).where(eq(mentorStudent.studentId, id)).limit(1),
-        db.select().from(evaluatorStudent).where(eq(evaluatorStudent.studentId, id)).limit(1),
+        db.select().from(mentorStudent).where(eq(mentorStudent.studentId, studentId)).limit(1),
+        db.select().from(evaluatorStudent).where(eq(evaluatorStudent.studentId, studentId)).limit(1),
       ]);
 
       const mentorId = mentorResult[0]?.mentorId;
       const evalId = evaluatorResult[0]?.evaluatorId;
 
       const [mentorRes, evalRes] = await Promise.all([
-        db.select().from(faculty).where(eq(faculty.id, mentorId)).limit(1),
-        db.select().from(faculty).where(eq(faculty.id, evalId)).limit(1),
+        mentorId ? db.select().from(faculty).where(eq(faculty.id, mentorId)).limit(1) : Promise.resolve([]),
+        evalId ? db.select().from(faculty).where(eq(faculty.id, evalId)).limit(1) : Promise.resolve([]),
       ]);
-      const mentorname = mentorRes[0];
-      const evalname = evalRes[0];
+
+      const mentorname = mentorRes[0] || null;
+      const evalname = evalRes[0] || null;
+
       return NextResponse.json({ mentorname, evalname }, { status: 200 });
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return NextResponse.json({ error: 'Failed to fetch student data' }, { status: 500 });
   }
 }
