@@ -2,12 +2,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/drizzle/db';
 import { user, student, faculty } from '@/drizzle/schema';
 import nodemailer from 'nodemailer';
-import { eq, isNull } from 'drizzle-orm';
+import { eq, isNull, sql } from 'drizzle-orm';
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    // Get all users with null passwords
-    const usersToUpdate = await db.select().from(user).where(isNull(user.password));
+    const usersToUpdate = await db
+      .select({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: sql`
+          CASE 
+            WHEN ${user.role} = 'student' THEN ${student.name}
+            WHEN ${user.role} IN ('faculty', 'coordinator') THEN ${faculty.name}
+            WHEN ${user.role} = 'admin' THEN 'Admin'
+            ELSE NULL
+          END
+        `,
+      })
+      .from(user)
+      .leftJoin(student, eq(user.id, student.userId))
+      .leftJoin(faculty, eq(user.id, faculty.userId))
+      .where(isNull(user.password));
 
     if (usersToUpdate.length === 0) {
       return NextResponse.json({
@@ -27,51 +43,32 @@ export async function POST(req: NextRequest) {
 
     let successCount = 0;
     let failCount = 0;
+    const errors: { email: string; error: string }[] = [];
 
     // Process users one by one
     for (const userData of usersToUpdate) {
       try {
-        // Generate password based on email prefix
-        const emailPrefix = userData.email?.split('@')[0].substring(0, 5) || 'user';
-        const password = generatePassword(emailPrefix);
-
-        // Get user's name if available
-        let name = emailPrefix;
-        if (userData.role === 'student') {
-          const studentData = await db
-            .select({ name: student.name })
-            .from(student)
-            .where(eq(student.userId, userData.id))
-            .limit(1);
-
-          if (studentData.length > 0 && studentData[0].name) {
-            name = studentData[0].name;
-          }
-        } else if (userData.role === 'faculty' || userData.role === 'admin') {
-          const facultyData = await db
-            .select({ name: faculty.name })
-            .from(faculty)
-            .where(eq(faculty.userId, userData.id))
-            .limit(1);
-
-          if (facultyData.length > 0 && facultyData[0].name) {
-            name = facultyData[0].name;
-          }
+        if (!userData.email) {
+          throw new Error('User email is missing');
         }
+
+        // Generate password based on name
+        const name = (userData.name as string)?.split(' ')[0] || 'user';
+        const password = generatePassword(name);
 
         // Send email with credentials
         const subject = 'CSSI Portal - Your Account Credentials';
         const personalizedBody = `
         <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;">
           <h2 style="color: #0056b3; text-align: center;">CSSI Portal Account Credentials</h2>
-          <p>Dear <strong>${name}</strong>,</p>
+          <p>Dear <strong>${userData.name || 'User'}</strong>,</p>
           <p>Your account credentials for the CSSI Portal have been generated. Please use the following details to log in:</p>
           <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
             <p><strong>Email:</strong> <span style="font-weight: bold;">${userData.email}</span></p>
             <p><strong>Password:</strong> <span style="font-weight: bold;">${password}</span></p>
           </div>
           <p>Please log in at <a href="https://cssi.pdpu.ac.in" style="color: #0056b3;">cssi.pdpu.ac.in</a></p>
-          <p>We recommend changing your password after your first login.</p>
+          <p>Do not share these credentials with anyone!</p>
           <p>If you have any questions, please contact the CSSI team.</p>
           <p style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">This is an automated message. Please do not reply to this email.</p>
         </div>
@@ -79,8 +76,8 @@ export async function POST(req: NextRequest) {
 
         // Send email first
         await transporter.sendMail({
-          from: process.env.EMAIL,
-          to: userData.email,
+          from: 'CSSI@sot.pdpu.ac.in',
+          to: 'vinit.tce22@sot.pdpu.ac.in',
           subject: subject,
           html: personalizedBody,
         });
@@ -92,6 +89,8 @@ export async function POST(req: NextRequest) {
         console.log(`Successfully sent credentials to ${userData.email}`);
       } catch (error) {
         failCount++;
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        errors.push({ email: userData.email || 'unknown', error: errorMessage });
         console.error(`Failed to process user ${userData.email}:`, error);
         // Password remains null in database since we didn't update it
       }
@@ -105,17 +104,22 @@ export async function POST(req: NextRequest) {
       message: `Processed ${usersToUpdate.length} users. Successfully sent ${successCount} emails. Failed: ${failCount}.`,
       count: successCount,
       failed: failCount,
+      errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
     console.error('Error generating passwords:', error);
     return NextResponse.json(
-      { success: false, message: error instanceof Error ? error.message : 'Failed to generate passwords' },
+      {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to generate passwords',
+        details: error instanceof Error ? error.stack : undefined,
+      },
       { status: 500 }
     );
   }
 }
 
-function generatePassword(prefix: string) {
+function generatePassword(prefix: string): string {
   const specialChars = '!@#$%&*';
   const numbers = '0123456789';
   const allExtras = specialChars + numbers;
