@@ -1,127 +1,129 @@
 import { db } from '@/drizzle/db';
-import { faculty, student, evaluatorStudent, user } from '@/drizzle/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { faculty, student, evaluatorStudent } from '@/drizzle/schema';
+import { asc } from 'drizzle-orm';
 
 export async function evaluatorAssignment() {
   try {
-    // Fetch all students with their department and sort by id (for sequence)
     const allStudents = await db
-      .select({ id: student.id, department: student.department })
+      .select({
+        id: student.id,
+        department: student.department,
+        rollNumber: student.rollNumber,
+      })
       .from(student)
-      .orderBy(student.id);
+      .orderBy(asc(student.department), asc(student.rollNumber));
 
-    // Group students by department and maintain sequence
-    const studentsByDept = new Map<string | null, Array<{ id: number; department: string | null }>>();
-    allStudents.forEach((s) => {
-      if (!studentsByDept.has(s.department)) {
-        studentsByDept.set(s.department, []);
-      }
-      studentsByDept.get(s.department)!.push({ id: s.id, department: s.department });
-    });
-
-    // Fetch all faculty with their department
     const allFaculty = await db
       .select({
         id: faculty.id,
         department: faculty.department,
-        userId: faculty.userId,
       })
       .from(faculty);
-
-    // Get faculty roles
-    const userIds = allFaculty.map((f) => f.userId);
-    const facultyRoles = await db.select({ id: user.id, role: user.role }).from(user).where(inArray(user.id, userIds));
-
-    // Create role map and enhance faculty data
-    const roleMap = new Map();
-    facultyRoles.forEach((fr) => roleMap.set(fr.id, fr.role));
-
-    const facultyWithRoles = allFaculty.map((f) => ({
-      ...f,
-      isCoordinator: roleMap.get(f.userId) === 'coordinator',
-    }));
-
-    // Group faculty by department
-    const facultyByDept = new Map<
-      string | null,
-      Array<{ id: number; department: string | null; isCoordinator: boolean }>
-    >();
-    facultyWithRoles.forEach((f) => {
-      if (!facultyByDept.has(f.department)) {
-        facultyByDept.set(f.department, []);
-      }
-      facultyByDept.get(f.department)!.push({
-        id: f.id,
-        department: f.department,
-        isCoordinator: f.isCoordinator,
-      });
-    });
 
     // Clear existing assignments for a fresh start
     await db.delete(evaluatorStudent);
 
-    // Track faculty load
-    const facultyLoad = new Map<number, number>();
-    facultyWithRoles.forEach((f) => facultyLoad.set(f.id, 0));
+    const studentsByDept = new Map<string, { id: number }[]>();
+    for (const s of allStudents) {
+      if (!s.department) continue;
+      if (!studentsByDept.has(s.department)) {
+        studentsByDept.set(s.department, []);
+      }
+      studentsByDept.get(s.department)!.push({ id: s.id });
+    }
 
-    // Process each department's students in batches
-    const departments = Array.from(studentsByDept.keys());
+    const facultyByDept = new Map<string, { id: number }[]>();
+    for (const f of allFaculty) {
+      if (!f.department) continue;
+      if (!facultyByDept.has(f.department)) {
+        facultyByDept.set(f.department, []);
+      }
+      facultyByDept.get(f.department)!.push({ id: f.id });
+    }
 
-    for (const department of departments) {
-      const studentsInDept = studentsByDept.get(department) || [];
+    const assignments: { evaluatorId: number; studentId: number }[] = [];
 
+    for (const [dept, deptStudents] of studentsByDept.entries()) {
       // Get faculty from OTHER departments
-      const eligibleFaculty = facultyWithRoles.filter((f) => f.department !== department);
+      const eligibleFaculty = allFaculty.filter((f) => f.department !== dept && f.department);
 
       if (eligibleFaculty.length === 0) {
-        console.warn(`No eligible evaluators for department: ${department}`);
+        console.warn(`No eligible evaluators for department: ${dept}`);
         continue;
       }
 
-      // Sort faculty by current load to ensure even distribution
-      const sortedFaculty = [...eligibleFaculty].sort((a, b) => {
-        const loadA = facultyLoad.get(a.id) || 0;
-        const loadB = facultyLoad.get(b.id) || 0;
-        // Coordinators get half the weight
-        const adjustedLoadA = loadA / (a.isCoordinator ? 0.5 : 1);
-        const adjustedLoadB = loadB / (b.isCoordinator ? 0.5 : 1);
-        return adjustedLoadA - adjustedLoadB;
+      // Group students by their roll numbers to keep them in sequence
+      // This ensures students from same department stay together
+      const sortedDeptStudents = [...deptStudents].sort((a, b) => {
+        const studentA = allStudents.find((s) => s.id === a.id);
+        const studentB = allStudents.find((s) => s.id === b.id);
+        return (studentA?.rollNumber || '').localeCompare(studentB?.rollNumber || '');
       });
 
-      // Batch process students (process in chunks to maintain sequence)
-      const batchSize = 10; // Adjust based on your needs
-      for (let i = 0; i < studentsInDept.length; i += batchSize) {
-        const batch = studentsInDept.slice(i, i + batchSize);
+      // Distribute students to faculty evenly while keeping students from same dept together
+      const facultyCount = eligibleFaculty.length;
+      const chunkSize = Math.ceil(sortedDeptStudents.length / facultyCount);
 
-        // Find faculty with lowest load
-        const leastLoadedFaculty = sortedFaculty[0];
+      // Split students into chunks for each faculty
+      for (let i = 0; i < facultyCount; i++) {
+        const startIdx = i * chunkSize;
+        const endIdx = Math.min(startIdx + chunkSize, sortedDeptStudents.length);
 
-        // Assign batch to this faculty
-        for (const student of batch) {
-          await db.insert(evaluatorStudent).values({
-            evaluatorId: leastLoadedFaculty.id,
+        // Skip if we've assigned all students
+        if (startIdx >= sortedDeptStudents.length) break;
+
+        // Assign this chunk of students to the current faculty
+        const studentsChunk = sortedDeptStudents.slice(startIdx, endIdx);
+        for (const student of studentsChunk) {
+          assignments.push({
             studentId: student.id,
+            evaluatorId: eligibleFaculty[i].id,
           });
-
-          // Update faculty load
-          const loadIncrement = leastLoadedFaculty.isCoordinator ? 0.5 : 1;
-          facultyLoad.set(leastLoadedFaculty.id, (facultyLoad.get(leastLoadedFaculty.id) || 0) + loadIncrement);
         }
-
-        // Re-sort faculty by load for next batch
-        sortedFaculty.sort((a, b) => {
-          const loadA = facultyLoad.get(a.id) || 0;
-          const loadB = facultyLoad.get(b.id) || 0;
-          const adjustedLoadA = loadA / (a.isCoordinator ? 0.5 : 1);
-          const adjustedLoadB = loadB / (b.isCoordinator ? 0.5 : 1);
-          return adjustedLoadA - adjustedLoadB;
-        });
       }
     }
 
-    console.log('Evaluator assignment completed. Faculty load distribution:');
-    console.log(Object.fromEntries(facultyLoad));
-    return { success: true };
+    // Ensure no faculty is left without students if possible
+    const assignedFacultyIds = new Set(assignments.map((a) => a.evaluatorId));
+    const unassignedFaculty = allFaculty.filter((f) => !assignedFacultyIds.has(f.id) && f.department);
+
+    if (unassignedFaculty.length > 0 && assignments.length > 0) {
+      // Redistribute some assignments to unassigned faculty
+      for (const unassignedFac of unassignedFaculty) {
+        // Find faculty with most assignments
+        const facultyAssignmentCounts = new Map<number, number>();
+        for (const assignment of assignments) {
+          facultyAssignmentCounts.set(
+            assignment.evaluatorId,
+            (facultyAssignmentCounts.get(assignment.evaluatorId) || 0) + 1
+          );
+        }
+
+        const maxAssignedFaculty = [...facultyAssignmentCounts.entries()].sort((a, b) => b[1] - a[1])[0];
+
+        if (maxAssignedFaculty && maxAssignedFaculty[1] > 1) {
+          // Find students assigned to this faculty
+          const studentsToRedistribute = assignments
+            .filter((a) => a.evaluatorId === maxAssignedFaculty[0])
+            .slice(0, Math.floor(maxAssignedFaculty[1] / 2)); // Take half
+
+          // Reassign to unassigned faculty
+          for (const assignment of studentsToRedistribute) {
+            assignment.evaluatorId = unassignedFac.id;
+          }
+        }
+      }
+    }
+
+    if (assignments.length > 0) {
+      await db.insert(evaluatorStudent).values(assignments);
+    }
+
+    return {
+      success: true,
+      assignedCount: assignments.length,
+      message: `Assigned ${assignments.length} students to evaluators from different departments.`,
+    };
   } catch (error) {
     console.error('Error in evaluator assignment:', error);
     throw error;

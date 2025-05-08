@@ -73,7 +73,7 @@ const AppSidebar: React.FC = () => {
           icon: <BookOpen size={22} />,
         },
         {
-          name: 'Roles/Guidelines',
+          name: 'Guidelines',
           path: '/home/coordinator/roles',
           icon: <ScrollText size={22} />,
         }
@@ -105,7 +105,7 @@ const AppSidebar: React.FC = () => {
     }
     if (role === 'faculty') {
       navItems.push({
-        name: 'Roles/Guidelines',
+        name: 'Guidelines',
         path: '/home/faculty/guidelines',
         icon: <ScrollText size={22} />,
       });

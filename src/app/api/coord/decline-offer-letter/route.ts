@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
 import { db } from '@/drizzle/db';
 import { student } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
+import transporter from '@/lib/transporter';
 
 export async function POST(req: NextRequest) {
   const faculty_user_id = req.nextUrl.searchParams.get('facultyId');
@@ -16,13 +16,6 @@ export async function POST(req: NextRequest) {
   if (!student_user_id || !faculty_user_id || !reason_of_declination) {
     return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
   }
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
 
   const student_details = await db
     .select({

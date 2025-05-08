@@ -1,8 +1,8 @@
 import { db } from '@/drizzle/db';
 import { faculty, student, user } from '@/drizzle/schema';
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
 import { eq } from 'drizzle-orm';
+import transporter from '@/lib/transporter';
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
@@ -28,21 +28,13 @@ export async function POST(req: NextRequest) {
       console.log(insertedUsers);
 
       const name = firstname + ' ' + lastname;
-      const addedStudent = await db.insert(student).values({
+      await db.insert(student).values({
         name: name,
         userId: insertedUsers[0].id,
         division: div,
         department: department,
         email: email,
         rollNumber: rollnumber,
-      });
-
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASS,
-        },
       });
 
       const subject = 'Welcome to CSSI Portal Your Account Details';
@@ -85,7 +77,7 @@ export async function POST(req: NextRequest) {
   </div>
 `;
 
-      const mail = await transporter.sendMail({
+      await transporter.sendMail({
         from: process.env.EMAIL,
         to: email,
         subject: subject,
@@ -119,21 +111,13 @@ export async function POST(req: NextRequest) {
       console.log(insertedUsers);
 
       const name = firstname + ' ' + lastname;
-      const addedStudent = await db.insert(student).values({
+      await db.insert(student).values({
         name: name,
         userId: insertedUsers[0].id,
         division: div,
         department: department,
         email: email,
         rollNumber: rollnumber,
-      });
-
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASS,
-        },
       });
 
       const subject = 'Welcome to CSSI Portal Your Account Details';
@@ -176,7 +160,7 @@ export async function POST(req: NextRequest) {
   </div>
 `;
 
-      const mail = await transporter.sendMail({
+      await transporter.sendMail({
         from: process.env.EMAIL,
         to: email,
         subject: subject,
