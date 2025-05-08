@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/drizzle/db';
 import { user, student, faculty } from '@/drizzle/schema';
-import nodemailer from 'nodemailer';
 import { eq, isNull } from 'drizzle-orm';
-
+import transporter from '@/lib/transporter';
 export async function POST(req: NextRequest) {
   try {
     // Get all users with null passwords
@@ -16,14 +15,6 @@ export async function POST(req: NextRequest) {
         count: 0,
       });
     }
-
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
 
     let successCount = 0;
     let failCount = 0;

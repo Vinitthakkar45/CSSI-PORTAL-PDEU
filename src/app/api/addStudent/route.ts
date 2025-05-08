@@ -1,8 +1,8 @@
 import { db } from '@/drizzle/db';
 import { faculty, student, user } from '@/drizzle/schema';
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
 import { eq } from 'drizzle-orm';
+import transporter from '@/lib/transporter';
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
@@ -35,14 +35,6 @@ export async function POST(req: NextRequest) {
         department: department,
         email: email,
         rollNumber: rollnumber,
-      });
-
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASS,
-        },
       });
 
       const subject = 'Welcome to CSSI Portal Your Account Details';
@@ -126,14 +118,6 @@ export async function POST(req: NextRequest) {
         department: department,
         email: email,
         rollNumber: rollnumber,
-      });
-
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASS,
-        },
       });
 
       const subject = 'Welcome to CSSI Portal Your Account Details';
