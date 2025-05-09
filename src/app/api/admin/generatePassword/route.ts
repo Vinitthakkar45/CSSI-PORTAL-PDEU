@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Generate password based on name
-        const name = (userData.name as string)?.split(' ')[0] || 'user';
+        const name = ((userData.name as string) || 'user').trim().split(/\s+/)[0];
         const password = generatePassword(name);
 
         // Send email with credentials

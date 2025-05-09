@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
-import { Download, FileText, Award, Presentation, Book } from 'lucide-react';
+import { Download, FileText, Award, Presentation, Book, Info } from 'lucide-react';
+import Image from 'next/image';
 
 const DocsFormatPage = () => {
   const documents = [
@@ -46,21 +47,6 @@ const DocsFormatPage = () => {
     window.open(filePath, '_blank');
   };
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const item = {
-    hidden: { y: 20, opacity: 0 },
-    show: { y: 0, opacity: 1 },
-  };
-
   return (
     <div className="p-4 md:p-6">
       <div className="mb-8">
@@ -97,6 +83,29 @@ const DocsFormatPage = () => {
         ))}
       </div>
 
+      {/* SDG Section */}
+      <div className="mt-10 rounded-xl border border-emerald-100 dark:border-emerald-800/30 bg-emerald-50 dark:bg-emerald-900/10 p-6">
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center space-x-2">
+            <Info className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Sustainable Development Goals</h3>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            CSSI projects align with the UN Sustainable Development Goals. Consider these goals when planning your
+            internship.
+          </p>
+          <div className="relative w-full h-64 md:h-80 mt-2 overflow-hidden rounded-lg">
+            <Image
+              src="/images/profiles/SDG.jpg"
+              alt="UN Sustainable Development Goals"
+              fill
+              style={{ objectFit: 'contain' }}
+              className="transition-all duration-300 hover:scale-105"
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="mt-10 rounded-xl border border-blue-100 dark:border-blue-800/30 bg-blue-50 dark:bg-blue-900/10 p-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
           <div>
@@ -106,7 +115,7 @@ const DocsFormatPage = () => {
             </p>
           </div>
           <a
-            href="/blog"
+            href="/guidelines"
             className="mt-4 md:mt-0 inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600"
           >
             View Guidelines

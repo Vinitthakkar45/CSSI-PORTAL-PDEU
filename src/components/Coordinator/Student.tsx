@@ -348,12 +348,12 @@ const StudentTable = () => {
                 >
                   NGO Name
                 </TableCell>
-                <TableCell
+                {/* <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
                   NGO Contact
-                </TableCell>
+                </TableCell> */}
                 <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
@@ -400,9 +400,9 @@ const StudentTable = () => {
                     <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                       {item.student.ngoName}
                     </TableCell>
-                    <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
+                    {/* <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                       {item.student.ngoPhone}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                       {item.student.ngoCity}
                     </TableCell>

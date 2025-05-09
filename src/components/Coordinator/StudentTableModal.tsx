@@ -60,7 +60,7 @@ export default function TableModal({ selectedStudent, isOpen, onClose, onCloseCr
               <Image
                 width={160}
                 height={160}
-                src="/images/user/DefaultProfile_light.png"
+                src="/images/user/DefaultProfile_Light.png"
                 // src={selectedStudent.profileImage ? selectedStudent.profileImage : ''}
                 alt={selectedStudent.name ? selectedStudent.name : ''}
               />

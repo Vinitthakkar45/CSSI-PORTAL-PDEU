@@ -31,7 +31,7 @@ const Contact = () => {
         toast.success('Message successfully submitted!');
         setFormData({ name: '', email: '', message: '' });
         setSubmitted(true);
-        setTimeout(() => setSubmitted(false), 10000);
+        setTimeout(() => setSubmitted(false), 30000);
       } else {
         toast.error('Something went wrong. Please try again.');
       }
@@ -118,7 +118,7 @@ const Contact = () => {
                           <span className="h-2 w-2 animate-bounce rounded-full bg-white"></span>
                         </span>
                       ) : submitted ? (
-                        'Submitted (try again after 10 secs)'
+                        'Submitted (try again after 30 secs)'
                       ) : (
                         'Submit Ticket'
                       )}
@@ -128,9 +128,6 @@ const Contact = () => {
               </form>
             </div>
           </div>
-          {/* <div className="w-full px-4 lg:w-5/12 xl:w-4/12">
-            <NewsLatterBox />
-          </div> */}
         </div>
       </div>
     </section>
