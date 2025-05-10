@@ -364,7 +364,7 @@ const StudentTable = () => {
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Status
+                  NGO Status
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -398,7 +398,7 @@ const StudentTable = () => {
                       {item.student.department}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
-                      {item.student.ngoName}
+                      {(item.student.ngoName && item.student.ngoName?.substring(0, 10) + '...') || 'N/A'}
                     </TableCell>
                     {/* <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                       {item.student.ngoPhone}

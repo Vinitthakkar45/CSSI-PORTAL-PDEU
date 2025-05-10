@@ -419,7 +419,7 @@ const StudentTable = () => {
                   NGO Location
                 </TableCell>
                 <TableCell isHeader className="py-3 px-4 w-32 md:w-40 text-gray-500 text-start dark:text-gray-400">
-                  Status
+                  NGO Status
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -444,7 +444,9 @@ const StudentTable = () => {
                     <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">
                       {item.student.department}
                     </TableCell>
-                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">{item.student.ngoName}</TableCell>
+                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">
+                      {(item.student.ngoName && item.student.ngoName?.substring(0, 10) + '...') || 'N/A'}
+                    </TableCell>
                     <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">
                       {item.student.ngoPhone}
                     </TableCell>
