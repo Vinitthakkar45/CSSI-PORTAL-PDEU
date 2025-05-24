@@ -2,10 +2,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
-import { student } from '@/drizzle/schema';
+import { faculty, student } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import LoadingOverlay from '../LoadingOverlay';
-import TableModal from './tableModal';
 import Button from '../Home/ui/button/Button';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -26,6 +25,8 @@ type StudentWithUser = {
     email: string | null;
     role: string | null;
   };
+  mentor: InferSelectModel<typeof faculty>;
+  evaluator: InferSelectModel<typeof faculty>;
 };
 
 // Cache key for localStorage
@@ -117,7 +118,6 @@ const StudentTable = () => {
       const res = await fetch('/api/admin/students');
       const data = await res.json();
 
-      // Update state with new data
       setStudents(data);
       setFilteredStudents(data);
 
@@ -225,6 +225,8 @@ const StudentTable = () => {
           'NGO Phone': item.student.ngoPhone,
           'Problem Definition': item.student.problemDefinition,
           'Proposed Solution': item.student.proposedSolution,
+          'Mentor Name': item.mentor?.name,
+          'Evaluator Name': item.evaluator?.name,
           'Internal Evaluation Marks': item.student.internal_evaluation_marks,
           'Final Evaluation Marks': item.student.final_evaluation_marks,
         };
