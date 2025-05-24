@@ -61,19 +61,19 @@ export default function EnrollmentChart() {
         <div style={{ minWidth: chartWidth + 80 }}>
           {loading ? (
             <div className="w-full max-w-5xl animate-pulse">
-              <div className="h-6 bg-gray-700 rounded w-48 mb-6 mx-auto" />
+              <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-48 mb-6 mx-auto" />
               <div className="flex justify-center gap-6">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="space-y-2">
-                    <div className="w-4 h-40 bg-gray-600 rounded mx-auto" />
-                    <div className="w-4 h-20 bg-gray-700 rounded mx-auto" />
-                    <div className="w-12 h-3 bg-gray-600 rounded mx-auto" />
+                    <div className="w-4 h-40 bg-gray-400 dark:bg-gray-600 rounded mx-auto" />
+                    <div className="w-4 h-20 bg-gray-300 dark:bg-gray-700 rounded mx-auto" />
+                    <div className="w-12 h-3 bg-gray-400 dark:bg-gray-600 rounded mx-auto" />
                   </div>
                 ))}
               </div>
               <div className="flex justify-center gap-4 mt-8">
-                <div className="w-20 h-4 bg-gray-700 rounded" />
-                <div className="w-20 h-4 bg-gray-700 rounded" />
+                <div className="w-20 h-4 bg-gray-300 dark:bg-gray-700 rounded" />
+                <div className="w-20 h-4 bg-gray-300 dark:bg-gray-700 rounded" />
               </div>
             </div>
           ) : (
@@ -85,7 +85,7 @@ export default function EnrollmentChart() {
                 x2={40}
                 y2={chartHeight + 10}
                 stroke="currentColor"
-                className="text-gray-300 dark:text-gray-700"
+                className="text-gray-400 dark:text-gray-700"
                 strokeWidth="2"
               />
               {/* X-axis */}
@@ -95,7 +95,7 @@ export default function EnrollmentChart() {
                 x2={chartWidth + 40}
                 y2={chartHeight + 10}
                 stroke="currentColor"
-                className="text-gray-300 dark:text-gray-700"
+                className="text-gray-400 dark:text-gray-700"
                 strokeWidth="2"
               />
 
@@ -115,13 +115,18 @@ export default function EnrollmentChart() {
                         x={x + barWidth}
                         y={chartHeight + 30}
                         textAnchor="middle"
-                        className="text-sm font-medium fill-gray-300"
+                        className="text-sm font-medium fill-black dark:fill-gray-300"
                       >
                         {dept}
                       </text>
 
                       {/* Total Label */}
-                      <text x={x + barWidth} y={chartHeight + 50} textAnchor="middle" className="text-xs fill-gray-500">
+                      <text
+                        x={x + barWidth}
+                        y={chartHeight + 50}
+                        textAnchor="middle"
+                        className="text-xs fill-gray-600 dark:fill-gray-500"
+                      >
                         Total: {total}
                       </text>
 
@@ -138,7 +143,7 @@ export default function EnrollmentChart() {
                         x={x + barWidth / 2}
                         y={chartHeight + 10 - activeHeight - 5}
                         textAnchor="middle"
-                        className="text-xs font-medium fill-white"
+                        className="text-xs font-medium fill-black dark:fill-white"
                       >
                         {data[department].active}
                       </text>
@@ -156,7 +161,7 @@ export default function EnrollmentChart() {
                         x={x + barWidth + barGap + barWidth / 2}
                         y={chartHeight + 10 - remainingHeight - 5}
                         textAnchor="middle"
-                        className="text-xs font-medium fill-white"
+                        className="text-xs font-medium  fill-black dark:fill-white"
                       >
                         {data[department].remaining}
                       </text>
@@ -175,10 +180,10 @@ export default function EnrollmentChart() {
                       x2={42}
                       y2={y}
                       stroke="currentColor"
-                      className="text-gray-300"
+                      className="text-gray-400 dark:text-gray-300"
                       strokeWidth="1"
                     />
-                    <text x={30} y={y + 4} textAnchor="end" className="text-xs fill-gray-500">
+                    <text x={30} y={y + 4} textAnchor="end" className="text-xs fill-gray-600 dark:fill-gray-500">
                       {Math.round(value)}
                     </text>
                   </g>
@@ -194,11 +199,11 @@ export default function EnrollmentChart() {
         <div className="flex justify-center items-center mt-4 gap-6">
           <div className="flex items-center">
             <div className="w-4 h-4 bg-indigo-500 rounded mr-2"></div>
-            <span className="text-sm text-gray-300">Enrolled</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">Enrolled</span>
           </div>
           <div className="flex items-center">
             <div className="w-4 h-4 bg-slate-400 rounded mr-2"></div>
-            <span className="text-sm text-gray-300">Not Enrolled</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">Not Enrolled</span>
           </div>
         </div>
       )}
