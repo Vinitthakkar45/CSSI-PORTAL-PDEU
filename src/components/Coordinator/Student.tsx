@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
-import { SelectStudent } from '@/drizzle/schema';
+import { faculty, SelectStudent } from '@/drizzle/schema';
 import { useSession } from 'next-auth/react';
 import Button from '../Home/ui/button/Button';
 import AddStudentModal from './AddStudentModal';
@@ -13,6 +13,7 @@ import { saveAs } from 'file-saver';
 import { Download } from 'lucide-react';
 import StudentModal from './Modal/StudentModal';
 import StudentTableSkeleton from './Skeletons/StudentTableSkele';
+import { InferSelectModel } from 'drizzle-orm';
 
 type StudentWithUser = {
   student: SelectStudent;
@@ -21,6 +22,8 @@ type StudentWithUser = {
     email: string | null;
     role: string | null;
   };
+  mentor: InferSelectModel<typeof faculty>;
+  evaluator: InferSelectModel<typeof faculty>;
 };
 
 // Helper function to get cache key for a specific coordinator
@@ -240,6 +243,8 @@ const StudentTable = () => {
           'NGO Phone': item.student.ngoPhone,
           'Problem Definition': item.student.problemDefinition,
           'Proposed Solution': item.student.proposedSolution,
+          'Mentor Name': item.mentor?.name || 'N/A',
+          'Evaluator Name': item.evaluator?.name || 'N/A',
           'Internal Evaluation Marks': item.student.internal_evaluation_marks,
           'Final Evaluation Marks': item.student.final_evaluation_marks,
         };
