@@ -41,7 +41,8 @@ export const getMentoredStudents = async (facultyId: string) => {
     .select({ student })
     .from(student)
     .innerJoin(user, eq(student.userId, user.id))
-    .where(inArray(student.id, ids));
+    .where(inArray(student.id, ids))
+    .orderBy(student.rollNumber);
 
   const students_data: SelectStudent[] = result.map((row) => row.student);
 
@@ -69,7 +70,8 @@ export const getEvaluatedStudents = async (facultyId: string) => {
     .select({ student })
     .from(student)
     .innerJoin(user, eq(student.userId, user.id))
-    .where(inArray(student.id, ids));
+    .where(inArray(student.id, ids))
+    .orderBy(student.rollNumber);
 
   const students_data: SelectStudent[] = result.map((row) => row.student);
 
