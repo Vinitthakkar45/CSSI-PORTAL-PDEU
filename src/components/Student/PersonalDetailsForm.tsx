@@ -4,6 +4,7 @@ import ComponentCard from '@/components/Home/common/ComponentCard';
 import Form from '@/components/Home/form/Form';
 import Input from '@/components/Home/form/input/InputField';
 import Button from '@/components/Home/ui/button/Button';
+import Select from '@/components/Home/form/Select';
 import { PersonalDetails, UserDetails } from '@/types/student';
 
 interface PersonalDetailsFormProps {
@@ -23,17 +24,40 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const departmentOptions = [
+    { value: 'BSC-DS', label: 'Bachelor of Science - Data Science (BSC-DS)' },
+    { value: 'CSE', label: 'Computer Science and Engineering (CSE)' },
+    { value: 'ICT', label: 'Information and Communication Technology (ICT)' },
+    { value: 'MECH', label: 'Mechanical Engineering (MECH)' },
+    { value: 'ECE', label: 'Electronics and Communication Engineering (ECE)' },
+    { value: 'CIVIL', label: 'Civil Engineering (CIVIL)' },
+    { value: 'CSBS', label: 'Computer Science and Business Systems (CSBS)' },
+  ];
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    // Clear error for the field being edited
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleDepartmentChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      department: value,
+    }));
+    if (errors.department) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.department;
         return newErrors;
       });
     }
@@ -113,14 +137,12 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
             {errors.groupNumber && <span className="text-red-500 text-sm">{errors.groupNumber}</span>}
           </div>
           <div className="w-full">
-            <Input
-              type="text"
-              name="department"
-              value={formData.department}
-              onChange={handleChange}
-              placeholder="Enter department"
-              error={errors.department}
-              required
+            <Select
+              options={departmentOptions}
+              placeholder="Select Department"
+              onChange={handleDepartmentChange}
+              defaultValue={formData.department}
+              className={errors.department ? 'border-red-500' : ''}
             />
             {errors.department && <span className="text-red-500 text-sm">{errors.department}</span>}
           </div>
