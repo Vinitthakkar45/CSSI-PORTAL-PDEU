@@ -13,6 +13,7 @@ import {
   BookOpenCheck,
   ScrollText,
   FileText,
+  Megaphone,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
@@ -43,6 +44,11 @@ const AppSidebar: React.FC = () => {
       name: 'Profile',
       path: '/home/profile',
       icon: <CircleUserRound size={22} />,
+    },
+    {
+      name: 'Announcements',
+      path: '/home/announcements',
+      icon: <Megaphone size={22} />,
     },
   ];
 
