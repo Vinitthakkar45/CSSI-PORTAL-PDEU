@@ -80,7 +80,7 @@ const StudentTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
-
+  const paginatedStudents = filteredStudents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   // Initialize from cache immediately
   useEffect(() => {
     const userId = session.data?.user?.id;
@@ -374,15 +374,15 @@ const StudentTable = () => {
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {filteredStudents.length > 0 ? (
-                filteredStudents.map((item, index) => (
+              {paginatedStudents.length > 0 ? (
+                paginatedStudents.map((item, index) => (
                   <TableRow
                     key={item.student.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                     onClick={() => handleCellClick(item)}
                   >
                     <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
-                      {index + 1}
+                      {(currentPage - 1) * itemsPerPage + index + 1}
                     </TableCell>
                     <TableCell className="py-3 px-4">
                       <div className="flex items-center gap-3">

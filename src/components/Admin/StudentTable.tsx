@@ -433,7 +433,9 @@ const StudentTable = () => {
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                     onClick={() => handleCellClick(item)}
                   >
-                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">{index + 1}</TableCell>
+                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </TableCell>
                     <TableCell className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <div>
