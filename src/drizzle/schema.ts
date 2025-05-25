@@ -1,4 +1,5 @@
 import { sql } from 'drizzle-orm';
+import { year } from 'drizzle-orm/mysql-core';
 import { integer, pgTable, serial, text, uuid } from 'drizzle-orm/pg-core';
 import { boolean } from 'drizzle-orm/pg-core';
 
@@ -125,6 +126,13 @@ export const stage = pgTable('stage', {
   stage: integer('stage').notNull(),
 });
 
+export const announcement = pgTable('announcement', {
+  id: serial('id').primaryKey(),
+  description: text('description').notNull(),
+  created_at: text('created_at').default(sql`(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')`),
+  year: text('year').notNull(),
+});
+
 export type InsertUser = typeof user.$inferInsert;
 export type SelectUser = typeof user.$inferSelect;
 export type InsertStudent = typeof student.$inferInsert;
@@ -138,3 +146,5 @@ export type SelectEvaluatorStudent = typeof evaluatorStudent.$inferSelect;
 export type InsertStage = typeof stage.$inferInsert;
 export type SelectStage = typeof stage.$inferSelect;
 export type SessionUser = typeof sessionuser.$inferSelect;
+export type InsertAnnouncement = typeof announcement.$inferInsert;
+export type SelectAnnouncement = typeof announcement.$inferSelect;

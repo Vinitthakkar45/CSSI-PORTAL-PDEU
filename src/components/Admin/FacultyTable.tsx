@@ -340,7 +340,7 @@ export default function FacultyTable() {
                       }}
                     >
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                        {index + 1}
+                        {(currentPage - 1) * itemsPerPage + index + 1}
                       </TableCell>
                       <TableCell className="py-3 px-4 truncate">
                         <div className="flex items-center gap-3">
