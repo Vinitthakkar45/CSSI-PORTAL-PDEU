@@ -47,8 +47,6 @@ export default function StudentModal({
   const [declineReason, setDeclineReason] = useState('');
   const [isDeclining, setIsDeclining] = useState(false);
   const [showDeclineInput, setShowDeclineInput] = useState(false);
-  const [mentorname, setMentorName] = useState('');
-  const [evalname, setEvalName] = useState('');
   const [marks, setMarks] = useState({
     posterOrganization: 0,
     dayToDayActivity: 0,
@@ -258,29 +256,6 @@ export default function StudentModal({
       setIsDeclining(false);
     }
   };
-  useEffect(() => {
-    async function fetchMentorAndEvaluator() {
-      if (!selectedStudent || !session?.user?.id) return;
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/mentorandevaluator`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: selectedStudent.student.userId,
-          }),
-        });
-        const data = await response.json();
-        setMentorName(data.mentorname?.name ?? 'Not assigned');
-        setEvalName(data.evalname?.name ?? 'Not assigned');
-      } catch (err) {
-        toast.error('issue while fetching');
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchMentorAndEvaluator();
-  }, []);
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-5 lg:p-10">
       {loading ? (
