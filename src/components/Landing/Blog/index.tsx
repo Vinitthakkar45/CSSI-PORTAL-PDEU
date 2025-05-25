@@ -247,7 +247,7 @@ const GuidelinesContent = () => {
             <li className="mb-2">To inspire young technocrats to become change makers</li>
           </ul>
           <p className="p-4 mt-6 text-base italic font-medium leading-relaxed bg-yellow-50 dark:bg-gray-800/50 border-l-4 border-yellow-400 rounded-r-lg text-gray-800 dark:text-yellow-300">
-            **CSSI (Course Code: 20TP110) is a mandatory course of 1 credit to be cleared by all the students for
+            CSSI (Course Code: 20TP110) is a mandatory course of 1 credit to be cleared by all the students for
             progression to higher semesters as per the academic rules.
           </p>
         </div>

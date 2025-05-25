@@ -69,7 +69,7 @@ export default function FacultyTableModal({ selectedFaculty, isOpen, onClose, se
         <br />
         <div className="flex justify-center gap-20 mb-5">
           <div className="w-40 h-40 overflow-hidden rounded-full">
-            <Image width={160} height={160} src="/images/user/DefaultProfile_light.png" alt={formData.name} />
+            <Image width={160} height={160} src="/images/user/DefaultProfile_Light.png" alt={formData.name} />
           </div>
           <div className="flex flex-col justify-center">
             <div className="mb-4">

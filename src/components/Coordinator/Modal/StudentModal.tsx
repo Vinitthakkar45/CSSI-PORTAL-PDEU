@@ -5,12 +5,13 @@ import Label from '@/components/Home/form/Label';
 import Input from '@/components/Home/form/input/InputField';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { SelectStudent } from '@/drizzle/schema';
+import { faculty, SelectStudent } from '@/drizzle/schema';
 import { ExternalLink } from 'lucide-react';
 import { z } from 'zod';
 import { useSession } from 'next-auth/react';
 import { toast } from '@/components/Home/ui/toast/Toast';
 import StudentModalSkele from '@/components/Coordinator/Skeletons/StudentModalSkele';
+import { InferSelectModel } from 'drizzle-orm';
 type StudentWithUser = {
   student: SelectStudent;
   user: {
@@ -18,6 +19,8 @@ type StudentWithUser = {
     email: string | null;
     role: string | null;
   };
+  mentor: InferSelectModel<typeof faculty>;
+  evaluator: InferSelectModel<typeof faculty>;
 };
 
 export default function StudentModal({
@@ -44,8 +47,6 @@ export default function StudentModal({
   const [declineReason, setDeclineReason] = useState('');
   const [isDeclining, setIsDeclining] = useState(false);
   const [showDeclineInput, setShowDeclineInput] = useState(false);
-  const [mentorname, setMentorName] = useState('');
-  const [evalname, setEvalName] = useState('');
   const [marks, setMarks] = useState({
     posterOrganization: 0,
     dayToDayActivity: 0,
@@ -255,29 +256,6 @@ export default function StudentModal({
       setIsDeclining(false);
     }
   };
-  useEffect(() => {
-    async function fetchMentorAndEvaluator() {
-      if (!selectedStudent || !session?.user?.id) return;
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/mentorandevaluator`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: selectedStudent.student.userId,
-          }),
-        });
-        const data = await response.json();
-        setMentorName(data.mentorname?.name ?? 'Not assigned');
-        setEvalName(data.evalname?.name ?? 'Not assigned');
-      } catch (err) {
-        toast.error('issue while fetching');
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchMentorAndEvaluator();
-  }, []);
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-5 lg:p-10">
       {loading ? (
@@ -391,11 +369,11 @@ export default function StudentModal({
                 <div className="grid grid-cols-2 gap-6 mb-4">
                   <div>
                     <Label>Mentor</Label>
-                    <Input type="text" value={mentorname} disabled />
+                    <Input type="text" value={selectedStudent.mentor?.name || 'N/A'} disabled />
                   </div>
                   <div>
                     <Label>Evaluator</Label>
-                    <Input type="text" value={evalname} disabled />
+                    <Input type="text" value={selectedStudent.evaluator?.name || 'N/A'} disabled />
                   </div>
                 </div>
               </div>

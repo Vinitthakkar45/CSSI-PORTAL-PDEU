@@ -10,7 +10,6 @@ import AddFacultyModal from './AddFacultyModal';
 import { Modal } from '@/components/Home/ui/modal';
 import { useModal } from '@/hooks/useModal';
 import UploadExcel from '@/components/UploadExcel';
-import LoadingOverlay from '../LoadingOverlay';
 import { toast } from '@/components/Home/ui/toast/Toast';
 import FacultyTableSkeleton from './skeletons/FacultyTableSkele';
 
@@ -318,13 +317,13 @@ export default function FacultyTable() {
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Mentor Status
+                  Mentor
                 </TableCell>
                 <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Evaluator Status
+                  Evaluator
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -341,7 +340,7 @@ export default function FacultyTable() {
                       }}
                     >
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                        {index + 1}
+                        {(currentPage - 1) * itemsPerPage + index + 1}
                       </TableCell>
                       <TableCell className="py-3 px-4 truncate">
                         <div className="flex items-center gap-3">
@@ -359,12 +358,13 @@ export default function FacultyTable() {
                         {item.faculty.department || 'N/A'}
                       </TableCell>
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                        {item.faculty.sitting || 'N/A'}
+                        {(item.faculty.sitting?.substring(0, 10) && item.faculty.sitting?.substring(0, 10) + '...') ||
+                          'N/A'}
                       </TableCell>
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                         {item.faculty.freeTimeSlots && item.faculty.freeTimeSlots.length > 0
-                          ? item.faculty.freeTimeSlots.join(', ')
-                          : 'Not specified'}
+                          ? item.faculty.freeTimeSlots.join(', ').substring(0, 10) + '...'
+                          : 'N/A'}
                       </TableCell>
                       <TableCell className="py-3  px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                         <Badge

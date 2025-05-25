@@ -225,25 +225,25 @@ const FacultyTable = () => {
                   isHeader
                   className="py-3 px-4 w-32 md:w-40  whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Sitting Location
+                  Sitting
                 </TableCell>
                 <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Available Time Slots
+                  Free Slots
                 </TableCell>
                 <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Mentor Status
+                  Mentor
                 </TableCell>
                 <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Evaluator Status
+                  Evaluator
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -275,15 +275,16 @@ const FacultyTable = () => {
                         {item.user.email}
                       </TableCell>
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                        {item.faculty.department || 'Not Assigned'}
+                        {item.faculty.department || 'N/A'}
                       </TableCell>
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
-                        {item.faculty.sitting || 'Not Assigned'}
+                        {(item.faculty.sitting?.substring(0, 10) && item.faculty.sitting?.substring(0, 10) + '...') ||
+                          'N/A'}
                       </TableCell>
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                         {item.faculty.freeTimeSlots && item.faculty.freeTimeSlots.length > 0
-                          ? item.faculty.freeTimeSlots.join(', ')
-                          : 'No time slots available'}
+                          ? item.faculty.freeTimeSlots.join(', ').substring(0, 10) + '...'
+                          : 'N/A'}
                       </TableCell>
                       <TableCell className="py-3  px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                         <Badge

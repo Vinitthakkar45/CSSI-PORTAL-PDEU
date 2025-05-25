@@ -2,10 +2,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
-import { student } from '@/drizzle/schema';
+import { faculty, student } from '@/drizzle/schema';
 import { InferSelectModel } from 'drizzle-orm';
 import LoadingOverlay from '../LoadingOverlay';
-import TableModal from './tableModal';
 import Button from '../Home/ui/button/Button';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -26,6 +25,8 @@ type StudentWithUser = {
     email: string | null;
     role: string | null;
   };
+  mentor: InferSelectModel<typeof faculty>;
+  evaluator: InferSelectModel<typeof faculty>;
 };
 
 // Cache key for localStorage
@@ -117,7 +118,6 @@ const StudentTable = () => {
       const res = await fetch('/api/admin/students');
       const data = await res.json();
 
-      // Update state with new data
       setStudents(data);
       setFilteredStudents(data);
 
@@ -225,6 +225,8 @@ const StudentTable = () => {
           'NGO Phone': item.student.ngoPhone,
           'Problem Definition': item.student.problemDefinition,
           'Proposed Solution': item.student.proposedSolution,
+          'Mentor Name': item.mentor?.name,
+          'Evaluator Name': item.evaluator?.name,
           'Internal Evaluation Marks': item.student.internal_evaluation_marks,
           'Final Evaluation Marks': item.student.final_evaluation_marks,
         };
@@ -419,7 +421,7 @@ const StudentTable = () => {
                   NGO Location
                 </TableCell>
                 <TableCell isHeader className="py-3 px-4 w-32 md:w-40 text-gray-500 text-start dark:text-gray-400">
-                  Status
+                  NGO Status
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -431,7 +433,9 @@ const StudentTable = () => {
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                     onClick={() => handleCellClick(item)}
                   >
-                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">{index + 1}</TableCell>
+                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </TableCell>
                     <TableCell className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <div>
@@ -444,7 +448,9 @@ const StudentTable = () => {
                     <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">
                       {item.student.department}
                     </TableCell>
-                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">{item.student.ngoName}</TableCell>
+                    <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">
+                      {(item.student.ngoName && item.student.ngoName?.substring(0, 10) + '...') || 'N/A'}
+                    </TableCell>
                     <TableCell className="py-3 px-4 text-gray-500 dark:text-gray-400">
                       {item.student.ngoPhone}
                     </TableCell>

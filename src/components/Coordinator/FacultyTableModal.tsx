@@ -27,7 +27,7 @@ export default function FacultyTableModal({ selectedFaculty, isOpen, onClose, on
               width={160}
               height={160}
               // src={selectedStudent.profileImage ? selectedStudent.profileImage : ''}
-              src="/images/user/DefaultProfile_light.png"
+              src="/images/user/DefaultProfile_Light.png"
               alt={selectedFaculty.name ? selectedFaculty.name : ''}
             />
           </div>

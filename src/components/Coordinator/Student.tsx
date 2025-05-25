@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from './Table';
 import Badge from '../Home/ui/badge/Badge';
-import { SelectStudent } from '@/drizzle/schema';
+import { faculty, SelectStudent } from '@/drizzle/schema';
 import { useSession } from 'next-auth/react';
 import Button from '../Home/ui/button/Button';
 import AddStudentModal from './AddStudentModal';
@@ -13,6 +13,7 @@ import { saveAs } from 'file-saver';
 import { Download } from 'lucide-react';
 import StudentModal from './Modal/StudentModal';
 import StudentTableSkeleton from './Skeletons/StudentTableSkele';
+import { InferSelectModel } from 'drizzle-orm';
 
 type StudentWithUser = {
   student: SelectStudent;
@@ -21,6 +22,8 @@ type StudentWithUser = {
     email: string | null;
     role: string | null;
   };
+  mentor: InferSelectModel<typeof faculty>;
+  evaluator: InferSelectModel<typeof faculty>;
 };
 
 // Helper function to get cache key for a specific coordinator
@@ -77,7 +80,7 @@ const StudentTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
-
+  const paginatedStudents = filteredStudents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   // Initialize from cache immediately
   useEffect(() => {
     const userId = session.data?.user?.id;
@@ -240,6 +243,8 @@ const StudentTable = () => {
           'NGO Phone': item.student.ngoPhone,
           'Problem Definition': item.student.problemDefinition,
           'Proposed Solution': item.student.proposedSolution,
+          'Mentor Name': item.mentor?.name || 'N/A',
+          'Evaluator Name': item.evaluator?.name || 'N/A',
           'Internal Evaluation Marks': item.student.internal_evaluation_marks,
           'Final Evaluation Marks': item.student.final_evaluation_marks,
         };
@@ -348,12 +353,12 @@ const StudentTable = () => {
                 >
                   NGO Name
                 </TableCell>
-                <TableCell
+                {/* <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
                   NGO Contact
-                </TableCell>
+                </TableCell> */}
                 <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
@@ -364,20 +369,20 @@ const StudentTable = () => {
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Status
+                  NGO Status
                 </TableCell>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {filteredStudents.length > 0 ? (
-                filteredStudents.map((item, index) => (
+              {paginatedStudents.length > 0 ? (
+                paginatedStudents.map((item, index) => (
                   <TableRow
                     key={item.student.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                     onClick={() => handleCellClick(item)}
                   >
                     <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
-                      {index + 1}
+                      {(currentPage - 1) * itemsPerPage + index + 1}
                     </TableCell>
                     <TableCell className="py-3 px-4">
                       <div className="flex items-center gap-3">
@@ -398,11 +403,11 @@ const StudentTable = () => {
                       {item.student.department}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
-                      {item.student.ngoName}
+                      {(item.student.ngoName && item.student.ngoName?.substring(0, 10) + '...') || 'N/A'}
                     </TableCell>
-                    <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
+                    {/* <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                       {item.student.ngoPhone}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell className="py-3 px-4 text-gray-500 text-theme-sm dark:text-gray-400 truncate">
                       {item.student.ngoCity}
                     </TableCell>

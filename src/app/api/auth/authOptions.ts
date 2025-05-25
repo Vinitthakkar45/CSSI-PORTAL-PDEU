@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/drizzle/db';
 import { eq } from 'drizzle-orm';
 import { user } from '@/drizzle/schema';
+import { sql } from 'drizzle-orm';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,7 +18,12 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const fetchedUsers = await db.select().from(user).where(eq(user.email, credentials.email)).limit(1);
+        const normalizedEmail = credentials.email.toLowerCase();
+        const fetchedUsers = await db
+          .select()
+          .from(user)
+          .where(eq(sql`LOWER(${user.email})`, normalizedEmail))
+          .limit(1);
         const fetchedUser = fetchedUsers[0];
 
         if (!fetchedUser || !(credentials.password === fetchedUser.password)) {
