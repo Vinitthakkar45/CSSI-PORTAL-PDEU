@@ -68,7 +68,8 @@ async function sendBulkMails(rec: string[], subject: string, bodyTemplate: strin
 
 export async function POST(req: NextRequest) {
   try {
-    const { stage } = await req.json();
+    let { stage } = await req.json();
+    stage = stage + 1;
     console.log(`Processing stage change to stage ${stage}`);
 
     // Get email templates for all user types
@@ -84,7 +85,6 @@ export async function POST(req: NextRequest) {
     const facultyEmails = usersMail.filter((user) => user.role === 'faculty').map((user) => user.email);
     const studentEmails = usersMail.filter((user) => user.role === 'student').map((user) => user.email);
     const adminEmails = usersMail.filter((user) => user.role === 'admin').map((user) => user.email);
-
     await Promise.all([
       sendBulkMails(
         facultyEmails,
