@@ -25,13 +25,13 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const departmentOptions = [
-    { value: 'BSC-DS', label: 'Bachelor of Science - Data Science (BSC-DS)' },
-    { value: 'CSE', label: 'Computer Science and Engineering (CSE)' },
-    { value: 'ICT', label: 'Information and Communication Technology (ICT)' },
-    { value: 'MECH', label: 'Mechanical Engineering (MECH)' },
-    { value: 'ECE', label: 'Electronics and Communication Engineering (ECE)' },
-    { value: 'CIVIL', label: 'Civil Engineering (CIVIL)' },
-    { value: 'CSBS', label: 'Computer Science and Business Systems (CSBS)' },
+    { value: 'BSC-DS', label: 'Bachelor of Science - Data Science (BSC-DS)', disabled: true },
+    { value: 'CSE', label: 'Computer Science and Engineering (CSE)', disabled: true },
+    { value: 'ICT', label: 'Information and Communication Technology (ICT)', disabled: true },
+    { value: 'MECH', label: 'Mechanical Engineering (MECH)', disabled: true },
+    { value: 'ECE', label: 'Electronics and Communication Engineering (ECE)', disabled: true },
+    { value: 'CIVIL', label: 'Civil Engineering (CIVIL)', disabled: true },
+    { value: 'CSBS', label: 'Computer Science and Business Systems (CSBS)', disabled: true },
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,6 +97,7 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
               placeholder="Enter full name"
               error={errors.name}
               required
+              disabled
             />
             {errors.name && <span className="text-red-500 text-sm">{errors.name}</span>}
           </div>
@@ -109,6 +110,7 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
               placeholder="Enter roll number"
               error={errors.rollNumber}
               required
+              disabled
             />
             {errors.rollNumber && <span className="text-red-500 text-sm">{errors.rollNumber}</span>}
           </div>
@@ -121,6 +123,7 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
               placeholder="Enter division"
               error={errors.division}
               required
+              disabled
             />
             {errors.division && <span className="text-red-500 text-sm">{errors.division}</span>}
           </div>
@@ -133,17 +136,28 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
               placeholder="Enter group number"
               error={errors.groupNumber}
               required
+              disabled
             />
             {errors.groupNumber && <span className="text-red-500 text-sm">{errors.groupNumber}</span>}
           </div>
           <div className="w-full">
-            <Select
+            <Input
+              type="text"
+              name="groupNumber"
+              value={formData.department}
+              onChange={handleChange}
+              placeholder="Enter group number"
+              error={errors.department}
+              required
+              disabled
+            />
+            {/* <Select
               options={departmentOptions}
               placeholder="Select Department"
               onChange={handleDepartmentChange}
               defaultValue={formData.department}
               className={errors.department ? 'border-red-500' : ''}
-            />
+            /> */}
             {errors.department && <span className="text-red-500 text-sm">{errors.department}</span>}
           </div>
           <div className="w-full">
