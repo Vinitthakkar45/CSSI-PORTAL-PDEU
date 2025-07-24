@@ -281,6 +281,7 @@ const Dashboard = () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Student Evaluators');
 
       XLSX.writeFile(workbook, 'evaluator_list.xlsx');
+      toast.success('Excel sheet downloaded successfully');
     } catch (err) {
       console.error('Failed to generate Excel:', err);
     }
