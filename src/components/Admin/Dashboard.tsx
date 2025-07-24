@@ -9,6 +9,8 @@ import Button from '../Home/ui/button/Button';
 import { InfoModal } from '../ConfirmationModals';
 import DashboardSkeleton from './skeletons/DashBoardSkele';
 import { toast } from '../Home/ui/toast/Toast';
+import { Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 type StageStatus = 'locked' | 'current' | 'completed';
 
 interface CountData {
@@ -17,6 +19,17 @@ interface CountData {
   mentors: number;
   evaluators: number;
 }
+
+type Student = {
+  rollNumber: string | null;
+  department: string | null;
+};
+
+type Faculty = {
+  name: string;
+  department: string;
+  students: Student[];
+};
 
 const Dashboard = () => {
   const { data: _session, status: _status } = useSession({
@@ -237,6 +250,42 @@ const Dashboard = () => {
     return 'locked';
   };
 
+  const handleEvaluatorExcelDownload = async () => {
+    try {
+      const res = await fetch('/api/admin/getEvaluatorExcel');
+
+      if (!res.ok) throw new Error('Failed to fetch evaluator data');
+
+      const data: Faculty[] = await res.json();
+
+      const rows: {
+        'Faculty Name': string;
+        'Faculty Department': string;
+        'Student Roll Number': string | null;
+        'Student Department': string | null;
+      }[] = [];
+
+      data.forEach((faculty) => {
+        faculty.students.forEach((student, index) => {
+          rows.push({
+            'Faculty Name': index === 0 ? faculty.name : '',
+            'Faculty Department': index === 0 ? faculty.department : '',
+            'Student Roll Number': student.rollNumber,
+            'Student Department': student.department,
+          });
+        });
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Student Evaluators');
+
+      XLSX.writeFile(workbook, 'evaluator_list.xlsx');
+    } catch (err) {
+      console.error('Failed to generate Excel:', err);
+    }
+  };
+
   return (
     <>
       {isLoading ? (
@@ -336,6 +385,9 @@ const Dashboard = () => {
               Assign Evaluator
             </Button>
           </div>
+          <Button size="md" variant="outline" className="mr-4 mt-4" onClick={handleEvaluatorExcelDownload}>
+            <Download /> Evaluator Excel
+          </Button>
         </>
       )}
     </>
