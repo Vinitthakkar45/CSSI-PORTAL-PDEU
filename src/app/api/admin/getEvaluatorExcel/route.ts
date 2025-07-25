@@ -42,10 +42,12 @@ export async function GET() {
     }
 
     const sorted = Object.values(grouped).sort((a, b) => {
-      if (a.department !== b.department) {
-        return a.department.localeCompare(b.department);
-      }
-      return a.name.localeCompare(b.name);
+      // Get the first (lowest) roll number from each faculty's students
+      const rollA = a.students.length > 0 ? (a.students[0]?.rollNumber ?? '') : '';
+      const rollB = b.students.length > 0 ? (b.students[0]?.rollNumber ?? '') : '';
+
+      // Sort by the lowest roll number in each faculty group
+      return rollA.localeCompare(rollB);
     });
 
     return new Response(JSON.stringify(sorted), {
