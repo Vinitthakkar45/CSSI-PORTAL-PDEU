@@ -64,6 +64,13 @@
       "when": 1748196865962,
       "tag": "0008_good_trish_tilby",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1753613648551,
+      "tag": "0009_sour_hellcat",
+      "breakpoints": true
     }
   ]
 }
