@@ -133,6 +133,64 @@ export const announcement = pgTable('announcement', {
   year: text('year').notNull(),
 });
 
+export const feedback = pgTable('feedback', {
+  id: serial('id').primaryKey(),
+  userId: uuid('user_id')
+    .notNull()
+    .unique()
+    .references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
+
+  // Section A: Info
+  internshipDurationWeeks: integer('internship_duration_weeks'),
+  internshipLocation: text('internship_location'), // Rural / Urban / Semi-Urban
+
+  // Section B: Civic Awareness (Scale: 1-5)
+  civicResponsibility: integer('civic_responsibility'),
+  societalAwareness: integer('societal_awareness'),
+  engineeringToSociety: integer('engineering_to_society'),
+  socialResponsibility: integer('social_responsibility'),
+  ngoUnderstanding: integer('ngo_understanding'),
+
+  // Section C: Problem Solving (Scale: 1-5)
+  problemIdentification: integer('problem_identification'),
+  analyticalThinking: integer('analytical_thinking'),
+  toolApplication: integer('tool_application'),
+  incompleteDataHandling: integer('incomplete_data_handling'),
+  collaborationSkills: integer('collaboration_skills'),
+
+  // Section D: Personal & Professional Dev. (Scale: 1-5)
+  communicationSkills: integer('communication_skills'),
+  confidenceDiversity: integer('confidence_diversity'),
+  timeManagement: integer('time_management'),
+  careerInfluence: integer('career_influence'),
+  initiativeConfidence: integer('initiative_confidence'),
+
+  // Section E: Technical Integration
+  usedDataForms: boolean('used_data_forms').default(false),
+  usedSpreadsheets: boolean('used_spreadsheets').default(false),
+  usedMobileApps: boolean('used_mobile_apps').default(false),
+  usedProgrammingTools: boolean('used_programming_tools').default(false),
+  programmingToolsName: text('programming_tools_name'),
+  usedIoTDevices: boolean('used_iot_devices').default(false),
+  noneOfAbove: boolean('none_of_above').default(false),
+  academicHelpfulness: text('academic_helpfulness'), // Yes / No / Partially
+  academicHelpExplanation: text('academic_help_explanation'),
+
+  // Section F: Reflection
+  realWorldProblem: text('real_world_problem'),
+  problemSolution: text('problem_solution'),
+
+  // Section G: Future Engagement
+  futureEngagement: text('future_engagement'), // Yes / No / Maybe
+  recommendInternship: text('recommend_internship'), // Yes / No
+  recommendationReason: text('recommendation_reason'),
+
+  submittedAt: text('submitted_at').default(sql`(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')`),
+});
+
+export type InsertFeedback = typeof feedback.$inferInsert;
+export type SelectFeedback = typeof feedback.$inferSelect;
+
 export type InsertUser = typeof user.$inferInsert;
 export type SelectUser = typeof user.$inferSelect;
 export type InsertStudent = typeof student.$inferInsert;
