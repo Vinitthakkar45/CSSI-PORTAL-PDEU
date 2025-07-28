@@ -16,6 +16,7 @@ export default function MultiStepForm({ onComplete }: { onComplete: () => void }
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
   const userId = session?.user?.id;
+  const [studentId, setStudentId] = useState<string | null>(null);
 
   const filterSensitiveData = (data: Record<string, unknown>) => {
     const allowedFields = [
