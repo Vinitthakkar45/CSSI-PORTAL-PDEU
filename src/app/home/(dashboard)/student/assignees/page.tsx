@@ -9,8 +9,8 @@ type Faculty = {
   userId: string;
   name: string;
   department: string;
-  sitting: string;
-  freeTimeSlots: string[];
+  // sitting: string;
+  // freeTimeSlots: string[];
   email: string;
   contactNumber: string;
   profileImage?: string;
@@ -184,7 +184,7 @@ export default function AssigneesPage() {
                 </div>
               )}
 
-              {faculty.sitting && (
+              {/* {faculty.sitting && (
                 <div className="flex items-start gap-2">
                   <MapPin className="mt-0.5 h-4 w-4 text-gray-400 dark:text-gray-500" />
                   <div>
@@ -192,9 +192,9 @@ export default function AssigneesPage() {
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{faculty.sitting}</p>
                   </div>
                 </div>
-              )}
+              )} */}
 
-              {faculty.freeTimeSlots && faculty.freeTimeSlots.length > 0 && (
+              {/* {faculty.freeTimeSlots && faculty.freeTimeSlots.length > 0 && (
                 <div className="md:col-span-2">
                   <p className="mb-2 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
                     Available Time Slots
@@ -211,7 +211,7 @@ export default function AssigneesPage() {
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>
