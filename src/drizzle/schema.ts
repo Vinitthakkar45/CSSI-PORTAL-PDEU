@@ -83,6 +83,11 @@ export const student = pgTable('student', {
 
   // QnA
   qnaMarks: integer('qna_marks'),
+
+  // Absent During Evaluation
+
+  Absent_Mentor_Evaluation: boolean('absent_mentor_evaluation').default(false),
+  Absent_Evaluator_Evaluation: boolean('absent_evaluator_evaluation').default(false),
 });
 
 export const faculty = pgTable('faculty', {

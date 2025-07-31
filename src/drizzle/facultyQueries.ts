@@ -82,59 +82,77 @@ export const getEvaluatedStudents = async (facultyId: string) => {
   return students_data;
 };
 
-export const updateInternalMarks = async (studentId: number, marks: MarksType) => {
-  const total_marks =
-    marks.posterOrganization +
-    marks.dayToDayActivity +
-    marks.contributionToWork +
-    marks.learningOutcomes +
-    marks.geoTagPhotos +
-    marks.reportOrganization +
-    marks.certificate;
-  if (total_marks >= 50) {
-    return { success: false, message: 'Total marks cannot exceed 50' };
-  }
-  await db
-    .update(student)
-    .set({
-      posterOrganization: marks.posterOrganization,
-      dayToDayActivity: marks.dayToDayActivity,
-      contributionToWork: marks.contributionToWork,
-      learningOutcomes: marks.learningOutcomes,
-      geotagPhotos: marks.geoTagPhotos,
-      reportOrganization: marks.reportOrganization,
-      hardCopyCertificate: marks.certificate,
-      internal_evaluation_marks: total_marks,
-    })
-    .where(eq(student.id, studentId));
+export const updateInternalMarks = async (studentId: number, marks: MarksType, isAbsent: boolean = false) => {
+  try {
+    const total_marks = isAbsent
+      ? 0
+      : marks.posterOrganization +
+        marks.dayToDayActivity +
+        marks.contributionToWork +
+        marks.learningOutcomes +
+        marks.geoTagPhotos +
+        marks.reportOrganization +
+        marks.certificate;
 
-  return { success: true };
+    if (!isAbsent && total_marks > 50) {
+      return { success: false, message: 'Total marks cannot exceed 50' };
+    }
+
+    await db
+      .update(student)
+      .set({
+        posterOrganization: isAbsent ? 0 : marks.posterOrganization,
+        dayToDayActivity: isAbsent ? 0 : marks.dayToDayActivity,
+        contributionToWork: isAbsent ? 0 : marks.contributionToWork,
+        learningOutcomes: isAbsent ? 0 : marks.learningOutcomes,
+        geotagPhotos: isAbsent ? 0 : marks.geoTagPhotos,
+        reportOrganization: isAbsent ? 0 : marks.reportOrganization,
+        hardCopyCertificate: isAbsent ? 0 : marks.certificate,
+        internal_evaluation_marks: total_marks,
+        Absent_Mentor_Evaluation: isAbsent,
+      })
+      .where(eq(student.id, studentId));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating internal marks:', error);
+    throw error;
+  }
 };
 
-export const updateFinalMarks = async (studentId: number, marks: MarksType) => {
-  const total_marks =
-    marks.learningExplanation +
-    marks.problemIdentification +
-    marks.contributionExplanation +
-    marks.proposedSolution +
-    marks.presentationSkills +
-    marks.qnaViva;
-  if (total_marks >= 50) {
-    return { success: false, message: 'Total marks cannot exceed 50' };
-  }
+export const updateFinalMarks = async (studentId: number, marks: MarksType, isAbsent: boolean = false) => {
+  try {
+    const total_marks = isAbsent
+      ? 0
+      : marks.learningExplanation +
+        marks.problemIdentification +
+        marks.contributionExplanation +
+        marks.proposedSolution +
+        marks.presentationSkills +
+        marks.qnaViva;
 
-  await db
-    .update(student)
-    .set({
-      learningExplanation: marks.learningExplanation,
-      problemIndentification: marks.problemIdentification,
-      contributionExplanation: marks.contributionExplanation,
-      proposedSolutionExplanation: marks.proposedSolution,
-      presentationSkill: marks.presentationSkills,
-      qnaMarks: marks.qnaViva,
-    })
-    .where(eq(student.id, studentId));
-  return { success: true };
+    if (!isAbsent && total_marks > 50) {
+      return { success: false, message: 'Total marks cannot exceed 50' };
+    }
+
+    await db
+      .update(student)
+      .set({
+        learningExplanation: isAbsent ? 0 : marks.learningExplanation,
+        problemIndentification: isAbsent ? 0 : marks.problemIdentification,
+        contributionExplanation: isAbsent ? 0 : marks.contributionExplanation,
+        proposedSolutionExplanation: isAbsent ? 0 : marks.proposedSolution,
+        presentationSkill: isAbsent ? 0 : marks.presentationSkills,
+        qnaMarks: isAbsent ? 0 : marks.qnaViva,
+        Absent_Evaluator_Evaluation: isAbsent,
+      })
+      .where(eq(student.id, studentId));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating final marks:', error);
+    throw error;
+  }
 };
 
 export const checkAdmin = async (facultyId: string) => {
