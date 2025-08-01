@@ -47,6 +47,8 @@ export default function StudentModal({
   const [declineReason, setDeclineReason] = useState('');
   const [isDeclining, setIsDeclining] = useState(false);
   const [showDeclineInput, setShowDeclineInput] = useState(false);
+  const [isAbsentMentor, setIsAbsentMentor] = useState(false);
+  const [isAbsentEvaluator, setIsAbsentEvaluator] = useState(false);
   const [marks, setMarks] = useState({
     posterOrganization: 0,
     dayToDayActivity: 0,
@@ -62,6 +64,23 @@ export default function StudentModal({
     presentationSkills: 0,
     qnaViva: 0,
   });
+
+  const [hasBeenSet, setHasBeenSet] = useState({
+    posterOrganization: false,
+    dayToDayActivity: false,
+    contributionToWork: false,
+    learningOutcomes: false,
+    geoTagPhotos: false,
+    reportOrganization: false,
+    certificate: false,
+    learningExplanation: false,
+    problemIdentification: false,
+    contributionExplanation: false,
+    proposedSolution: false,
+    presentationSkills: false,
+    qnaViva: false,
+  });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [reportUrl, setReportUrl] = useState('');
   const [certificateUrl, setCertificateUrl] = useState('');
@@ -87,6 +106,10 @@ export default function StudentModal({
         `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Report/${selectedStudent.student.userId}.pdf`
       );
 
+      // Set absent status for both mentor and evaluator
+      setIsAbsentMentor(selectedStudent.student.Absent_Mentor_Evaluation || false);
+      setIsAbsentEvaluator(selectedStudent.student.Absent_Evaluator_Evaluation || false);
+
       setMarks({
         posterOrganization: selectedStudent.student.posterOrganization || 0,
         dayToDayActivity: selectedStudent.student.dayToDayActivity || 0,
@@ -101,6 +124,43 @@ export default function StudentModal({
         proposedSolution: selectedStudent.student.proposedSolutionExplanation || 0,
         presentationSkills: selectedStudent.student.presentationSkill || 0,
         qnaViva: selectedStudent.student.qnaMarks || 0,
+      });
+
+      // Set hasBeenSet flags - true if the value exists and is not null/undefined
+      setHasBeenSet({
+        posterOrganization:
+          selectedStudent.student.posterOrganization !== null &&
+          selectedStudent.student.posterOrganization !== undefined,
+        dayToDayActivity:
+          selectedStudent.student.dayToDayActivity !== null && selectedStudent.student.dayToDayActivity !== undefined,
+        contributionToWork:
+          selectedStudent.student.contributionToWork !== null &&
+          selectedStudent.student.contributionToWork !== undefined,
+        learningOutcomes:
+          selectedStudent.student.learningOutcomes !== null && selectedStudent.student.learningOutcomes !== undefined,
+        geoTagPhotos:
+          selectedStudent.student.geotagPhotos !== null && selectedStudent.student.geotagPhotos !== undefined,
+        reportOrganization:
+          selectedStudent.student.reportOrganization !== null &&
+          selectedStudent.student.reportOrganization !== undefined,
+        certificate:
+          selectedStudent.student.hardCopyCertificate !== null &&
+          selectedStudent.student.hardCopyCertificate !== undefined,
+        learningExplanation:
+          selectedStudent.student.learningExplanation !== null &&
+          selectedStudent.student.learningExplanation !== undefined,
+        problemIdentification:
+          selectedStudent.student.problemIndentification !== null &&
+          selectedStudent.student.problemIndentification !== undefined,
+        contributionExplanation:
+          selectedStudent.student.contributionExplanation !== null &&
+          selectedStudent.student.contributionExplanation !== undefined,
+        proposedSolution:
+          selectedStudent.student.proposedSolutionExplanation !== null &&
+          selectedStudent.student.proposedSolutionExplanation !== undefined,
+        presentationSkills:
+          selectedStudent.student.presentationSkill !== null && selectedStudent.student.presentationSkill !== undefined,
+        qnaViva: selectedStudent.student.qnaMarks !== null && selectedStudent.student.qnaMarks !== undefined,
       });
     }
   }, [selectedStudent]);
@@ -121,7 +181,11 @@ export default function StudentModal({
     qnaViva: z.number().min(0).max(10),
   });
 
-  const validateMarks = () => {
+  const validateMarks = (evaluationType?: 'mentor' | 'evaluator') => {
+    // Skip validation if the corresponding evaluation is marked as absent
+    if (evaluationType === 'mentor' && isAbsentMentor) return true;
+    if (evaluationType === 'evaluator' && isAbsentEvaluator) return true;
+
     const result = marksSchema.safeParse(marks);
     if (!result.success) {
       const newErrors: Record<string, string> = {};
@@ -137,6 +201,43 @@ export default function StudentModal({
     return true;
   };
 
+  const handleAbsentToggleMentor = () => {
+    const newAbsentState = !isAbsentMentor;
+    setIsAbsentMentor(newAbsentState);
+
+    // If marking as absent, reset mentor evaluation marks to 0
+    if (newAbsentState) {
+      setMarks((prev) => ({
+        ...prev,
+        posterOrganization: 0,
+        dayToDayActivity: 0,
+        contributionToWork: 0,
+        learningOutcomes: 0,
+        geoTagPhotos: 0,
+        reportOrganization: 0,
+        certificate: 0,
+      }));
+    }
+  };
+
+  const handleAbsentToggleEvaluator = () => {
+    const newAbsentState = !isAbsentEvaluator;
+    setIsAbsentEvaluator(newAbsentState);
+
+    // If marking as absent, reset evaluator evaluation marks to 0
+    if (newAbsentState) {
+      setMarks((prev) => ({
+        ...prev,
+        learningExplanation: 0,
+        problemIdentification: 0,
+        contributionExplanation: 0,
+        proposedSolution: 0,
+        presentationSkills: 0,
+        qnaViva: 0,
+      }));
+    }
+  };
+
   const handlePrevTab = () => {
     const currentIndex = tabs.indexOf(activeTab);
     if (currentIndex > 0) setActiveTab(tabs[currentIndex - 1]);
@@ -148,7 +249,7 @@ export default function StudentModal({
   };
 
   const handleSave = async (type: string) => {
-    if (!selectedStudent || !validateMarks()) {
+    if (!selectedStudent || !validateMarks(type as 'mentor' | 'evaluator')) {
       toast.warning('Please fix validation errors before saving.');
       return;
     }
@@ -156,12 +257,38 @@ export default function StudentModal({
 
     const typeofmarks = type === 'mentor' ? 'internal' : 'final';
     const studentid = selectedStudent.student.id;
+    const isAbsent = type === 'mentor' ? isAbsentMentor : isAbsentEvaluator;
 
     try {
       const response = await fetch(`/api/coord/evaluate?facultyId=${session?.user.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentid, typeofmarks, marks }),
+        body: JSON.stringify({
+          studentid,
+          typeofmarks,
+          marks: isAbsent
+            ? type === 'mentor'
+              ? {
+                  posterOrganization: 0,
+                  dayToDayActivity: 0,
+                  contributionToWork: 0,
+                  learningOutcomes: 0,
+                  geoTagPhotos: 0,
+                  reportOrganization: 0,
+                  certificate: 0,
+                }
+              : {
+                  learningExplanation: 0,
+                  problemIdentification: 0,
+                  contributionExplanation: 0,
+                  proposedSolution: 0,
+                  presentationSkills: 0,
+                  qnaViva: 0,
+                }
+            : marks,
+          isAbsent,
+          absentType: type === 'mentor' ? 'absentMentorEvaluation' : 'absentEvaluatorEvaluation',
+        }),
       });
 
       const result = await response.json();
@@ -169,26 +296,54 @@ export default function StudentModal({
 
       const updated = students.map((student) => {
         if (student.student.id === studentid) {
-          if (typeofmarks === 'internal') {
-            student.student.posterOrganization = marks.posterOrganization;
-            student.student.dayToDayActivity = marks.dayToDayActivity;
-            student.student.contributionToWork = marks.contributionToWork;
-            student.student.learningOutcomes = marks.learningOutcomes;
-            student.student.geotagPhotos = marks.geoTagPhotos;
-            student.student.reportOrganization = marks.reportOrganization;
-            student.student.hardCopyCertificate = marks.certificate;
-          } else if (typeofmarks === 'final') {
-            student.student.learningExplanation = marks.learningExplanation;
-            student.student.problemIndentification = marks.problemIdentification;
-            student.student.contributionExplanation = marks.contributionExplanation;
-            student.student.proposedSolutionExplanation = marks.proposedSolution;
-            student.student.presentationSkill = marks.presentationSkills;
-            student.student.qnaMarks = marks.qnaViva;
+          // Update absent status
+          if (type === 'mentor') {
+            student.student.Absent_Mentor_Evaluation = isAbsentMentor;
+          } else {
+            student.student.Absent_Evaluator_Evaluation = isAbsentEvaluator;
+          }
+
+          // Update marks only if not absent
+          if (!isAbsent) {
+            if (typeofmarks === 'internal') {
+              student.student.posterOrganization = marks.posterOrganization;
+              student.student.dayToDayActivity = marks.dayToDayActivity;
+              student.student.contributionToWork = marks.contributionToWork;
+              student.student.learningOutcomes = marks.learningOutcomes;
+              student.student.geotagPhotos = marks.geoTagPhotos;
+              student.student.reportOrganization = marks.reportOrganization;
+              student.student.hardCopyCertificate = marks.certificate;
+            } else if (typeofmarks === 'final') {
+              student.student.learningExplanation = marks.learningExplanation;
+              student.student.problemIndentification = marks.problemIdentification;
+              student.student.contributionExplanation = marks.contributionExplanation;
+              student.student.proposedSolutionExplanation = marks.proposedSolution;
+              student.student.presentationSkill = marks.presentationSkills;
+              student.student.qnaMarks = marks.qnaViva;
+            }
+          } else {
+            // Reset marks to 0 if absent
+            if (typeofmarks === 'internal') {
+              student.student.posterOrganization = 0;
+              student.student.dayToDayActivity = 0;
+              student.student.contributionToWork = 0;
+              student.student.learningOutcomes = 0;
+              student.student.geotagPhotos = 0;
+              student.student.reportOrganization = 0;
+              student.student.hardCopyCertificate = 0;
+            } else if (typeofmarks === 'final') {
+              student.student.learningExplanation = 0;
+              student.student.problemIndentification = 0;
+              student.student.contributionExplanation = 0;
+              student.student.proposedSolutionExplanation = 0;
+              student.student.presentationSkill = 0;
+              student.student.qnaMarks = 0;
+            }
           }
         }
         return student;
       });
-      toast.success('Marks Saved Successfully');
+      toast.success(isAbsent ? 'Student marked as absent' : 'Marks Saved Successfully');
       setSavingMarks(false);
 
       setStudents(updated);
@@ -211,10 +366,37 @@ export default function StudentModal({
   }
 
   const handleInputChange = (field: keyof typeof marks, value: string, upperlim: number) => {
+    // Check if this field is disabled due to absent status
+    const mentorFields = [
+      'posterOrganization',
+      'dayToDayActivity',
+      'contributionToWork',
+      'learningOutcomes',
+      'geoTagPhotos',
+      'reportOrganization',
+      'certificate',
+    ];
+    const evaluatorFields = [
+      'learningExplanation',
+      'problemIdentification',
+      'contributionExplanation',
+      'proposedSolution',
+      'presentationSkills',
+      'qnaViva',
+    ];
+
+    if ((mentorFields.includes(field) && isAbsentMentor) || (evaluatorFields.includes(field) && isAbsentEvaluator)) {
+      return;
+    }
+
     if (value === '') {
       setMarks((prevMarks) => ({
         ...prevMarks,
         [field]: 0,
+      }));
+      setHasBeenSet((prev) => ({
+        ...prev,
+        [field]: false,
       }));
       return;
     }
@@ -222,6 +404,10 @@ export default function StudentModal({
       setMarks((prevMarks) => ({
         ...prevMarks,
         [field]: Number(value),
+      }));
+      setHasBeenSet((prev) => ({
+        ...prev,
+        [field]: true,
       }));
     }
   };
@@ -290,7 +476,7 @@ export default function StudentModal({
                 {tabs.map((tab) => (
                   <button
                     key={tab}
-                    className={`px-4 py-2 text-sm font-medium max-w-[450px] ${
+                    className={`px-4 py-2 text-sm font-medium max-w-[450px] relative ${
                       activeTab === tab
                         ? 'border-b-2  border-blue-500 text-blue-500'
                         : ' border-b-2 border-gray-400 text-gray-400'
@@ -306,6 +492,21 @@ export default function StudentModal({
                           : tab === 'documents'
                             ? 'Proof of Work'
                             : 'Evaluation'}
+                    {/* Show absent badges on evaluation tab */}
+                    {tab === 'evaluation' && (
+                      <>
+                        {selectedStudent.student.Absent_Mentor_Evaluation && (
+                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">
+                            M-Absent
+                          </span>
+                        )}
+                        {selectedStudent.student.Absent_Evaluator_Evaluation && (
+                          <span className="absolute -top-1 -right-6 bg-orange-500 text-white text-xs px-1 py-0.5 rounded-full">
+                            E-Absent
+                          </span>
+                        )}
+                      </>
+                    )}
                   </button>
                 ))}
               </div>
@@ -613,6 +814,43 @@ export default function StudentModal({
                       {' '}
                       <i> Internal Evaluation </i>
                     </h2>
+
+                    {/* Internal Evaluation Absent Toggle */}
+                    <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-base font-medium">Mark Student as Absent (Internal Evaluation)</Label>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only"
+                            checked={isAbsentMentor}
+                            onChange={handleAbsentToggleMentor}
+                          />
+                          <div
+                            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${
+                              isAbsentMentor ? 'bg-red-500' : 'bg-gray-300'
+                            }`}
+                          >
+                            <div
+                              className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${
+                                isAbsentMentor ? 'transform translate-x-5' : ''
+                              }`}
+                            ></div>
+                          </div>
+                        </label>
+                      </div>
+                      {isAbsentMentor && (
+                        <div className="mt-3 p-3 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-md">
+                          <div className="flex items-center">
+                            <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                            <span className="text-red-700 dark:text-red-300 text-sm font-medium">
+                              This student has been marked as absent for internal evaluation
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     <h3 className="mb-4">Poster Organization</h3>
 
                     <div className="mb-6 grid grid-cols-2 grid-rows-3 gap-6">
@@ -623,9 +861,10 @@ export default function StudentModal({
                           id="posterOrganization"
                           name="posterOrganization"
                           type="text"
-                          value={marks.posterOrganization || ''}
+                          value={hasBeenSet.posterOrganization ? marks.posterOrganization.toString() : ''}
                           onChange={(e) => handleInputChange('posterOrganization', e.target.value, 10)}
                           placeholder="Marks - out of 10"
+                          disabled={isAbsentMentor}
                         />
                       </div>
                       <div>
@@ -633,9 +872,10 @@ export default function StudentModal({
                         <Input
                           error={marks.dayToDayActivity < 0 || marks.dayToDayActivity > 10 ? true : false}
                           type="text"
-                          value={marks.dayToDayActivity || ''}
+                          value={hasBeenSet.dayToDayActivity ? marks.dayToDayActivity.toString() : ''}
                           onChange={(e) => handleInputChange('dayToDayActivity', e.target.value, 10)}
                           placeholder="Marks - out of 10"
+                          disabled={isAbsentMentor}
                         />
                       </div>
                       <div>
@@ -643,9 +883,10 @@ export default function StudentModal({
                         <Input
                           error={marks.contributionToWork < 0 || marks.contributionToWork > 5 ? true : false}
                           type="text"
-                          value={marks.contributionToWork || ''}
+                          value={hasBeenSet.contributionToWork ? marks.contributionToWork.toString() : ''}
                           onChange={(e) => handleInputChange('contributionToWork', e.target.value, 5)}
                           placeholder="Marks - out of 5"
+                          disabled={isAbsentMentor}
                         />
                       </div>
                       <div>
@@ -653,9 +894,10 @@ export default function StudentModal({
                         <Input
                           error={marks.learningOutcomes < 0 || marks.learningOutcomes > 5 ? true : false}
                           type="text"
-                          value={marks.learningOutcomes || ''}
+                          value={hasBeenSet.learningOutcomes ? marks.learningOutcomes.toString() : ''}
                           onChange={(e) => handleInputChange('learningOutcomes', e.target.value, 5)}
                           placeholder="Marks - out of 5"
+                          disabled={isAbsentMentor}
                         />
                       </div>
                       <div>
@@ -663,9 +905,10 @@ export default function StudentModal({
                         <Input
                           error={marks.geoTagPhotos < 0 || marks.geoTagPhotos > 5 ? true : false}
                           type="text"
-                          value={marks.geoTagPhotos || ''}
+                          value={hasBeenSet.geoTagPhotos ? marks.geoTagPhotos.toString() : ''}
                           onChange={(e) => handleInputChange('geoTagPhotos', e.target.value, 5)}
                           placeholder="Marks - out of 5"
+                          disabled={isAbsentMentor}
                         />
                       </div>
                       <div></div>
@@ -679,19 +922,21 @@ export default function StudentModal({
                         <Input
                           error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
                           type="text"
-                          value={marks.reportOrganization || ''}
+                          value={hasBeenSet.reportOrganization ? marks.reportOrganization.toString() : ''}
                           onChange={(e) => handleInputChange('reportOrganization', e.target.value, 10)}
                           placeholder="Marks - out of 10"
+                          disabled={isAbsentMentor}
                         />
                       </div>
                       <div>
                         <Label>{'Hard Copy Certificate'}</Label>
                         <Input
-                          error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
+                          error={marks.certificate < 0 || marks.certificate > 5 ? true : false}
                           type="text"
-                          value={marks.certificate || ''}
+                          value={hasBeenSet.certificate ? marks.certificate.toString() : ''}
                           onChange={(e) => handleInputChange('certificate', e.target.value, 5)}
                           placeholder="Marks - out of 5"
+                          disabled={isAbsentMentor}
                         />
                       </div>
                     </div>
@@ -714,91 +959,132 @@ export default function StudentModal({
                         Close
                       </Button>
                       <Button size="sm" onClick={saveinternalmarks}>
-                        {savingMarks ? 'Saving...' : 'Save Internal Marks'}
+                        {savingMarks ? 'Saving...' : isAbsentMentor ? 'Mark Internal Absent' : 'Save Internal Marks'}
                       </Button>
                     </div>
                   </div>
                 )}
                 {(option === 'evaluator' || option === 'both') && (
                   <div>
-                    <div>
-                      <h2 className="mb-6">
-                        {' '}
-                        <i> External Evaluation </i>
-                      </h2>
+                    <h2 className="mb-6 mt-5">
+                      {' '}
+                      <i> External Evaluation </i>
+                    </h2>
 
-                      <h3 className="mb-4">Presentation</h3>
-
-                      <div className="mb-6 grid grid-cols-2 grid-rows-3 gap-6">
-                        <div>
-                          <Label>{'Learning Explanation'}</Label>
-                          <Input
-                            error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
-                            type="text"
-                            value={marks.learningExplanation || ''}
-                            onChange={(e) => handleInputChange('learningExplanation', e.target.value, 5)}
-                            placeholder="Marks - out of 5"
+                    {/* External Evaluation Absent Toggle */}
+                    <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-base font-medium">Mark Student as Absent (External Evaluation)</Label>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only"
+                            checked={isAbsentEvaluator}
+                            onChange={handleAbsentToggleEvaluator}
                           />
-                        </div>
-                        <div>
-                          <Label>{'Problem Identification'}</Label>
-                          <Input
-                            error={marks.problemIdentification < 0 || marks.problemIdentification > 5}
-                            type="text"
-                            value={marks.problemIdentification || ''}
-                            onChange={(e) => handleInputChange('problemIdentification', e.target.value, 5)}
-                            placeholder="Marks - out of 5"
-                          />
-                        </div>
-                        <div>
-                          <Label>{'Contribution Explanation'}</Label>
-                          <Input
-                            error={marks.contributionExplanation < 0 || marks.contributionExplanation > 10}
-                            type="text"
-                            value={marks.contributionExplanation || ''}
-                            onChange={(e) => handleInputChange('contributionExplanation', e.target.value, 10)}
-                            placeholder="Marks - out of 10"
-                          />
-                        </div>
-                        <div>
-                          <Label>{'Proposed Solution'}</Label>
-                          <Input
-                            error={marks.proposedSolution < 0 || marks.proposedSolution > 10}
-                            type="text"
-                            value={marks.proposedSolution || ''}
-                            onChange={(e) => handleInputChange('proposedSolution', e.target.value, 10)}
-                            placeholder="Marks - out of 10"
-                          />
-                        </div>
-                        <div>
-                          <Label>{'Presenatation Skills'}</Label>
-                          <Input
-                            error={marks.presentationSkills < 0 || marks.presentationSkills > 10}
-                            type="text"
-                            value={marks.presentationSkills || ''}
-                            onChange={(e) => handleInputChange('presentationSkills', e.target.value, 10)}
-                            placeholder="Marks - out of 10"
-                          />
-                        </div>
-                        <div></div>
+                          <div
+                            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${
+                              isAbsentEvaluator ? 'bg-red-500' : 'bg-gray-300'
+                            }`}
+                          >
+                            <div
+                              className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${
+                                isAbsentEvaluator ? 'transform translate-x-5' : ''
+                              }`}
+                            ></div>
+                          </div>
+                        </label>
                       </div>
-
-                      <h3 className="mb-4">Question and Anwser</h3>
-
-                      <div className="mb-6 grid grid-cols-2 grid-rows-1 gap-6">
-                        <div>
-                          <Label>{'QnA Viva'}</Label>
-                          <Input
-                            error={marks.qnaViva < 0 || marks.qnaViva > 10}
-                            type="text"
-                            value={marks.qnaViva || ''}
-                            onChange={(e) => handleInputChange('qnaViva', e.target.value, 10)}
-                            placeholder="Marks - out of 10"
-                          />
+                      {isAbsentEvaluator && (
+                        <div className="mt-3 p-3 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-md">
+                          <div className="flex items-center">
+                            <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                            <span className="text-red-700 dark:text-red-300 text-sm font-medium">
+                              This student has been marked as absent for external evaluation
+                            </span>
+                          </div>
                         </div>
-                        <div></div>
-                      </div>
+                      )}
                     </div>
+
+                    <h3 className="mb-4">Presentation</h3>
+
+                    <div className="mb-6 grid grid-cols-2 grid-rows-3 gap-6">
+                      <div>
+                        <Label>{'Learning Explanation'}</Label>
+                        <Input
+                          error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
+                          type="text"
+                          value={hasBeenSet.learningExplanation ? marks.learningExplanation.toString() : ''}
+                          onChange={(e) => handleInputChange('learningExplanation', e.target.value, 5)}
+                          placeholder="Marks - out of 5"
+                          disabled={isAbsentEvaluator}
+                        />
+                      </div>
+                      <div>
+                        <Label>{'Problem Identification'}</Label>
+                        <Input
+                          error={marks.problemIdentification < 0 || marks.problemIdentification > 5}
+                          type="text"
+                          value={hasBeenSet.problemIdentification ? marks.problemIdentification.toString() : ''}
+                          onChange={(e) => handleInputChange('problemIdentification', e.target.value, 5)}
+                          placeholder="Marks - out of 5"
+                          disabled={isAbsentEvaluator}
+                        />
+                      </div>
+                      <div>
+                        <Label>{'Contribution Explanation'}</Label>
+                        <Input
+                          error={marks.contributionExplanation < 0 || marks.contributionExplanation > 10}
+                          type="text"
+                          value={hasBeenSet.contributionExplanation ? marks.contributionExplanation.toString() : ''}
+                          onChange={(e) => handleInputChange('contributionExplanation', e.target.value, 10)}
+                          placeholder="Marks - out of 10"
+                          disabled={isAbsentEvaluator}
+                        />
+                      </div>
+                      <div>
+                        <Label>{'Proposed Solution'}</Label>
+                        <Input
+                          error={marks.proposedSolution < 0 || marks.proposedSolution > 10}
+                          type="text"
+                          value={hasBeenSet.proposedSolution ? marks.proposedSolution.toString() : ''}
+                          onChange={(e) => handleInputChange('proposedSolution', e.target.value, 10)}
+                          placeholder="Marks - out of 10"
+                          disabled={isAbsentEvaluator}
+                        />
+                      </div>
+                      <div>
+                        <Label>{'Presenatation Skills'}</Label>
+                        <Input
+                          error={marks.presentationSkills < 0 || marks.presentationSkills > 10}
+                          type="text"
+                          value={hasBeenSet.presentationSkills ? marks.presentationSkills.toString() : ''}
+                          onChange={(e) => handleInputChange('presentationSkills', e.target.value, 10)}
+                          placeholder="Marks - out of 10"
+                          disabled={isAbsentEvaluator}
+                        />
+                      </div>
+                      <div></div>
+                    </div>
+
+                    <h3 className="mb-4">Question and Anwser</h3>
+
+                    <div className="mb-6 grid grid-cols-2 grid-rows-1 gap-6">
+                      <div>
+                        <Label>{'QnA Viva'}</Label>
+                        <Input
+                          error={marks.qnaViva < 0 || marks.qnaViva > 10}
+                          type="text"
+                          value={hasBeenSet.qnaViva ? marks.qnaViva.toString() : ''}
+                          onChange={(e) => handleInputChange('qnaViva', e.target.value, 10)}
+                          placeholder="Marks - out of 10"
+                          disabled={isAbsentEvaluator}
+                        />
+                      </div>
+                      <div></div>
+                    </div>
+
                     <div>
                       <p>
                         Total External Marks:{' '}
@@ -816,7 +1102,7 @@ export default function StudentModal({
                         Close
                       </Button>
                       <Button size="sm" onClick={saveexternalmarks}>
-                        {savingMarks ? 'Saving...' : 'Save External Marks'}
+                        {savingMarks ? 'Saving...' : isAbsentEvaluator ? 'Mark External Absent' : 'Save External Marks'}
                       </Button>
                     </div>
                   </div>
