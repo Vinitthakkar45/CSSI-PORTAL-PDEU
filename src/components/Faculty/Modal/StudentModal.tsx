@@ -51,6 +51,23 @@ export default function StudentModal({
     presentationSkills: 0,
     qnaViva: 0,
   });
+
+  const [hasBeenSet, setHasBeenSet] = useState({
+    posterOrganization: false,
+    dayToDayActivity: false,
+    contributionToWork: false,
+    learningOutcomes: false,
+    geoTagPhotos: false,
+    reportOrganization: false,
+    certificate: false,
+    learningExplanation: false,
+    problemIdentification: false,
+    contributionExplanation: false,
+    proposedSolution: false,
+    presentationSkills: false,
+    qnaViva: false,
+  });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [reportUrl, setReportUrl] = useState('');
   const [certificateUrl, setCertificateUrl] = useState('');
@@ -62,7 +79,6 @@ export default function StudentModal({
 
   useEffect(() => {
     if (selectedStudent) {
-      //   setMarks(option === 'mentor' ? selectedStudent.internal_evaluation_marks : selectedStudent.final_evaluation_marks);
       setCertificateUrl(
         `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Certificate/${selectedStudent.userId}.pdf`
       );
@@ -83,6 +99,7 @@ export default function StudentModal({
         setIsAbsent(selectedStudent.Absent_Evaluator_Evaluation || false);
       }
 
+      // Set marks - keep the actual values from database
       setMarks({
         posterOrganization: selectedStudent.posterOrganization || 0,
         dayToDayActivity: selectedStudent.dayToDayActivity || 0,
@@ -97,6 +114,32 @@ export default function StudentModal({
         proposedSolution: selectedStudent.proposedSolutionExplanation || 0,
         presentationSkills: selectedStudent.presentationSkill || 0,
         qnaViva: selectedStudent.qnaMarks || 0,
+      });
+
+      // Set hasBeenSet flags - true if the value exists and is not null/undefined
+      setHasBeenSet({
+        posterOrganization:
+          selectedStudent.posterOrganization !== null && selectedStudent.posterOrganization !== undefined,
+        dayToDayActivity: selectedStudent.dayToDayActivity !== null && selectedStudent.dayToDayActivity !== undefined,
+        contributionToWork:
+          selectedStudent.contributionToWork !== null && selectedStudent.contributionToWork !== undefined,
+        learningOutcomes: selectedStudent.learningOutcomes !== null && selectedStudent.learningOutcomes !== undefined,
+        geoTagPhotos: selectedStudent.geotagPhotos !== null && selectedStudent.geotagPhotos !== undefined,
+        reportOrganization:
+          selectedStudent.reportOrganization !== null && selectedStudent.reportOrganization !== undefined,
+        certificate: selectedStudent.hardCopyCertificate !== null && selectedStudent.hardCopyCertificate !== undefined,
+        learningExplanation:
+          selectedStudent.learningExplanation !== null && selectedStudent.learningExplanation !== undefined,
+        problemIdentification:
+          selectedStudent.problemIndentification !== null && selectedStudent.problemIndentification !== undefined,
+        contributionExplanation:
+          selectedStudent.contributionExplanation !== null && selectedStudent.contributionExplanation !== undefined,
+        proposedSolution:
+          selectedStudent.proposedSolutionExplanation !== null &&
+          selectedStudent.proposedSolutionExplanation !== undefined,
+        presentationSkills:
+          selectedStudent.presentationSkill !== null && selectedStudent.presentationSkill !== undefined,
+        qnaViva: selectedStudent.qnaMarks !== null && selectedStudent.qnaMarks !== undefined,
       });
     }
   }, [selectedStudent, option]);
@@ -282,19 +325,28 @@ export default function StudentModal({
   }
 
   const handleInputChange = (field: keyof typeof marks, value: string, upperlim: number) => {
-    if (isAbsent) return; // Don't allow input changes when marked absent
+    if (isAbsent) return;
 
     if (value === '') {
       setMarks((prevMarks) => ({
         ...prevMarks,
         [field]: 0,
       }));
+      setHasBeenSet((prev) => ({
+        ...prev,
+        [field]: false,
+      }));
       return;
     }
+
     if (Number(value) <= upperlim && Number(value) >= 0) {
       setMarks((prevMarks) => ({
         ...prevMarks,
         [field]: Number(value),
+      }));
+      setHasBeenSet((prev) => ({
+        ...prev,
+        [field]: true,
       }));
     }
   };
@@ -717,7 +769,7 @@ export default function StudentModal({
                         id="posterOrganization"
                         name="posterOrganization"
                         type="text"
-                        value={marks.posterOrganization || ''}
+                        value={hasBeenSet.posterOrganization ? marks.posterOrganization.toString() : ''}
                         onChange={(e) => handleInputChange('posterOrganization', e.target.value, 10)}
                         placeholder="Marks - out of 10"
                         disabled={isAbsent}
@@ -728,7 +780,7 @@ export default function StudentModal({
                       <Input
                         error={marks.dayToDayActivity < 0 || marks.dayToDayActivity > 10 ? true : false}
                         type="text"
-                        value={marks.dayToDayActivity || ''}
+                        value={hasBeenSet.dayToDayActivity ? marks.dayToDayActivity.toString() : ''}
                         onChange={(e) => handleInputChange('dayToDayActivity', e.target.value, 10)}
                         placeholder="Marks - out of 10"
                         disabled={isAbsent}
@@ -739,7 +791,7 @@ export default function StudentModal({
                       <Input
                         error={marks.contributionToWork < 0 || marks.contributionToWork > 5 ? true : false}
                         type="text"
-                        value={marks.contributionToWork || ''}
+                        value={hasBeenSet.contributionToWork ? marks.contributionToWork.toString() : ''}
                         onChange={(e) => handleInputChange('contributionToWork', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                         disabled={isAbsent}
@@ -750,7 +802,7 @@ export default function StudentModal({
                       <Input
                         error={marks.learningOutcomes < 0 || marks.learningOutcomes > 5 ? true : false}
                         type="text"
-                        value={marks.learningOutcomes || ''}
+                        value={hasBeenSet.learningOutcomes ? marks.learningOutcomes.toString() : ''}
                         onChange={(e) => handleInputChange('learningOutcomes', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                         disabled={isAbsent}
@@ -761,7 +813,7 @@ export default function StudentModal({
                       <Input
                         error={marks.geoTagPhotos < 0 || marks.geoTagPhotos > 5 ? true : false}
                         type="text"
-                        value={marks.geoTagPhotos || ''}
+                        value={hasBeenSet.geoTagPhotos ? marks.geoTagPhotos.toString() : ''}
                         onChange={(e) => handleInputChange('geoTagPhotos', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                         disabled={isAbsent}
@@ -778,7 +830,7 @@ export default function StudentModal({
                       <Input
                         error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
                         type="text"
-                        value={marks.reportOrganization || ''}
+                        value={hasBeenSet.reportOrganization ? marks.reportOrganization.toString() : ''}
                         onChange={(e) => handleInputChange('reportOrganization', e.target.value, 10)}
                         placeholder="Marks - out of 10"
                         disabled={isAbsent}
@@ -789,7 +841,7 @@ export default function StudentModal({
                       <Input
                         error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
                         type="text"
-                        value={marks.certificate || ''}
+                        value={hasBeenSet.certificate ? marks.certificate.toString() : ''}
                         onChange={(e) => handleInputChange('certificate', e.target.value, 5)}
                         placeholder="Marks - out of 5"
                         disabled={isAbsent}
@@ -830,7 +882,7 @@ export default function StudentModal({
                         <Input
                           error={marks.learningExplanation < 0 || marks.learningExplanation > 5 ? true : false}
                           type="text"
-                          value={marks.learningExplanation || ''}
+                          value={hasBeenSet.learningExplanation ? marks.learningExplanation.toString() : ''}
                           onChange={(e) => handleInputChange('learningExplanation', e.target.value, 5)}
                           placeholder="Marks - out of 5"
                           disabled={isAbsent}
@@ -841,7 +893,7 @@ export default function StudentModal({
                         <Input
                           error={marks.problemIdentification < 0 || marks.problemIdentification > 5}
                           type="text"
-                          value={marks.problemIdentification || ''}
+                          value={hasBeenSet.problemIdentification ? marks.problemIdentification.toString() : ''}
                           onChange={(e) => handleInputChange('problemIdentification', e.target.value, 5)}
                           placeholder="Marks - out of 5"
                           disabled={isAbsent}
@@ -852,7 +904,7 @@ export default function StudentModal({
                         <Input
                           error={marks.contributionExplanation < 0 || marks.contributionExplanation > 10}
                           type="text"
-                          value={marks.contributionExplanation || ''}
+                          value={hasBeenSet.contributionExplanation ? marks.contributionExplanation.toString() : ''}
                           onChange={(e) => handleInputChange('contributionExplanation', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                           disabled={isAbsent}
@@ -863,7 +915,7 @@ export default function StudentModal({
                         <Input
                           error={marks.proposedSolution < 0 || marks.proposedSolution > 10}
                           type="text"
-                          value={marks.proposedSolution || ''}
+                          value={hasBeenSet.proposedSolution ? marks.proposedSolution.toString() : ''}
                           onChange={(e) => handleInputChange('proposedSolution', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                           disabled={isAbsent}
@@ -874,7 +926,7 @@ export default function StudentModal({
                         <Input
                           error={marks.presentationSkills < 0 || marks.presentationSkills > 10}
                           type="text"
-                          value={marks.presentationSkills || ''}
+                          value={hasBeenSet.presentationSkills ? marks.presentationSkills.toString() : ''}
                           onChange={(e) => handleInputChange('presentationSkills', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                           disabled={isAbsent}
