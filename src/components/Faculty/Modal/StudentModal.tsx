@@ -35,6 +35,7 @@ export default function StudentModal({
   const [declineReason, setDeclineReason] = useState('');
   const [isDeclining, setIsDeclining] = useState(false);
   const [showDeclineInput, setShowDeclineInput] = useState(false);
+  const [isAbsent, setIsAbsent] = useState(false);
   const [marks, setMarks] = useState({
     posterOrganization: 0,
     dayToDayActivity: 0,
@@ -75,6 +76,13 @@ export default function StudentModal({
         `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Report/${selectedStudent.userId}.pdf`
       );
 
+      // Set absent status based on option
+      if (option === 'mentor') {
+        setIsAbsent(selectedStudent.Absent_Mentor_Evaluation || false);
+      } else {
+        setIsAbsent(selectedStudent.Absent_Evaluator_Evaluation || false);
+      }
+
       setMarks({
         posterOrganization: selectedStudent.posterOrganization || 0,
         dayToDayActivity: selectedStudent.dayToDayActivity || 0,
@@ -91,7 +99,7 @@ export default function StudentModal({
         qnaViva: selectedStudent.qnaMarks || 0,
       });
     }
-  }, [selectedStudent]);
+  }, [selectedStudent, option]);
 
   const marksSchema = z.object({
     posterOrganization: z.number().min(0).max(10),
@@ -110,6 +118,8 @@ export default function StudentModal({
   });
 
   const validateMarks = () => {
+    if (isAbsent) return true; // Skip validation if student is marked absent
+
     const result = marksSchema.safeParse(marks);
     if (!result.success) {
       const newErrors: Record<string, string> = {};
@@ -123,6 +133,30 @@ export default function StudentModal({
     }
     setErrors({});
     return true;
+  };
+
+  const handleAbsentToggle = () => {
+    const newAbsentState = !isAbsent;
+    setIsAbsent(newAbsentState);
+
+    // If marking as absent, reset all marks to 0
+    if (newAbsentState) {
+      setMarks({
+        posterOrganization: 0,
+        dayToDayActivity: 0,
+        contributionToWork: 0,
+        learningOutcomes: 0,
+        geoTagPhotos: 0,
+        reportOrganization: 0,
+        certificate: 0,
+        learningExplanation: 0,
+        problemIdentification: 0,
+        contributionExplanation: 0,
+        proposedSolution: 0,
+        presentationSkills: 0,
+        qnaViva: 0,
+      });
+    }
   };
 
   const handlePrevTab = () => {
@@ -149,7 +183,29 @@ export default function StudentModal({
       const response = await fetch('/api/faculty', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentid, typeofmarks, marks }),
+        body: JSON.stringify({
+          studentid,
+          typeofmarks,
+          marks: isAbsent
+            ? {
+                posterOrganization: 0,
+                dayToDayActivity: 0,
+                contributionToWork: 0,
+                learningOutcomes: 0,
+                geoTagPhotos: 0,
+                reportOrganization: 0,
+                certificate: 0,
+                learningExplanation: 0,
+                problemIdentification: 0,
+                contributionExplanation: 0,
+                proposedSolution: 0,
+                presentationSkills: 0,
+                qnaViva: 0,
+              }
+            : marks,
+          isAbsent,
+          absentType: option === 'mentor' ? 'absentMentorEvaluation' : 'absentEvaluatorEvaluation',
+        }),
       });
 
       const result = await response.json();
@@ -157,26 +213,54 @@ export default function StudentModal({
 
       const updated = students.map((student) => {
         if (student.id === studentid) {
-          if (typeofmarks === 'internal') {
-            student.posterOrganization = marks.posterOrganization;
-            student.dayToDayActivity = marks.dayToDayActivity;
-            student.contributionToWork = marks.contributionToWork;
-            student.learningOutcomes = marks.learningOutcomes;
-            student.geotagPhotos = marks.geoTagPhotos;
-            student.reportOrganization = marks.reportOrganization;
-            student.hardCopyCertificate = marks.certificate;
-          } else if (typeofmarks === 'final') {
-            student.learningExplanation = marks.learningExplanation;
-            student.problemIndentification = marks.problemIdentification;
-            student.contributionExplanation = marks.contributionExplanation;
-            student.proposedSolutionExplanation = marks.proposedSolution;
-            student.presentationSkill = marks.presentationSkills;
-            student.qnaMarks = marks.qnaViva;
+          // Update absent status
+          if (option === 'mentor') {
+            student.Absent_Mentor_Evaluation = isAbsent;
+          } else {
+            student.Absent_Evaluator_Evaluation = isAbsent;
+          }
+
+          // Update marks only if not absent
+          if (!isAbsent) {
+            if (typeofmarks === 'internal') {
+              student.posterOrganization = marks.posterOrganization;
+              student.dayToDayActivity = marks.dayToDayActivity;
+              student.contributionToWork = marks.contributionToWork;
+              student.learningOutcomes = marks.learningOutcomes;
+              student.geotagPhotos = marks.geoTagPhotos;
+              student.reportOrganization = marks.reportOrganization;
+              student.hardCopyCertificate = marks.certificate;
+            } else if (typeofmarks === 'final') {
+              student.learningExplanation = marks.learningExplanation;
+              student.problemIndentification = marks.problemIdentification;
+              student.contributionExplanation = marks.contributionExplanation;
+              student.proposedSolutionExplanation = marks.proposedSolution;
+              student.presentationSkill = marks.presentationSkills;
+              student.qnaMarks = marks.qnaViva;
+            }
+          } else {
+            // Reset marks to 0 if absent
+            if (typeofmarks === 'internal') {
+              student.posterOrganization = 0;
+              student.dayToDayActivity = 0;
+              student.contributionToWork = 0;
+              student.learningOutcomes = 0;
+              student.geotagPhotos = 0;
+              student.reportOrganization = 0;
+              student.hardCopyCertificate = 0;
+            } else if (typeofmarks === 'final') {
+              student.learningExplanation = 0;
+              student.problemIndentification = 0;
+              student.contributionExplanation = 0;
+              student.proposedSolutionExplanation = 0;
+              student.presentationSkill = 0;
+              student.qnaMarks = 0;
+            }
           }
         }
         return student;
       });
-      toast.success('Marks Saved Successfully');
+      toast.success(isAbsent ? 'Student marked as absent' : 'Marks Saved Successfully');
       setSavingMarks(false);
 
       setStudents(updated);
@@ -198,6 +282,8 @@ export default function StudentModal({
   }
 
   const handleInputChange = (field: keyof typeof marks, value: string, upperlim: number) => {
+    if (isAbsent) return; // Don't allow input changes when marked absent
+
     if (value === '') {
       setMarks((prevMarks) => ({
         ...prevMarks,
@@ -272,7 +358,7 @@ export default function StudentModal({
               {tabs.map((tab) => (
                 <button
                   key={tab}
-                  className={`px-4 py-2 text-sm font-medium max-w-[450px] ${
+                  className={`px-4 py-2 text-sm font-medium max-w-[450px] relative ${
                     activeTab === tab
                       ? 'border-b-2  border-blue-500 text-blue-500'
                       : ' border-b-2 border-gray-400 text-gray-400'
@@ -288,6 +374,14 @@ export default function StudentModal({
                         : tab === 'documents'
                           ? 'Proof of Work'
                           : 'Evaluation'}
+                  {/* Show absent badge on evaluation tab */}
+                  {tab === 'evaluation' &&
+                    ((option === 'mentor' && selectedStudent.Absent_Mentor_Evaluation) ||
+                      (option === 'evaluator' && selectedStudent.Absent_Evaluator_Evaluation)) && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">
+                        Absent
+                      </span>
+                    )}
                 </button>
               ))}
             </div>
@@ -578,6 +672,38 @@ export default function StudentModal({
 
           {activeTab === 'evaluation' && (
             <div>
+              {/* Absent Toggle */}
+              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-medium">Mark Student as Absent</Label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only" checked={isAbsent} onChange={handleAbsentToggle} />
+                    <div
+                      className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${
+                        isAbsent ? 'bg-red-500' : 'bg-gray-300'
+                      }`}
+                    >
+                      <div
+                        className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${
+                          isAbsent ? 'transform translate-x-5' : ''
+                        }`}
+                      ></div>
+                    </div>
+                  </label>
+                </div>
+                {isAbsent && (
+                  <div className="mt-3 p-3 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-md">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                      <span className="text-red-700 dark:text-red-300 text-sm font-medium">
+                        This student has been marked as absent for {option === 'mentor' ? 'mentor' : 'evaluator'}{' '}
+                        evaluation
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Evaluation */}
               {option === 'mentor' ? (
                 <div>
@@ -594,6 +720,7 @@ export default function StudentModal({
                         value={marks.posterOrganization || ''}
                         onChange={(e) => handleInputChange('posterOrganization', e.target.value, 10)}
                         placeholder="Marks - out of 10"
+                        disabled={isAbsent}
                       />
                     </div>
                     <div>
@@ -604,6 +731,7 @@ export default function StudentModal({
                         value={marks.dayToDayActivity || ''}
                         onChange={(e) => handleInputChange('dayToDayActivity', e.target.value, 10)}
                         placeholder="Marks - out of 10"
+                        disabled={isAbsent}
                       />
                     </div>
                     <div>
@@ -614,6 +742,7 @@ export default function StudentModal({
                         value={marks.contributionToWork || ''}
                         onChange={(e) => handleInputChange('contributionToWork', e.target.value, 5)}
                         placeholder="Marks - out of 5"
+                        disabled={isAbsent}
                       />
                     </div>
                     <div>
@@ -624,6 +753,7 @@ export default function StudentModal({
                         value={marks.learningOutcomes || ''}
                         onChange={(e) => handleInputChange('learningOutcomes', e.target.value, 5)}
                         placeholder="Marks - out of 5"
+                        disabled={isAbsent}
                       />
                     </div>
                     <div>
@@ -634,6 +764,7 @@ export default function StudentModal({
                         value={marks.geoTagPhotos || ''}
                         onChange={(e) => handleInputChange('geoTagPhotos', e.target.value, 5)}
                         placeholder="Marks - out of 5"
+                        disabled={isAbsent}
                       />
                     </div>
                     <div></div>
@@ -650,6 +781,7 @@ export default function StudentModal({
                         value={marks.reportOrganization || ''}
                         onChange={(e) => handleInputChange('reportOrganization', e.target.value, 10)}
                         placeholder="Marks - out of 10"
+                        disabled={isAbsent}
                       />
                     </div>
                     <div>
@@ -660,6 +792,7 @@ export default function StudentModal({
                         value={marks.certificate || ''}
                         onChange={(e) => handleInputChange('certificate', e.target.value, 5)}
                         placeholder="Marks - out of 5"
+                        disabled={isAbsent}
                       />
                     </div>
                   </div>
@@ -682,7 +815,7 @@ export default function StudentModal({
                       Close
                     </Button>
                     <Button size="sm" onClick={savemarks}>
-                      {savingMarks ? 'Saving...' : 'Save Changes'}
+                      {savingMarks ? 'Saving...' : isAbsent ? 'Mark as Absent' : 'Save Changes'}
                     </Button>
                   </div>
                 </div>
@@ -700,6 +833,7 @@ export default function StudentModal({
                           value={marks.learningExplanation || ''}
                           onChange={(e) => handleInputChange('learningExplanation', e.target.value, 5)}
                           placeholder="Marks - out of 5"
+                          disabled={isAbsent}
                         />
                       </div>
                       <div>
@@ -710,6 +844,7 @@ export default function StudentModal({
                           value={marks.problemIdentification || ''}
                           onChange={(e) => handleInputChange('problemIdentification', e.target.value, 5)}
                           placeholder="Marks - out of 5"
+                          disabled={isAbsent}
                         />
                       </div>
                       <div>
@@ -720,6 +855,7 @@ export default function StudentModal({
                           value={marks.contributionExplanation || ''}
                           onChange={(e) => handleInputChange('contributionExplanation', e.target.value, 10)}
                           placeholder="Marks - out of 10"
+                          disabled={isAbsent}
                         />
                       </div>
                       <div>
@@ -730,6 +866,7 @@ export default function StudentModal({
                           value={marks.proposedSolution || ''}
                           onChange={(e) => handleInputChange('proposedSolution', e.target.value, 10)}
                           placeholder="Marks - out of 10"
+                          disabled={isAbsent}
                         />
                       </div>
                       <div>
@@ -740,6 +877,7 @@ export default function StudentModal({
                           value={marks.presentationSkills || ''}
                           onChange={(e) => handleInputChange('presentationSkills', e.target.value, 10)}
                           placeholder="Marks - out of 10"
+                          disabled={isAbsent}
                         />
                       </div>
                       <div></div>
@@ -756,6 +894,7 @@ export default function StudentModal({
                           value={marks.qnaViva || ''}
                           onChange={(e) => handleInputChange('qnaViva', e.target.value, 10)}
                           placeholder="Marks - out of 10"
+                          disabled={isAbsent}
                         />
                       </div>
                       <div></div>
@@ -778,7 +917,7 @@ export default function StudentModal({
                       Close
                     </Button>
                     <Button size="sm" onClick={savemarks}>
-                      Save Changes
+                      {savingMarks ? 'Saving...' : isAbsent ? 'Mark as Absent' : 'Save Changes'}
                     </Button>
                   </div>
                 </div>

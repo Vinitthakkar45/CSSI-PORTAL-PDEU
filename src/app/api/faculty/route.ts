@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     const facultyId = session.user.id;
 
     const body = await req.json();
-    const { studentid, typeofmarks, marks } = body;
+    const { studentid, typeofmarks, marks, isAbsent } = body;
 
     if (!studentid || !typeofmarks || marks === undefined) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -64,12 +64,12 @@ export async function POST(req: NextRequest) {
       if (!isMentor) {
         return NextResponse.json({ error: 'Unauthorized to update internal marks' }, { status: 403 });
       }
-      await updateInternalMarks(studentid, marks);
+      await updateInternalMarks(studentid, marks, isAbsent || false);
     } else if (typeofmarks === 'final') {
       if (!isEvaluator) {
         return NextResponse.json({ error: 'Unauthorized to update final marks' }, { status: 403 });
       }
-      await updateFinalMarks(studentid, marks);
+      await updateFinalMarks(studentid, marks, isAbsent || false);
     } else {
       return NextResponse.json({ error: 'Invalid typeofmarks value' }, { status: 400 });
     }
