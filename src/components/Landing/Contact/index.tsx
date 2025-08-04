@@ -32,7 +32,6 @@ const Contact = () => {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
 
-      // Reset OTP state when email changes
       if (name === 'email') {
         setOtpData({
           otp: '',
@@ -45,7 +44,7 @@ const Contact = () => {
   };
 
   const startTimer = () => {
-    setOtpTimer(300); // 5 minutes
+    setOtpTimer(600);
     const interval = setInterval(() => {
       setOtpTimer((prev) => {
         if (prev <= 1) {
