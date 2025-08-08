@@ -246,7 +246,18 @@ const StudentTable = () => {
           'Mentor Name': item.mentor?.name || 'N/A',
           'Evaluator Name': item.evaluator?.name || 'N/A',
           'Internal Evaluation Marks': item.student.internal_evaluation_marks,
-          'Final Evaluation Marks': item.student.final_evaluation_marks,
+          //! this is temporary fix, in future when the final evaluation api is fixed, revert these changes
+          'Final Evaluation Marks': (() => {
+            const total =
+              (item.student.learningExplanation ?? 0) +
+              (item.student.problemIndentification ?? 0) +
+              (item.student.contributionExplanation ?? 0) +
+              (item.student.proposedSolutionExplanation ?? 0) +
+              (item.student.presentationSkill ?? 0) +
+              (item.student.qnaMarks ?? 0);
+
+            return total === 0 ? '' : total;
+          })(),
         };
       });
 
