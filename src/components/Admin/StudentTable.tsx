@@ -227,9 +227,18 @@ const StudentTable = () => {
           'Proposed Solution': item.student.proposedSolution,
           'Mentor Name': item.mentor?.name,
           'Evaluator Name': item.evaluator?.name,
-          'Internal Evaluation Marks': item.student.internal_evaluation_marks,
+          'Internal Evaluation Marks': (() => {
+            if (item.student.Absent_Mentor_Evaluation) {
+              return 'AB';
+            } else {
+              return item.student.internal_evaluation_marks;
+            }
+          })(),
           //! this is temporary fix, in future when the final evaluation api is fixed, revert these changes
           'Final Evaluation Marks': (() => {
+            if (item.student.Absent_Evaluator_Evaluation) {
+              return 'AB';
+            }
             const total =
               (item.student.learningExplanation ?? 0) +
               (item.student.problemIndentification ?? 0) +
