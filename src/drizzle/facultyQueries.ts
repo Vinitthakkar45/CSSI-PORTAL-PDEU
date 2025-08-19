@@ -144,6 +144,7 @@ export const updateFinalMarks = async (studentId: number, marks: MarksType, isAb
         proposedSolutionExplanation: isAbsent ? 0 : marks.proposedSolution,
         presentationSkill: isAbsent ? 0 : marks.presentationSkills,
         qnaMarks: isAbsent ? 0 : marks.qnaViva,
+        final_evaluation_marks: total_marks,
         Absent_Evaluator_Evaluation: isAbsent,
       })
       .where(eq(student.id, studentId));
