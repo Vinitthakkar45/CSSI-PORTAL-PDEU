@@ -17,3 +17,4 @@ public/**/*.ico
 public/**/*.pdf
 .gitignore
 .hintrc
+.env*
