@@ -1,0 +1,50 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: cssi-production
+
+rule_files:
+  - /etc/prometheus/alert-rules.yml
+
+alerting:
+  alertmanagers: []  # Grafana Alerting is used instead of Alertmanager
+
+scrape_configs:
+
+  # Prometheus self-monitoring
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Host metrics (CPU, memory, disk, network)
+  - job_name: node
+    static_configs:
+      - targets: ["node_exporter:9100"]
+
+  # PostgreSQL metrics
+  - job_name: postgres
+    static_configs:
+      - targets: ["postgres_exporter:9187"]
+
+  # Next.js app metrics (via /api/metrics if implemented, else just HTTP probe)
+  - job_name: nextjs
+    metrics_path: /api/metrics
+    static_configs:
+      - targets: ["nextjs:3000"]
+
+  # Nginx metrics (via stub_status if enabled, otherwise HTTP probe)
+  - job_name: nginx
+    static_configs:
+      - targets: ["nginx:80"]
+
+  # MinIO metrics
+  - job_name: minio
+    metrics_path: /minio/v2/metrics/cluster
+    static_configs:
+      - targets: ["minio:9000"]
+
+  # Loki self-monitoring
+  - job_name: loki
+    static_configs:
+      - targets: ["loki:3100"]

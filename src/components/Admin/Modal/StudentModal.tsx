@@ -77,16 +77,16 @@ export default function StudentModal({
     if (selectedStudent) {
       //   setMarks(option === 'mentor' ? selectedStudent.internal_evaluation_marks : selectedStudent.final_evaluation_marks);
       setCertificateUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Certificate/${selectedStudent.student.userId}.pdf`
+        `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/certificate/${selectedStudent.student.userId}.pdf`
       );
       setOfferLetterUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/OfferLetter/${selectedStudent.student.userId}.pdf`
+        `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/offerletter/${selectedStudent.student.userId}.pdf`
       );
       setPosterUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Poster/${selectedStudent.student.userId}.pdf`
+        `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/poster/${selectedStudent.student.userId}.pdf`
       );
       setReportUrl(
-        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/Report/${selectedStudent.student.userId}.pdf`
+        `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/report/${selectedStudent.student.userId}.pdf`
       );
 
       setMarks({
@@ -329,7 +329,7 @@ export default function StudentModal({
                         height={160}
                         src={
                           selectedStudent.student.profileImage
-                            ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.student.profileImage}`
+                            ? `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.student.profileImage}`
                             : '/images/user/DefaultProfile_Light.png'
                         }
                         alt={selectedStudent.student.name || ''}
@@ -457,15 +457,13 @@ export default function StudentModal({
                       <div className="ml-4">
                         {selectedStudent.student.week_one_photo ? (
                           <a
-                            href={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.student.week_one_photo}`}
+                            href={`${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.student.week_one_photo}`}
                             target="_blank"
                           >
-                            <Image
-                              src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.student.week_one_photo}`}
+                            <img
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.student.week_one_photo}`}
                               alt="Week 1 Photo"
-                              width={160}
-                              height={160}
-                              className=" rounded-lg"
+                              className="w-40 h-40 object-cover rounded-lg"
                             />
                           </a>
                         ) : (
@@ -478,15 +476,13 @@ export default function StudentModal({
                       <div className="ml-4">
                         {selectedStudent.student.week_two_photo ? (
                           <a
-                            href={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.student.week_two_photo}`}
+                            href={`${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.student.week_two_photo}`}
                             target="_blank"
                           >
-                            <Image
-                              src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${selectedStudent.student.week_two_photo}`}
+                            <img
+                              src={`${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.student.week_two_photo}`}
                               alt="Week 2 Photo"
-                              width={160}
-                              height={160}
-                              className="rounded-lg"
+                              className="w-40 h-40 object-cover rounded-lg"
                             />
                           </a>
                         ) : (

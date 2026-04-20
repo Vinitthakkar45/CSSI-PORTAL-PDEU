@@ -1,99 +1,61 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
 import { db } from '@/drizzle/db';
 import { eq } from 'drizzle-orm';
 import { student } from '@/drizzle/schema';
+import { uploadMedia, deleteMedia } from '@/lib/storage';
 
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+const FOLDER_TO_COLUMN: Record<string, keyof typeof student.$inferSelect> = {
+  offerletter: 'offerLetter',
+  report: 'report',
+  certificate: 'certificate',
+  poster: 'poster',
+  weekonephoto: 'week_one_photo',
+  weektwophoto: 'week_two_photo',
+  profileimage: 'profileImage',
+};
 
-interface CloudinaryUploadResponse {
-  public_id: string;
-  [key: string]: string | number | boolean | null | undefined;
-  bytes: number;
-}
+const PDF_FOLDERS = new Set(['offerletter', 'report', 'certificate', 'poster']);
 
 export async function POST(req: NextRequest) {
-  if (req.method !== 'POST') {
-    return NextResponse.json({ error: 'Method Not Allowed' }, { status: 405 });
-  }
-
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const folderName = formData.get('folderName') as string;
+    const folderName = (formData.get('folderName') as string)?.toLowerCase();
     const userId = formData.get('userId') as string;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID not found' }, { status: 400 });
+    if (!userId) return NextResponse.json({ error: 'User ID not found' }, { status: 400 });
+    if (!file) return NextResponse.json({ error: 'File Not Found' }, { status: 400 });
+
+    const columnName = FOLDER_TO_COLUMN[folderName];
+    if (!columnName) return NextResponse.json({ error: 'Invalid folder name' }, { status: 400 });
+
+    const isPdf = PDF_FOLDERS.has(folderName);
+    const ext = isPdf ? 'pdf' : file.name.split('.').pop() ?? 'bin';
+    const contentType = isPdf ? 'application/pdf' : file.type || 'application/octet-stream';
+    const newKey = `${folderName}/${userId}.${ext}`;
+
+    // For photo uploads: fetch current key and delete it if extension changed
+    if (!isPdf) {
+      const [row] = await db
+        .select({ val: student[columnName] })
+        .from(student)
+        .where(eq(student.userId, userId))
+        .limit(1);
+      const oldKey = row?.val as string | null;
+      if (oldKey && oldKey !== newKey) {
+        await deleteMedia(oldKey).catch(() => {}); // non-fatal
+      }
     }
 
-    if (!file) {
-      return NextResponse.json({ error: 'File Not Found' }, { status: 400 });
-    }
-
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Determine if this is a PDF document or an image based on folder name
-    const isPdfDocument = ['offerletter', 'report', 'certificate', 'poster'].includes(folderName.toLowerCase());
-
-    // Configure upload options based on file type
-    const uploadOptions = {
-      resource_type: isPdfDocument ? ('raw' as const) : ('image' as const),
-      folder: folderName,
-      format: isPdfDocument ? 'pdf' : undefined,
-      pages: isPdfDocument ? true : undefined,
-      use_filename: true,
-      unique_filename: false,
-      overwrite: true,
-      public_id: userId,
-    };
-
-    const result = await new Promise<CloudinaryUploadResponse>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
-        if (error) reject(error);
-        else resolve(result as CloudinaryUploadResponse);
-      });
-      uploadStream.end(buffer);
-    });
-
-    let columnName = '';
-    switch (folderName.toLowerCase()) {
-      case 'offerletter':
-        columnName = 'offerLetter';
-        break;
-      case 'report':
-        columnName = 'report';
-        break;
-      case 'certificate':
-        columnName = 'certificate';
-        break;
-      case 'poster':
-        columnName = 'poster';
-        break;
-      case 'weekonephoto':
-        columnName = 'week_one_photo';
-        break;
-      case 'weektwophoto':
-        columnName = 'week_two_photo';
-        break;
-      case 'profileimage':
-        columnName = 'profile_image';
-        break;
-      default:
-        throw new Error('Invalid folder name');
-    }
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await uploadMedia(buffer, newKey, contentType);
 
     await db
       .update(student)
-      .set({ [columnName]: result.public_id })
+      .set({ [columnName]: newKey })
       .where(eq(student.userId, userId));
 
-    return NextResponse.json({ publicId: result.public_id }, { status: 200 });
+    return NextResponse.json({ publicId: newKey }, { status: 200 });
   } catch (error) {
     console.error('Upload failed:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

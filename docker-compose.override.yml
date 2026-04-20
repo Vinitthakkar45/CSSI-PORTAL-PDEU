@@ -1,0 +1,56 @@
+# Local development overrides — loaded AUTOMATICALLY by 'docker compose up'.
+# Never used in production. Never deployed to the VM.
+# Add to .gitignore if you want machine-specific values; keep in git for shared local config.
+#
+# What this file does:
+#  - Replaces nginx with an HTTP-only config (no SSL cert needed locally)
+#  - Exposes database and storage ports directly (needed for local migrations/inspection)
+#  - Adds Mailpit (fake SMTP server) so Grafana alert emails are catchable locally
+#  - Points Grafana SMTP at Mailpit instead of the PDPU server
+
+services:
+
+  # ── Nginx: use local HTTP-only config instead of production HTTPS config ──
+  nginx:
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # Shadow the production cssi.conf with the local HTTP-only config.
+      # Docker applies bind mounts in order; this file mount is added after the base
+      # directory mount, so it overwrites /etc/nginx/conf.d/cssi.conf in the container.
+      # Result: only local.conf content is active — no SSL directives, no conflicts.
+      - ./nginx/conf.d/local.conf:/etc/nginx/conf.d/cssi.conf:ro
+
+  # ── Expose Postgres port for local psql / drizzle-kit commands ─────────────
+  postgres:
+    ports:
+      - "5432:5432"
+    # Now you can run: psql postgresql://cssi_user:pass@localhost:5432/cssi_db
+    # And: DATABASE_URL=postgresql://...@localhost:5432/... pnpm drizzle:push
+
+  # ── Expose MinIO API port for mc CLI and migration scripts ─────────────────
+  minio:
+    ports:
+      - "9000:9000"   # S3 API — mc alias set local http://localhost:9000 ...
+      - "9001:9001"   # MinIO web console — http://localhost:9001
+
+  # ── Expose Prometheus for local alert rule testing ─────────────────────────
+  prometheus:
+    ports:
+      - "9090:9090"   # http://localhost:9090 — view metrics, test PromQL queries
+
+  # ── Mailpit: catches all outgoing emails from Grafana ─────────────────────
+  # Visit http://localhost:8025 to see emails Grafana would have sent.
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "8025:8025"   # web UI
+    networks:
+      - monitoring_net
+
+  # ── Point Grafana SMTP at Mailpit instead of PDPU server ─────────────────
+  grafana:
+    environment:
+      GF_SMTP_HOST: "mailpit:1025"
+      GF_SMTP_FROM_ADDRESS: "grafana@local.dev"
+      GF_SERVER_ROOT_URL: "http://localhost/grafana/"

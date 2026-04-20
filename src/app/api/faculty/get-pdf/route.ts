@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
-
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+import { getPresignedDownloadUrl } from '@/lib/storage';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -16,15 +10,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const publicUrl = cloudinary.url(filePath, {
-      resource_type: 'auto',
-      type: 'upload',
-      flags: 'attachment',
-    });
-
+    const publicUrl = await getPresignedDownloadUrl(filePath);
     return NextResponse.json({ publicUrl });
   } catch (error) {
-    console.error('Cloudinary public URL error:', error);
-    return NextResponse.json({ error: 'Failed to generate public URL' }, { status: 500 });
+    console.error('Storage URL error:', error);
+    return NextResponse.json({ error: 'Failed to generate download URL' }, { status: 500 });
   }
 }

@@ -1,0 +1,16 @@
+.git
+.gitignore
+.next
+node_modules
+npm-debug.log
+README.md
+.env
+.env.*
+!.env.example
+docker-compose*.yml
+Dockerfile*
+monitoring/
+backup/
+nginx/
+*.md
+.husky

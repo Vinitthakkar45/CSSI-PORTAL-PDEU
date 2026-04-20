@@ -23,7 +23,8 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Enforce frontend-only access to ALL API routes
-  if (pathname.startsWith('/api')) {
+  // Exempt internal-only endpoints from origin check (Docker healthcheck, Prometheus scrape)
+  if (pathname.startsWith('/api') && pathname !== '/api/health' && pathname !== '/api/metrics') {
     const origin = req.headers.get('origin') || '';
     const referer = req.headers.get('referer') || '';
     const isAllowedDomain =

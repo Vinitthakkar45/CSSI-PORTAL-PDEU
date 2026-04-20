@@ -1,0 +1,21 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: email-admins
+    receivers:
+      - uid: email-admins-uid
+        type: email
+        settings:
+          # Grafana reads this from the GF_ALERTING_EMAIL_ADDRESSES env var.
+          # Set that var in docker-compose.yml grafana environment block.
+          addresses: ${GF_ALERTING_EMAIL_ADDRESSES}
+          subject: "[CSSI Alert] {{ .GroupLabels.alertname }}"
+          message: |
+            {{ range .Alerts }}
+            Alert:   {{ .Annotations.summary }}
+            Details: {{ .Annotations.description }}
+            Severity: {{ .Labels.severity }}
+            Time: {{ .StartsAt }}
+            {{ end }}
+        disableResolveMessage: false

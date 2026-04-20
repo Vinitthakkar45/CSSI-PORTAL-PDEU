@@ -1,0 +1,127 @@
+# Production Swarm overrides — merged on top of docker-compose.yml
+#
+# Deploy command (on the VM after docker swarm init):
+#   docker build -t cssi_nextjs:latest . && docker build -t cssi_backup:latest ./backup/
+#   set -a; source .env; set +a
+#   docker stack deploy -c docker-compose.yml -c docker-compose.prod.yml cssi
+#
+# Rolling update (zero-downtime — new container starts before old one stops):
+#   docker build -t cssi_nextjs:latest .
+#   set -a; source .env; set +a
+#   docker stack deploy -c docker-compose.yml -c docker-compose.prod.yml cssi
+
+networks:
+  # Override to overlay — required for Swarm multi-node communication.
+  # attachable: true lets temporary migration containers join this network.
+  app_net:
+    driver: overlay
+    attachable: true
+  monitoring_net:
+    driver: overlay
+    attachable: true
+
+services:
+
+  nginx:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  nextjs:
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first       # Start new → wait for healthcheck → stop old = zero downtime
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 0s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  postgres:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+      placement:
+        constraints:
+          # Pin to manager node so the postgres_data volume is always accessible.
+          # On a single-node Swarm the VM is always the manager.
+          - node.role == manager
+
+  redis:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  minio:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      placement:
+        constraints:
+          - node.role == manager   # Same reason as postgres
+
+  minio_setup:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none            # Never restart — exits cleanly after bucket creation
+
+  backup:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+
+  prometheus:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  loki:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  promtail:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # node_exporter in Swarm: mode:global runs one container per node automatically.
+  # No replicas key (incompatible with global mode — this was your original error).
+  # pid:host is not supported in Swarm; the /host volume mount covers all critical metrics.
+  node_exporter:
+    deploy:
+      mode: global                 # One instance per node, auto-scaled as nodes are added
+      restart_policy:
+        condition: on-failure
+
+  postgres_exporter:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  grafana:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure

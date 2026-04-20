@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     const { currentStage } = await req.json();
     const newStage = currentStage + 1;
     const response = await db.update(stage).set({ stage: newStage }).where(eq(stage.year, year));
-    if (response.rowCount > 0) {
+    if (response.rowCount != null && response.rowCount > 0) {
       return NextResponse.json({ message: 'Update successful', affectedRows: response.rowCount }, { status: 200 });
     } else {
       return NextResponse.json({ message: 'No rows updated. Record not found.' }, { status: 404 });

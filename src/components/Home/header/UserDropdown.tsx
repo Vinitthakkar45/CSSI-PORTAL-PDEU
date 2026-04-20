@@ -1,42 +1,45 @@
 'use client';
-import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import { signOut } from 'next-auth/react';
+import { buildProfileUrl } from '@/components/Home/user-profile/UserMetaCard';
 
 type SessionUserBasic = {
-  role: 'admin' | 'faculty' | 'student';
+  role: 'admin' | 'faculty' | 'student' | 'coordinator';
   info: {
-    name: string;
-    email: string;
-    profile_image?: string;
+    name?: string;
+    email?: string;
+    profileImage?: string;
   };
 };
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<SessionUserBasic | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch('/api/user/getUserBySession');
+        const res = await fetch('/api/user/getUserBySession', { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to fetch user');
         const data = (await res.json()) as SessionUserBasic;
-        setUser({
-          role: data.role,
-          info: {
-            name: data.role === 'admin' ? 'Admin' : data.info.name,
-            email: data.info.email,
-            profile_image: data.info.profile_image,
-          },
-        });
+        setUser(data);
+        setAvatarUrl(buildProfileUrl(data.info?.profileImage));
       } catch (e) {
         console.error(e);
       }
     }
     fetchUser();
+
+    // Sync instantly when UserMetaCard finishes an upload
+    const handler = (e: Event) => {
+      const { url } = (e as CustomEvent<{ url: string }>).detail;
+      setAvatarUrl(url);
+    };
+    window.addEventListener('profile-image-updated', handler);
+    return () => window.removeEventListener('profile-image-updated', handler);
   }, []);
 
   const toggleDropdown = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -45,33 +48,24 @@ export default function UserDropdown() {
   };
   const closeDropdown = () => setIsOpen(false);
 
+  const displayName = user?.role === 'admin' ? 'Admin' : (user?.info?.name ?? user?.role ?? '');
+
   return (
     <div className="relative">
       <button onClick={toggleDropdown} className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle">
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          {user?.info.profile_image ? (
-            <Image width={44} height={44} src={user.info.profile_image} alt="avatar" />
+        <span className="mr-3 overflow-hidden rounded-full h-11 w-11 bg-gray-100 dark:bg-gray-800">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="avatar" className="object-cover w-full h-full" />
           ) : (
-            <>
-              <Image
-                width={44}
-                height={44}
-                src="/images/user/DefaultProfile_Light.png"
-                alt="avatar"
-                className="dark:hidden"
-              />
-              <Image
-                width={44}
-                height={44}
-                src="/images/user/DefaultProfile_Light.png"
-                alt="avatar"
-                className="hidden dark:block"
-              />
-            </>
+            <img
+              src="/images/user/DefaultProfile_Light.png"
+              alt="avatar"
+              className="object-cover w-full h-full"
+            />
           )}
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">{user?.info.name}</span>
+        <span className="block mr-1 font-medium text-theme-sm">{displayName}</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
@@ -100,9 +94,11 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user?.info?.name ? user?.info?.name : user?.role}
+            {displayName}
           </span>
-          <span className="ml-5 mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">{user?.info?.email}</span>
+          <span className="ml-5 mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
+            {user?.info?.email}
+          </span>
         </div>
 
         <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">

@@ -8,6 +8,7 @@ export const user = pgTable('user', {
   email: text('email').notNull().unique(),
   password: text('password'),
   role: text('role').notNull(),
+  profileImage: text('profile_image'),
 });
 
 export const sessionuser = pgTable('user', {

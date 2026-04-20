@@ -44,3 +44,4 @@ app.yaml
 
 rsa_cssi
 rsa_cssi.pub
+*.txt

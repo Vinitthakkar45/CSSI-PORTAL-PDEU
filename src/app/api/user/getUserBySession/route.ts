@@ -32,7 +32,7 @@ export async function GET() {
 
     if (role === 'admin') {
       const result = await db
-        .select({ id: user.id, email: user.email, role: user.role })
+        .select({ id: user.id, email: user.email, role: user.role, profileImage: user.profileImage })
         .from(user)
         .where(eq(user.id, id))
         .limit(1);

@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const ttlSeconds = 600;
 
   try {
-    await redis.set(`otp:${email}`, otp, { ex: ttlSeconds });
+    await redis.set(`otp:${email}`, otp, 'EX', ttlSeconds);
 
     await transporter.sendMail({
       from: process.env.EMAIL,

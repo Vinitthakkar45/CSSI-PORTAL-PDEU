@@ -79,7 +79,7 @@ export default function TableList({
                             height={40}
                             src={
                               student.profileImage
-                                ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${student.profileImage}`
+                                ? `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${student.profileImage}`
                                 : '/images/user/DefaultProfile_Light.png'
                             }
                             alt={student.name || ''}
