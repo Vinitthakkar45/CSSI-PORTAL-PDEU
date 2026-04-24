@@ -23,6 +23,7 @@ networks:
 services:
 
   nginx:
+    depends_on: []
     deploy:
       replicas: 1
       restart_policy:
@@ -30,6 +31,7 @@ services:
         delay: 5s
 
   nextjs:
+    depends_on: []
     deploy:
       replicas: 1
       update_config:
@@ -75,12 +77,14 @@ services:
           - node.role == manager   # Same reason as postgres
 
   minio_setup:
+    depends_on: []
     deploy:
       replicas: 1
       restart_policy:
         condition: none            # Never restart — exits cleanly after bucket creation
 
   backup:
+    depends_on: []
     deploy:
       replicas: 1
       restart_policy:
@@ -115,6 +119,7 @@ services:
         condition: on-failure
 
   postgres_exporter:
+    depends_on: []
     deploy:
       replicas: 1
       restart_policy:
