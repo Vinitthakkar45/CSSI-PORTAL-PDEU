@@ -169,7 +169,7 @@ services:
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
       BACKUP_CRON: ${BACKUP_CRON:-0 2 * * 6}
     volumes:
-      - /tmp/cssi_backups:/backups
+      - /var/lib/cssi/backups:/backups
     networks:
       - app_net
     depends_on:
