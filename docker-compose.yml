@@ -40,12 +40,9 @@ services:
       - app_net
       - monitoring_net
     depends_on:
-      nextjs:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
-      grafana:
-        condition: service_healthy
+      - nextjs
+      - minio
+      - grafana
 
   # ── Next.js Application ───────────────────────────────────────────────────
   nextjs:
@@ -65,12 +62,9 @@ services:
       - app_net
       - monitoring_net
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
+      - postgres
+      - redis
+      - minio
     healthcheck:
       # Use 127.0.0.1 explicitly — 'localhost' resolves to ::1 (IPv6) in Alpine
       # but Next.js standalone server only binds IPv4
@@ -155,8 +149,7 @@ services:
         echo 'MinIO bucket ready.';
       "
     depends_on:
-      minio:
-        condition: service_healthy
+      - minio
 
   # ── Backup (cron daily at 2 AM) ────────────────────────────────────────────
   backup:
@@ -180,8 +173,7 @@ services:
     networks:
       - app_net
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
 
   # ── Prometheus ─────────────────────────────────────────────────────────────
   prometheus:
@@ -260,8 +252,7 @@ services:
       - monitoring_net
       - app_net
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
 
   # ── Grafana ────────────────────────────────────────────────────────────────
   grafana:
