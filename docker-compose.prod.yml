@@ -1,7 +1,11 @@
 # Production Swarm overrides — merged on top of docker-compose.yml
 #
 # Deploy command (on the VM after docker swarm init):
-#   docker build -t cssi_nextjs:latest . && docker build -t cssi_backup:latest ./backup/
+#   docker build \
+#     --build-arg NEXT_PUBLIC_MEDIA_BASE_URL=https://cssi.pdpu.ac.in/media \
+#     --build-arg NEXT_PUBLIC_MINIO_BUCKET=cssi \
+#     -t cssi_nextjs:latest .
+#   docker build -t cssi_backup:latest ./backup/
 #   set -a; source .env; set +a
 #   docker stack deploy -c docker-compose.yml -c docker-compose.prod.yml cssi
 #
