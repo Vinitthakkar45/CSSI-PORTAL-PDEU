@@ -131,14 +131,14 @@ groups:
 
       # ── Disk ─────────────────────────────────────────────────────────────────
       - uid: cssi-disk-warning
-        title: Disk Usage > 80%
+        title: Disk Usage > 85%
         condition: B
         for: 5m
         labels:
           severity: warning
         annotations:
           summary: High disk usage on CSSI server
-          description: Root filesystem usage is above 80%
+          description: Root filesystem usage is above 85%
         data:
           - refId: A
             queryType: ''
@@ -159,7 +159,7 @@ groups:
               expression: A
               conditions:
                 - evaluator:
-                    params: [80]
+                    params: [85]
                     type: gt
                   operator:
                     type: and

@@ -273,6 +273,7 @@ services:
       GF_SMTP_USER: ${GRAFANA_SMTP_USER:-}
       GF_SMTP_PASSWORD: ${GRAFANA_SMTP_PASSWORD:-}
       GF_SMTP_STARTTLS_POLICY: "NoStartTLS"
+      GF_SMTP_TIMEOUT: "360"
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
       # Used by contact-points.yml provisioning — comma-separated admin emails
       GF_ALERTING_EMAIL_ADDRESSES: ${GRAFANA_ALERT_EMAILS}
