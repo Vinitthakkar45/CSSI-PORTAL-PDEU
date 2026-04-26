@@ -10,7 +10,7 @@ groups:
       # ── CPU ──────────────────────────────────────────────────────────────────
       - uid: cssi-cpu-warning
         title: CPU Usage > 80%
-        condition: C
+        condition: B
         for: 5m
         noDataState: NoData
         execErrState: Error
@@ -34,18 +34,8 @@ groups:
           - refId: B
             datasourceUid: __expr__
             model:
-              type: reduce
+              type: classic_conditions
               refId: B
-              expression: A
-              reducer: last
-              settings:
-                mode: ''
-          - refId: C
-            datasourceUid: __expr__
-            model:
-              type: threshold
-              refId: C
-              expression: B
               conditions:
                 - evaluator:
                     params: [80]
@@ -53,7 +43,7 @@ groups:
                   operator:
                     type: and
                   query:
-                    params: [B]
+                    params: [A]
                   reducer:
                     params: []
                     type: last
@@ -61,7 +51,7 @@ groups:
 
       - uid: cssi-cpu-critical
         title: CPU Usage > 95%
-        condition: C
+        condition: B
         for: 2m
         noDataState: NoData
         execErrState: Error
@@ -85,18 +75,8 @@ groups:
           - refId: B
             datasourceUid: __expr__
             model:
-              type: reduce
+              type: classic_conditions
               refId: B
-              expression: A
-              reducer: last
-              settings:
-                mode: ''
-          - refId: C
-            datasourceUid: __expr__
-            model:
-              type: threshold
-              refId: C
-              expression: B
               conditions:
                 - evaluator:
                     params: [95]
@@ -104,7 +84,7 @@ groups:
                   operator:
                     type: and
                   query:
-                    params: [B]
+                    params: [A]
                   reducer:
                     params: []
                     type: last
@@ -113,7 +93,7 @@ groups:
       # ── Memory ───────────────────────────────────────────────────────────────
       - uid: cssi-ram-warning
         title: Memory Usage > 85%
-        condition: C
+        condition: B
         for: 5m
         noDataState: NoData
         execErrState: Error
@@ -137,18 +117,8 @@ groups:
           - refId: B
             datasourceUid: __expr__
             model:
-              type: reduce
+              type: classic_conditions
               refId: B
-              expression: A
-              reducer: last
-              settings:
-                mode: ''
-          - refId: C
-            datasourceUid: __expr__
-            model:
-              type: threshold
-              refId: C
-              expression: B
               conditions:
                 - evaluator:
                     params: [85]
@@ -156,7 +126,7 @@ groups:
                   operator:
                     type: and
                   query:
-                    params: [B]
+                    params: [A]
                   reducer:
                     params: []
                     type: last
@@ -165,7 +135,7 @@ groups:
       # ── Disk ─────────────────────────────────────────────────────────────────
       - uid: cssi-disk-warning
         title: Disk Usage > 85%
-        condition: C
+        condition: B
         for: 5m
         noDataState: NoData
         execErrState: Error
@@ -189,18 +159,8 @@ groups:
           - refId: B
             datasourceUid: __expr__
             model:
-              type: reduce
+              type: classic_conditions
               refId: B
-              expression: A
-              reducer: last
-              settings:
-                mode: ''
-          - refId: C
-            datasourceUid: __expr__
-            model:
-              type: threshold
-              refId: C
-              expression: B
               conditions:
                 - evaluator:
                     params: [85]
@@ -208,7 +168,7 @@ groups:
                   operator:
                     type: and
                   query:
-                    params: [B]
+                    params: [A]
                   reducer:
                     params: []
                     type: last
@@ -216,7 +176,7 @@ groups:
 
       - uid: cssi-disk-critical
         title: Disk Usage > 90%
-        condition: C
+        condition: B
         for: 1m
         noDataState: NoData
         execErrState: Error
@@ -240,18 +200,8 @@ groups:
           - refId: B
             datasourceUid: __expr__
             model:
-              type: reduce
+              type: classic_conditions
               refId: B
-              expression: A
-              reducer: last
-              settings:
-                mode: ''
-          - refId: C
-            datasourceUid: __expr__
-            model:
-              type: threshold
-              refId: C
-              expression: B
               conditions:
                 - evaluator:
                     params: [90]
@@ -259,7 +209,7 @@ groups:
                   operator:
                     type: and
                   query:
-                    params: [B]
+                    params: [A]
                   reducer:
                     params: []
                     type: last
@@ -268,7 +218,7 @@ groups:
       # ── PostgreSQL ───────────────────────────────────────────────────────────
       - uid: cssi-postgres-down
         title: PostgreSQL Down
-        condition: C
+        condition: B
         for: 1m
         noDataState: NoData
         execErrState: Error
@@ -292,18 +242,8 @@ groups:
           - refId: B
             datasourceUid: __expr__
             model:
-              type: reduce
+              type: classic_conditions
               refId: B
-              expression: A
-              reducer: last
-              settings:
-                mode: ''
-          - refId: C
-            datasourceUid: __expr__
-            model:
-              type: threshold
-              refId: C
-              expression: B
               conditions:
                 - evaluator:
                     params: [1]
@@ -311,7 +251,7 @@ groups:
                   operator:
                     type: and
                   query:
-                    params: [B]
+                    params: [A]
                   reducer:
                     params: []
                     type: last
