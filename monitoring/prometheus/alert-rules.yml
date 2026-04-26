@@ -81,10 +81,10 @@ groups:
     rules:
 
       - alert: ServiceDown
-        # Fires when any scraped service target goes down (node_exporter, postgres_exporter, etc.)
-        # Uses 'up' metric which Prometheus sets to 0 when a scrape target is unreachable.
-        # Replaces the cAdvisor-based ContainerDown rule (cAdvisor is not in this stack).
-        expr: up{job=~"node|postgres|nextjs|nginx|minio|loki"} == 0
+        # Fires when a core monitored service target goes down.
+        # Only covers jobs with real Prometheus exporters in this stack.
+        # (nginx/minio excluded: nginx has no metrics endpoint; minio needs bearer auth)
+        expr: up{job=~"node|postgres|loki"} == 0
         for: 2m
         labels:
           severity: critical
