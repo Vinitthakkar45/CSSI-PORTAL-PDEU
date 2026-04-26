@@ -1,0 +1,252 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: CSSI System Alerts
+    folder: CSSI Alerts
+    interval: 1m
+    rules:
+
+      # ── CPU ──────────────────────────────────────────────────────────────────
+      - uid: cssi-cpu-warning
+        title: CPU Usage > 80%
+        condition: B
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High CPU on CSSI server
+          description: CPU usage has been above 80% for 5 minutes
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: cssi-prometheus
+            model:
+              expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+              instant: false
+              range: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    params: [80]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+
+      - uid: cssi-cpu-critical
+        title: CPU Usage > 95%
+        condition: B
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Critical CPU on CSSI server
+          description: CPU usage has been above 95% for 2 minutes
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: cssi-prometheus
+            model:
+              expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+              instant: false
+              range: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    params: [95]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+
+      # ── Memory ───────────────────────────────────────────────────────────────
+      - uid: cssi-ram-warning
+        title: Memory Usage > 85%
+        condition: B
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High memory on CSSI server
+          description: Memory usage has been above 85% for 5 minutes
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: cssi-prometheus
+            model:
+              expr: 100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))
+              instant: false
+              range: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    params: [85]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+
+      # ── Disk ─────────────────────────────────────────────────────────────────
+      - uid: cssi-disk-warning
+        title: Disk Usage > 80%
+        condition: B
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High disk usage on CSSI server
+          description: Root filesystem usage is above 80%
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: cssi-prometheus
+            model:
+              expr: 100 * (1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!="tmpfs"} / node_filesystem_size_bytes{mountpoint="/",fstype!="tmpfs"}))
+              instant: false
+              range: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    params: [80]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+
+      - uid: cssi-disk-critical
+        title: Disk Usage > 90%
+        condition: B
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Critical disk usage on CSSI server
+          description: Root filesystem usage is above 90%
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: cssi-prometheus
+            model:
+              expr: 100 * (1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!="tmpfs"} / node_filesystem_size_bytes{mountpoint="/",fstype!="tmpfs"}))
+              instant: false
+              range: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    params: [90]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+
+      # ── PostgreSQL ───────────────────────────────────────────────────────────
+      - uid: cssi-postgres-down
+        title: PostgreSQL Down
+        condition: B
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: PostgreSQL is unreachable
+          description: postgres_exporter cannot connect to PostgreSQL
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: cssi-prometheus
+            model:
+              expr: pg_up
+              instant: true
+              range: false
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    params: [1]
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
