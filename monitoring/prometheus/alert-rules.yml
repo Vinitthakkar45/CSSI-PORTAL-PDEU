@@ -80,11 +80,14 @@ groups:
   - name: application
     rules:
 
-      - alert: ContainerDown
-        expr: absent(container_last_seen{name=~"cssi_.*"})
+      - alert: ServiceDown
+        # Fires when any scraped service target goes down (node_exporter, postgres_exporter, etc.)
+        # Uses 'up' metric which Prometheus sets to 0 when a scrape target is unreachable.
+        # Replaces the cAdvisor-based ContainerDown rule (cAdvisor is not in this stack).
+        expr: up{job=~"node|postgres|nextjs|nginx|minio|loki"} == 0
         for: 2m
         labels:
           severity: critical
         annotations:
-          summary: "Container {{ $labels.name }} is down"
-          description: "Container has been unreachable for more than 2 minutes"
+          summary: "Service {{ $labels.job }} is down"
+          description: "Prometheus cannot scrape {{ $labels.job }} ({{ $labels.instance }}) for more than 2 minutes"
