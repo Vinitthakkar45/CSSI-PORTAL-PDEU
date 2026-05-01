@@ -20,6 +20,10 @@ type StudentWithUser = {
 };
 
 async function AssignMentors({ students, faculties }: { students: StudentWithUser[]; faculties: FacultyWithUser[] }) {
+  // NEW POLICY: Mentors are assigned only to students from the same department
+  // Each mentor will act as both mentor and evaluator for assigned students
+  // Students are distributed evenly among available faculty mentors
+
   // Calculate base students per faculty
   const studentsPerFaculty = Math.floor(students.length / faculties.length);
   const remainingStudents = students.length % faculties.length;

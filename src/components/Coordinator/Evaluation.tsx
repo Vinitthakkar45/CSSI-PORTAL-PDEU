@@ -10,10 +10,13 @@ const Dashboard = () => {
   const session = useSession();
 
   const [mentoredStudents, setMentoredStudents] = useState<SelectStudent[]>([]);
-  const [evaluatedStudents, setEvaluatedStudents] = useState<SelectStudent[]>([]);
+  // const [evaluatedStudents, setEvaluatedStudents] = useState<SelectStudent[]>([]);
+  // COMMENTED OUT - New policy: Mentors act as both mentor and evaluator, no separate evaluator view needed
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedToggle, setSelectedToggle] = useState<'mentor' | 'evaluator'>('mentor'); // Toggler state
+  // const [selectedToggle, setSelectedToggle] = useState<'mentor' | 'evaluator'>('mentor'); // COMMENTED OUT
+  // COMMENTED OUT - Only mentors view needed now
+  const [selectedToggle] = useState<'mentor'>('mentor'); // Always mentor view
   const [marksToggle, setMarksToggle] = useState<boolean>(false); // Toggler state
 
   // Fetch Faculty Student Data
@@ -28,7 +31,8 @@ const Dashboard = () => {
         }
         const data = await response.json();
         setMentoredStudents(data.mentoredStudents || []);
-        setEvaluatedStudents(data.evaluatedStudents || []);
+        // setEvaluatedStudents(data.evaluatedStudents || []);
+        // COMMENTED OUT - Evaluator data no longer needed (mentors handle both roles)
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -44,15 +48,14 @@ const Dashboard = () => {
       {/* <div> */}
       <div className="flex mb-2">
         <button
-          className={`px-4 py-2 rounded-l-lg shadow-md transition-colors duration-300 border border-gray-500 ${
-            selectedToggle === 'mentor'
-              ? 'bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400'
-              : 'text-gray-700 hover:bg-gray-100 group-hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300'
-          }`}
-          onClick={() => setSelectedToggle('mentor')}
+          className="px-4 py-2 rounded-lg shadow-md transition-colors duration-300 border border-gray-500 bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400 cursor-default"
+          disabled
+          title="Mentors now act as both mentor and evaluator"
         >
           Mentored Students
         </button>
+        {/*
+        COMMENTED OUT - Evaluated Students tab removed (new policy: mentors act as both mentor and evaluator)
         <button
           className={`px-4 py-2 rounded-r-lg shadow-md transition-colors duration-300 border border-gray-500  ${
             selectedToggle === 'evaluator'
@@ -63,6 +66,7 @@ const Dashboard = () => {
         >
           Evaluated Students
         </button>
+        */}
       </div>
 
       {loading || error ? (
@@ -71,14 +75,13 @@ const Dashboard = () => {
         ) : (
           <EvalSekele />
         )
-      ) : (selectedToggle === 'mentor' && mentoredStudents.length > 0) ||
-        (selectedToggle != 'mentor' && evaluatedStudents.length > 0) ? (
+      ) : mentoredStudents.length > 0 ? (
         <TableList
-          students={selectedToggle === 'mentor' ? mentoredStudents : evaluatedStudents}
-          option={selectedToggle}
+          students={mentoredStudents}
+          option="mentor"
           setMarksToggle={setMarksToggle}
           marksToggle={marksToggle}
-          setStudents={selectedToggle === 'mentor' ? setMentoredStudents : setEvaluatedStudents}
+          setStudents={setMentoredStudents}
         />
       ) : (
         <p className="m-4">Students are yet to be assigned !</p>

@@ -17,7 +17,8 @@ interface CountData {
   students: number;
   faculty: number;
   mentors: number;
-  evaluators: number;
+  // evaluators: number;
+  // COMMENTED OUT - Evaluator count no longer tracked (evaluator assignment deprecated)
 }
 
 type Student = {
@@ -41,10 +42,12 @@ const Dashboard = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [mentorLoading, setMentorLoading] = useState(false);
-  const [evaluatorLoading, setEvaluatorLoading] = useState(false);
+  // const [evaluatorLoading, setEvaluatorLoading] = useState(false);
+  // COMMENTED OUT - Evaluator assignment deprecated as per new policy (only mentors act as both mentor and evaluator)
   const [currentStage, setCurrentStage] = useState<number>(0);
   const [showModal, setShowModal] = useState(false);
-  const [showEvaluatorModal, setShowEvaluatorModal] = useState(false);
+  // const [showEvaluatorModal, setShowEvaluatorModal] = useState(false);
+  // COMMENTED OUT - Evaluator assignment deprecated
   const [showAllAssignedModal, setShowAllAssignedModal] = useState(false);
   const [showRemainingModal, setShowRemainingModal] = useState(false);
   const [remainingStudents, setRemainingStudents] = useState(0);
@@ -52,7 +55,8 @@ const Dashboard = () => {
     students: 0,
     faculty: 0,
     mentors: 0,
-    evaluators: 0,
+    // evaluators: 0,
+    // COMMENTED OUT - Evaluator count no longer tracked (evaluator assignment deprecated)
   });
 
   useEffect(() => {
@@ -133,6 +137,8 @@ const Dashboard = () => {
   };
 
   const handleAssignEvaluators = async () => {
+    /* 
+    COMMENTED OUT - New policy: Only mentors are assigned, they act as both mentor and evaluator
     // Fetch the latest counts before proceeding
     const currentCounts = await fetchCounts();
 
@@ -143,9 +149,13 @@ const Dashboard = () => {
       // Directly assign evaluators if none exist
       await assignEvaluators();
     }
+    */
+    toast.error('Evaluator assignment is no longer available. Only mentors will be assigned.');
   };
 
   const assignEvaluators = async () => {
+    /*
+    COMMENTED OUT - New policy: Evaluator assignment deprecated
     setEvaluatorLoading(true);
     try {
       const response = await fetch('/api/admin/assignevaluator', { method: 'POST' });
@@ -164,9 +174,12 @@ const Dashboard = () => {
     } finally {
       setEvaluatorLoading(false);
     }
+    */
   };
 
   const handleReassignEvaluators = async () => {
+    /*
+    COMMENTED OUT - New policy: Evaluator assignment deprecated
     try {
       // First delete existing evaluator assignments
       const deleteResponse = await fetch('/api/admin/deleteevaluators', { method: 'DELETE' });
@@ -183,6 +196,7 @@ const Dashboard = () => {
     } finally {
       setShowEvaluatorModal(false);
     }
+    */
   };
 
   const handleUnlockStage = () => {
@@ -228,7 +242,8 @@ const Dashboard = () => {
   };
 
   const handleEvaluatorModalClose = () => {
-    setShowEvaluatorModal(false);
+    // COMMENTED OUT - Evaluator assignment deprecated
+    // setShowEvaluatorModal(false);
   };
 
   const handleAllAssignedModalClose = () => {
@@ -250,6 +265,8 @@ const Dashboard = () => {
     return 'locked';
   };
 
+  /*
+  COMMENTED OUT - Evaluator Excel download function (evaluator assignment deprecated)
   const handleEvaluatorExcelDownload = async () => {
     try {
       const res = await fetch('/api/admin/getEvaluatorExcel');
@@ -286,6 +303,7 @@ const Dashboard = () => {
       console.error('Failed to generate Excel:', err);
     }
   };
+  */
 
   return (
     <>
@@ -302,7 +320,8 @@ const Dashboard = () => {
             <div className="bg-primary h-2.5 rounded-full animate-pulse w-3/4"></div>
           </div>
         </div>
-      ) : evaluatorLoading ? (
+      ) : false ? (
+        // COMMENTED OUT - Evaluator loading section (evaluator assignment deprecated)
         <div className="flex flex-col items-center justify-center py-12 px-4">
           <div className="w-16 h-16 border-t-4 border-b-4 border-primary rounded-full animate-spin mb-6"></div>
           <h3 className="text-xl font-semibold mb-2">Assigning Evaluators</h3>
@@ -348,6 +367,8 @@ const Dashboard = () => {
             />
           )}
 
+          {/*
+          COMMENTED OUT - Evaluator modal (evaluator assignment deprecated)
           {showEvaluatorModal && (
             <InfoModal
               isOpen={showEvaluatorModal}
@@ -358,6 +379,7 @@ const Dashboard = () => {
               buttonInfo="Yes, Reassign"
             />
           )}
+          */}
 
           <div className="container pb-4 mx-auto">
             <StageProgress
@@ -382,13 +404,19 @@ const Dashboard = () => {
             <Button size="md" variant="primary" className="mr-4" onClick={handleAssignMentors}>
               Assign Mentor
             </Button>
+            {/*
+            COMMENTED OUT - Evaluator assignment button (evaluator assignment deprecated)
             <Button size="md" variant="primary" onClick={handleAssignEvaluators}>
               Assign Evaluator
             </Button>
+            */}
           </div>
+          {/*
+          COMMENTED OUT - Evaluator Excel download (evaluator assignment deprecated)
           <Button size="md" variant="outline" className="mr-4 mt-4" onClick={handleEvaluatorExcelDownload}>
             <Download /> Evaluator Excel
           </Button>
+          */}
         </>
       )}
     </>

@@ -4,6 +4,10 @@ import { eq, isNull, asc } from 'drizzle-orm';
 
 export async function mentorAssignment() {
   try {
+    // NEW POLICY: Only one mentor is assigned to each student
+    // The mentor acts as both mentor and evaluator
+    // Same department mentors are assigned to same department students only
+
     const students = await db
       .select({
         id: student.id,
