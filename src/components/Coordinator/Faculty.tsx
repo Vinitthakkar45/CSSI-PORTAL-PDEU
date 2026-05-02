@@ -106,6 +106,8 @@ const FacultyTable = () => {
     return assignment && assignment.assignedMentor === 1 ? 'Assigned' : 'Pending';
   };
 
+  /*
+  COMMENTED OUT - Evaluator assignment deprecated (only one mentor acts as evaluator)
   const getEvaluatorStatus = (facultyId: number) => {
     if (!assignmentsLoaded) return 'Loading...';
 
@@ -114,6 +116,7 @@ const FacultyTable = () => {
     const assignment = assignments.find((item) => item.facultyId === facultyId);
     return assignment && assignment.evaluatorAssigned === 1 ? 'Assigned' : 'Pending';
   };
+  */
 
   const handleModalclose = () => {
     setShowModal(false);
@@ -237,14 +240,17 @@ const FacultyTable = () => {
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
-                  Mentor
+                  Evaluator
                 </TableCell>
+                {/* 
+                COMMENTED OUT - Evaluator column removed (only one mentor acts as evaluator)
                 <TableCell
                   isHeader
                   className="py-3 px-4 w-32 md:w-40 whitespace-nowrap font-medium text-gray-500 text-start text-theme-base dark:text-gray-400"
                 >
                   Evaluator
                 </TableCell>
+                */}
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -293,7 +299,9 @@ const FacultyTable = () => {
                         >
                           {getMentorStatus(item.faculty.id)}
                         </Badge>
-                      </TableCell>
+                      </TableCell>{' '}
+                      {/* 
+                      COMMENTED OUT - Evaluator status column removed (only one mentor acts as evaluator)
                       <TableCell className="py-3 px-4 truncate text-gray-500 text-theme-sm dark:text-gray-400">
                         <Badge
                           size="sm"
@@ -302,11 +310,13 @@ const FacultyTable = () => {
                           {getEvaluatorStatus(item.faculty.id)}
                         </Badge>
                       </TableCell>
+                      */}
                     </TableRow>
                   ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
+                  {/* COMMENTED OUT - Updated colSpan from 8 to 7 (removed Evaluator column) */}
+                  <TableCell colSpan={7} className="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
                     No faculty found matching your search criteria
                   </TableCell>
                 </TableRow>

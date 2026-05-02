@@ -93,7 +93,7 @@ const Dashboard = () => {
               disabled
               title="Mentors now act as both mentor and evaluator"
             >
-              Mentored Students
+              Evaluated Student
             </button>
             {/*
             COMMENTED OUT - Evaluated Students tab removed (new policy: mentors act as both mentor and evaluator)

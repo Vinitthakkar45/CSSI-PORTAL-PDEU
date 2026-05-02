@@ -611,7 +611,9 @@ export default function StudentModal({
                     <div>
                       <h2 className="mb-6">
                         {' '}
+                        {/* COMMENTED OUT - Internal Evaluation heading (only Poster Organization section used)
                         <i> Internal Evaluation </i>
+                        */}
                       </h2>
                       <h3 className="mb-4">Poster Organization</h3>
 
@@ -714,7 +716,7 @@ export default function StudentModal({
                           Close
                         </Button>
                         <Button size="sm" onClick={saveinternalmarks}>
-                          {savingMarks ? 'Saving...' : 'Save Internal Marks'}
+                          {savingMarks ? 'Saving...' : 'Save Marks'}
                         </Button>
                       </div>
                     </div>
@@ -724,7 +726,9 @@ export default function StudentModal({
                       <div>
                         <h2 className="mb-6">
                           {' '}
+                          {/* COMMENTED OUT - External Evaluation heading (only Presentation section used)
                           <i> External Evaluation </i>
+                          */}
                         </h2>
 
                         <h3 className="mb-4">Presentation</h3>
@@ -816,7 +820,7 @@ export default function StudentModal({
                           Close
                         </Button>
                         <Button size="sm" onClick={saveexternalmarks}>
-                          {savingMarks ? 'Saving...' : 'Save External Marks'}
+                          {savingMarks ? 'Saving...' : 'Save Marks'}
                         </Button>
                       </div>
                     </div>

@@ -2,11 +2,20 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components
 
 const SkeletonRow = () => (
   <TableRow>
+    {/* COMMENTED OUT - Changed from 8 to 7 cells (removed Evaluator status) */}
+    {[...Array(7)].map((_, i) => (
+      <TableCell key={i} className="py-3 px-4">
+        <div className="h-4 bg-gray-200 rounded dark:bg-gray-700 w-full animate-pulse"></div>
+      </TableCell>
+    ))}
+    {/* 
+    COMMENTED OUT - Evaluator status skeleton removed
     {[...Array(8)].map((_, i) => (
       <TableCell key={i} className="py-3 px-4">
         <div className="h-4 bg-gray-200 rounded dark:bg-gray-700 w-full animate-pulse"></div>
       </TableCell>
     ))}
+    */}
   </TableRow>
 );
 
@@ -27,8 +36,13 @@ const FacultyTableSkeleton = () => {
               <TableCell isHeader>Department</TableCell>
               <TableCell isHeader>Sitting Location</TableCell>
               <TableCell isHeader>Available Time Slots</TableCell>
+              {/* COMMENTED OUT - Changed to Evaluator Status (removed Mentor Status) */}
+              <TableCell isHeader>Evaluator Status</TableCell>
+              {/* 
+              COMMENTED OUT - Original headers with both Mentor Status and Evaluator Status
               <TableCell isHeader>Mentor Status</TableCell>
               <TableCell isHeader>Evaluator Status</TableCell>
+              */}
             </TableRow>
           </TableHeader>
           <TableBody>

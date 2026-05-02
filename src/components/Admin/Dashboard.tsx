@@ -402,7 +402,7 @@ const Dashboard = () => {
           </div>
           <div>
             <Button size="md" variant="primary" className="mr-4" onClick={handleAssignMentors}>
-              Assign Mentor
+              Assign Evaluator
             </Button>
             {/*
             COMMENTED OUT - Evaluator assignment button (evaluator assignment deprecated)
