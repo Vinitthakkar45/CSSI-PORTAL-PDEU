@@ -19,7 +19,7 @@ export interface MarksType {
 }
 
 export const getMentoredStudents = async (facultyId: string) => {
-  // Fetch the faculty ID based on the user ID
+  // facultyId is the session user.id — already tied to the current academic year's account.
   const fac_id_result = await db.select({ id: faculty.id }).from(faculty).where(eq(faculty.userId, facultyId)).limit(1);
 
   if (fac_id_result.length === 0) {
@@ -28,7 +28,6 @@ export const getMentoredStudents = async (facultyId: string) => {
 
   const fac_id = fac_id_result[0].id;
 
-  // Fetch the student IDs mentored by the faculty
   const stu_ids = await db
     .select({ id: mentorStudent.studentId })
     .from(mentorStudent)
@@ -36,7 +35,6 @@ export const getMentoredStudents = async (facultyId: string) => {
 
   const ids = stu_ids.map((stud) => stud.id);
 
-  // Fetch the student details
   const result = await db
     .select({ student })
     .from(student)
@@ -50,7 +48,6 @@ export const getMentoredStudents = async (facultyId: string) => {
 };
 
 export const getEvaluatedStudents = async (facultyId: string) => {
-  // Fetch the faculty ID based on the user ID
   const fac_id_result = await db.select({ id: faculty.id }).from(faculty).where(eq(faculty.userId, facultyId)).limit(1);
 
   if (fac_id_result.length === 0) {
@@ -75,10 +72,6 @@ export const getEvaluatedStudents = async (facultyId: string) => {
 
   const students_data: SelectStudent[] = result.map((row) => row.student);
 
-  // students_data.forEach((student) => {
-  //   student.image = '/images/user/user-17.jpg'; // Static image path
-  //   student.ngoStatus = student.ngoChosen ? 'active' : 'pending'; // NGO status
-  // });
   return students_data;
 };
 

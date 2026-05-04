@@ -17,6 +17,7 @@ import { toast } from '@/components/Home/ui/toast/Toast';
 import StudentTableSkeleton from './skeletons/StudentTableSkele';
 import StudentModal from './Modal/StudentModal';
 import { InfoModal } from '../ConfirmationModals';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 type StudentWithUser = {
   student: InferSelectModel<typeof student>;
@@ -29,8 +30,8 @@ type StudentWithUser = {
   evaluator: InferSelectModel<typeof faculty>;
 };
 
-// Cache key for localStorage
-const CACHE_KEY = 'admin_students_cache';
+// Cache key for localStorage — include academic year to avoid cross-year stale data
+const CACHE_KEY = `admin_students_cache_${getCurrentAcademicYear()}`;
 const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Helper function to get cached data
@@ -90,8 +91,9 @@ const StudentTable = () => {
   useEffect(() => {
     const cached = getCachedStudents();
     if (cached) {
-      setStudents(cached.data);
-      setFilteredStudents(cached.data);
+      const safeData = Array.isArray(cached.data) ? cached.data : [];
+      setStudents(safeData);
+      setFilteredStudents(safeData);
       setLastFetched(cached.timestamp);
       setLoading(false);
     }
@@ -107,8 +109,9 @@ const StudentTable = () => {
 
       // Use cache if available and not forced refresh and not expired
       if (!forceRefresh && cached && now - cached.timestamp < CACHE_EXPIRY) {
-        setStudents(cached.data);
-        setFilteredStudents(cached.data);
+        const safeData = Array.isArray(cached.data) ? cached.data : [];
+        setStudents(safeData);
+        setFilteredStudents(safeData);
         setLastFetched(cached.timestamp);
         setLoading(false);
         return;
@@ -116,13 +119,15 @@ const StudentTable = () => {
 
       // Fetch fresh data
       const res = await fetch('/api/admin/students');
+      if (!res.ok) throw new Error(`Failed to fetch students: ${res.status}`);
       const data = await res.json();
+      const safeData = Array.isArray(data) ? data : [];
 
-      setStudents(data);
-      setFilteredStudents(data);
+      setStudents(safeData);
+      setFilteredStudents(safeData);
 
       // Cache the new data
-      const timestamp = setCachedStudents(data);
+      const timestamp = setCachedStudents(safeData);
       setLastFetched(timestamp);
     } catch (error) {
       console.error('Error fetching student data:', error);
@@ -497,7 +502,9 @@ const StudentTable = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={8} className="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
-                    No students found matching your search criteria
+                    {students.length === 0
+                      ? `No students imported for ${getCurrentAcademicYear()} yet. Upload the Excel file to get started.`
+                      : 'No students found matching your search criteria'}
                   </TableCell>
                 </TableRow>
               )}

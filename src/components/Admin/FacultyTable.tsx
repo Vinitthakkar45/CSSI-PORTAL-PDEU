@@ -12,6 +12,7 @@ import { useModal } from '@/hooks/useModal';
 import UploadExcel from '@/components/UploadExcel';
 import { toast } from '@/components/Home/ui/toast/Toast';
 import FacultyTableSkeleton from './skeletons/FacultyTableSkele';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -60,8 +61,9 @@ export default function FacultyTable() {
       }
 
       const data = await res.json();
-      setFaculties(data);
-      setFilteredFaculties(data);
+      const safeData = Array.isArray(data) ? data : [];
+      setFaculties(safeData);
+      setFilteredFaculties(safeData);
       closeUploadModal();
       toast.success('Faculty list refreshed successfully');
     } catch (error) {
@@ -85,8 +87,9 @@ export default function FacultyTable() {
         }
 
         const data = await res.json();
-        setFaculties(data);
-        setFilteredFaculties(data); // initialize with all
+        const safeData = Array.isArray(data) ? data : [];
+        setFaculties(safeData);
+        setFilteredFaculties(safeData); // initialize with all
       } catch (error) {
         console.error('Error fetching faculty data:', error);
         toast.error(error instanceof Error ? error.message : 'Failed to fetch faculty data');
@@ -397,7 +400,9 @@ export default function FacultyTable() {
                 <TableRow>
                   {/* COMMENTED OUT - Updated colSpan from 8 to 7 (removed Evaluator column) */}
                   <TableCell colSpan={7} className="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
-                    No faculty found matching your search criteria
+                    {faculties.length === 0
+                      ? `No faculty imported for ${getCurrentAcademicYear()} yet. Upload the Excel file to get started.`
+                      : 'No faculty found matching your search criteria'}
                   </TableCell>
                 </TableRow>
               )}

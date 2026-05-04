@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/drizzle/db';
 import { user, student, faculty } from '@/drizzle/schema';
-import { eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import transporter from '@/lib/transporter';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 export async function POST(request: NextRequest) {
   try {
+    // Only send credentials to new users who have no password yet.
+    // Scope to the current academic year so old-year accounts (which already have passwords)
+    // are never touched. Admins (academic_year IS NULL) are excluded here intentionally.
     const usersToUpdate = await db
       .select({
         id: user.id,
         email: user.email,
         role: user.role,
         name: sql`
-          CASE 
+          CASE
             WHEN ${user.role} = 'student' THEN ${student.name}
             WHEN ${user.role} IN ('faculty', 'coordinator') THEN ${faculty.name}
             WHEN ${user.role} = 'admin' THEN 'Admin'
@@ -22,7 +26,7 @@ export async function POST(request: NextRequest) {
       .from(user)
       .leftJoin(student, eq(user.id, student.userId))
       .leftJoin(faculty, eq(user.id, faculty.userId))
-      .where(isNull(user.password));
+      .where(and(isNull(user.password), eq(user.academicYear, getCurrentAcademicYear())));
 
     if (usersToUpdate.length === 0) {
       return NextResponse.json({

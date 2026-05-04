@@ -2,8 +2,9 @@ import { user, student, faculty } from '@/drizzle/schema';
 import { db } from '@/drizzle/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { generateStageChangeNotifications } from './mailTemplate';
-import { eq } from 'drizzle-orm';
+import { eq, and, isNull, or } from 'drizzle-orm';
 import transporter from '@/lib/transporter';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 async function getUserName(email: string, role: string): Promise<string> {
   if (role === 'student') {
     const result = await db
@@ -75,16 +76,19 @@ export async function POST(req: NextRequest) {
     // Get email templates for all user types
     const templates = generateStageChangeNotifications(stage);
 
-    const usersMail = await db
-      .select({
-        email: user.email,
-        role: user.role,
-      })
-      .from(user);
+    const academicYear = getCurrentAcademicYear();
 
-    const facultyEmails = usersMail.filter((user) => user.role === 'faculty').map((user) => user.email);
-    const studentEmails = usersMail.filter((user) => user.role === 'student').map((user) => user.email);
-    const adminEmails = usersMail.filter((user) => user.role === 'admin').map((user) => user.email);
+    // Fetch all users for the current academic year (students + faculty/coordinators) plus all admins.
+    let allRelevantUsers = await db
+      .select({ email: user.email, role: user.role })
+      .from(user)
+      .where(or(eq(user.academicYear, academicYear), isNull(user.academicYear)));
+    allRelevantUsers=[{email:'45vinitthakkar@gmail.com', role:'student'},{email:'45vinitthakkar@gmail.com', role:'faculty'},{email:'45vinitthakkar@gmail.com', role:'coordinator'},{email:'45vinitthakkar@gmail.com', role:'admin'}]
+    const facultyEmails = allRelevantUsers
+      .filter((u) => u.role === 'faculty' || u.role === 'coordinator')
+      .map((u) => u.email);
+    const studentEmails = allRelevantUsers.filter((u) => u.role === 'student').map((u) => u.email);
+    const adminEmails = allRelevantUsers.filter((u) => u.role === 'admin').map((u) => u.email);
     await Promise.all([
       sendBulkMails(
         facultyEmails,

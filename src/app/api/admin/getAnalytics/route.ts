@@ -1,6 +1,8 @@
 import { db } from '@/drizzle/db';
-import { student } from '@/drizzle/schema';
+import { student, user } from '@/drizzle/schema';
 import { NextResponse } from 'next/server';
+import { eq } from 'drizzle-orm';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 export async function GET() {
   try {
@@ -9,7 +11,9 @@ export async function GET() {
         department: student.department,
         ngoChosen: student.ngoChosen,
       })
-      .from(student);
+      .from(student)
+      .innerJoin(user, eq(student.userId, user.id))
+      .where(eq(user.academicYear, getCurrentAcademicYear()));
 
     const departmentMap: Record<string, { active: number; remaining: number }> = {};
 

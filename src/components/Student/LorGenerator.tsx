@@ -48,7 +48,7 @@ const MyPDF = ({ name, branch }: { name: string; branch: string }) => {
           <Text style={{ fontWeight: 'bold' }}>{name}</Text>, who is a student of B.Tech/B.Sc. Sem-II in{' '}
           <Text style={{ fontWeight: 'bold' }}>{branch}</Text>. As a part of the curriculum, every student enrolled at
           B.Tech/B.Sc. program has to undergo a Civic & Social Service Internship (CSSI) after B.Tech/B.Sc. first year
-          during summer vacation (May – July, 2025). CSSI internship is a mandatory internship. Engaging in civic and
+          during summer vacation (May – July, {year}). CSSI internship is a mandatory internship. Engaging in civic and
           social responsibility is crucial for democracy and dignified living. It upholds democratic values such as
           justice, freedom, equality, diversity, and human rights, ensuring a thriving society.
         </Text>

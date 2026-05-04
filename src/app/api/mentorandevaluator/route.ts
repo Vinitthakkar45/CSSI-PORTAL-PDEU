@@ -2,6 +2,8 @@ import { db } from '@/drizzle/db';
 import { evaluatorStudent, faculty, mentorStudent, student, user } from '@/drizzle/schema';
 import { NextRequest, NextResponse } from 'next/server';
 import { eq, and, inArray } from 'drizzle-orm';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,10 +29,15 @@ export async function POST(req: NextRequest) {
       const evalId = evaluatorResult[0]?.evaluatorId;
 
       // Get coordinator (faculty with coordinator role in the same department)
-      const coordinatorUsers = await db.select({ userId: user.id }).from(user).where(eq(user.role, 'coordinator'));
+      // Only coordinators enrolled in the current academic year
+      const coordinatorUsers = await db
+        .select({ userId: user.id })
+        .from(user)
+        .where(and(eq(user.role, 'coordinator'), eq(user.academicYear, getCurrentAcademicYear())));
 
       const coordinatorUserIds = coordinatorUsers.map((c) => c.userId);
 
+      // coordinator user IDs are already scoped to current year (filtered above by role + academicYear)
       const coordinators = await db
         .select()
         .from(faculty)

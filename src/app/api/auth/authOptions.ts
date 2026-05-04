@@ -1,9 +1,9 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/drizzle/db';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import { user } from '@/drizzle/schema';
-import { sql } from 'drizzle-orm';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -19,14 +19,24 @@ export const authOptions: NextAuthOptions = {
         }
 
         const normalizedEmail = credentials.email.toLowerCase();
+
+        // Admins have academic_year = NULL (always active).
+        // All other roles must match the current academic year so old credentials
+        // from prior batches cannot be used to log in.
         const fetchedUsers = await db
           .select()
           .from(user)
-          .where(eq(sql`LOWER(${user.email})`, normalizedEmail))
+          .where(
+            and(
+              eq(sql`LOWER(${user.email})`, normalizedEmail),
+              or(isNull(user.academicYear), eq(user.academicYear, getCurrentAcademicYear()))
+            )
+          )
           .limit(1);
+
         const fetchedUser = fetchedUsers[0];
 
-        if (!fetchedUser || !(credentials.password === fetchedUser.password)) {
+        if (!fetchedUser || credentials.password !== fetchedUser.password) {
           return null;
         }
 

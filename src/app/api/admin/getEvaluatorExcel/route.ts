@@ -1,9 +1,15 @@
 import { db } from '@/drizzle/db';
-import { evaluatorStudent, faculty, student } from '@/drizzle/schema'; // Adjust import path
-import { eq } from 'drizzle-orm';
+import { evaluatorStudent, faculty, student, user } from '@/drizzle/schema';
+import { eq, and } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
+
+const facultyUser = alias(user, 'facultyUser');
 
 export async function GET() {
   try {
+    const academicYear = getCurrentAcademicYear();
+
     const data = await db
       .select({
         facultyId: faculty.id,
@@ -14,7 +20,9 @@ export async function GET() {
       })
       .from(evaluatorStudent)
       .innerJoin(faculty, eq(evaluatorStudent.evaluatorId, faculty.id))
-      .innerJoin(student, eq(evaluatorStudent.studentId, student.id));
+      .innerJoin(facultyUser, and(eq(faculty.userId, facultyUser.id), eq(facultyUser.academicYear, academicYear)))
+      .innerJoin(student, eq(evaluatorStudent.studentId, student.id))
+      .innerJoin(user, and(eq(student.userId, user.id), eq(user.academicYear, academicYear)));
 
     const grouped: Record<
       string,
@@ -42,11 +50,8 @@ export async function GET() {
     }
 
     const sorted = Object.values(grouped).sort((a, b) => {
-      // Get the first (lowest) roll number from each faculty's students
       const rollA = a.students.length > 0 ? (a.students[0]?.rollNumber ?? '') : '';
       const rollB = b.students.length > 0 ? (b.students[0]?.rollNumber ?? '') : '';
-
-      // Sort by the lowest roll number in each faculty group
       return rollA.localeCompare(rollB);
     });
 

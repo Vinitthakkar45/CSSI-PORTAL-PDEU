@@ -1,7 +1,8 @@
 import { db } from '@/drizzle/db';
 import { faculty, user } from '@/drizzle/schema';
 import { NextRequest, NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,7 +13,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Invalid or missing ID' }, { status: 400 });
     }
 
-    const department = await db.select({ department: faculty.department }).from(faculty).where(eq(faculty.userId, id));
+    const academicYear = getCurrentAcademicYear();
+
+    // The coordinator's user.id is already year-specific (from their session).
+    // Their faculty profile is looked up by userId; filtering by academicYear via the user join
+    // ensures we get the correct year's profile.
+    const department = await db
+      .select({ department: faculty.department })
+      .from(faculty)
+      .innerJoin(user, eq(faculty.userId, user.id))
+      .where(and(eq(faculty.userId, id), eq(user.academicYear, academicYear)));
     const userdep = department[0]?.department;
 
     if (!userdep) {
@@ -29,7 +39,7 @@ export async function POST(req: NextRequest) {
       })
       .from(faculty)
       .innerJoin(user, eq(faculty.userId, user.id))
-      .where(eq(faculty.department, userdep));
+      .where(and(eq(faculty.department, userdep), eq(user.academicYear, academicYear)));
 
     return NextResponse.json(facultyList, { status: 200 });
   } catch (error) {

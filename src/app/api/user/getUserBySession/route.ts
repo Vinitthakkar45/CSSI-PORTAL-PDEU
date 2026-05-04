@@ -17,6 +17,7 @@ export async function GET() {
     const { id, role, email } = currentUser;
 
     if (role === 'student') {
+      // session.user.id is already this year's user.id — no additional year filter needed
       const result = await db.select().from(student).where(eq(student.userId, id)).limit(1);
       return NextResponse.json({ role, info: result[0] || null });
     }

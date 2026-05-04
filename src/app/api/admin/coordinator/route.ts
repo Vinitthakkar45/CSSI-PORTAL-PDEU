@@ -1,7 +1,8 @@
 import { db } from '@/drizzle/db';
 import { faculty, user } from '@/drizzle/schema';
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 export async function GET() {
   try {
@@ -16,7 +17,7 @@ export async function GET() {
       })
       .from(faculty)
       .innerJoin(user, eq(faculty.userId, user.id))
-      .where(eq(user.role, 'coordinator'));
+      .where(and(eq(user.role, 'coordinator'), eq(user.academicYear, getCurrentAcademicYear())));
     return NextResponse.json(coordList, { status: 200 });
   } catch (err) {
     console.log(err);

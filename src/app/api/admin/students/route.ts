@@ -3,6 +3,7 @@ import { evaluatorStudent, faculty, mentorStudent, student, user } from '@/drizz
 import { NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 const mentorFaculty = alias(faculty, 'mentorFaculty');
 const evaluatorFaculty = alias(faculty, 'evaluatorFaculty');
@@ -24,7 +25,8 @@ export async function GET() {
       .leftJoin(mentorStudent, eq(mentorStudent.studentId, student.id))
       .leftJoin(evaluatorStudent, eq(evaluatorStudent.studentId, student.id))
       .leftJoin(mentorFaculty, eq(mentorFaculty.id, mentorStudent.mentorId))
-      .leftJoin(evaluatorFaculty, eq(evaluatorFaculty.id, evaluatorStudent.evaluatorId));
+      .leftJoin(evaluatorFaculty, eq(evaluatorFaculty.id, evaluatorStudent.evaluatorId))
+      .where(eq(user.academicYear, getCurrentAcademicYear()));
 
     return NextResponse.json(results);
   } catch (error) {

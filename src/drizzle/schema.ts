@@ -1,20 +1,29 @@
 import { sql } from 'drizzle-orm';
 import { year } from 'drizzle-orm/mysql-core';
-import { integer, pgTable, serial, text, uuid } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, text, uuid, unique } from 'drizzle-orm/pg-core';
 import { boolean } from 'drizzle-orm/pg-core';
 
-export const user = pgTable('user', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  email: text('email').notNull().unique(),
-  password: text('password'),
-  role: text('role').notNull(),
-  profileImage: text('profile_image'),
-});
+export const user = pgTable(
+  'user',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    email: text('email').notNull(),
+    password: text('password'),
+    role: text('role').notNull(),
+    profileImage: text('profile_image'),
+    // NULL for admins (always active across years).
+    // "2024-2025", "2025-2026", … for students / faculty / coordinators.
+    // Same email may appear multiple times — once per academic year.
+    academicYear: text('academic_year'),
+  },
+  (t) => [unique('user_email_year_unique').on(t.email, t.academicYear)]
+);
 
 export const sessionuser = pgTable('user', {
   id: uuid('id').primaryKey(),
-  email: text('email').notNull().unique(),
+  email: text('email').notNull(),
   role: text('role').notNull(),
+  academicYear: text('academic_year'),
 });
 
 export const student = pgTable('student', {

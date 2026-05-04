@@ -2,6 +2,7 @@ import { db } from '@/drizzle/db';
 import { faculty, user } from '@/drizzle/schema';
 import { NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 export async function GET() {
   try {
@@ -16,11 +17,10 @@ export async function GET() {
       })
       .from(faculty)
       .innerJoin(user, eq(faculty.userId, user.id))
-      .where(eq(faculty.userId, user.id));
+      .where(eq(user.academicYear, getCurrentAcademicYear()));
     return NextResponse.json(facultyList);
   } catch (error) {
-    console.error('Error fetching student:', error);
-
+    console.error('Error fetching faculty:', error);
     return NextResponse.json({ error: 'Failed to fetch faculty data' }, { status: 500 });
   }
 }

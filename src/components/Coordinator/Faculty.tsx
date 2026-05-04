@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react';
 import Button from '../Home/ui/button/Button';
 import AddFacultyModal from './AddFacultyModal';
 import FacultyTableSkeleton from './Skeletons/FacultyTableSkele';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 type FacultyWithUser = {
   faculty: InferSelectModel<typeof faculty>;
@@ -58,9 +59,11 @@ const FacultyTable = () => {
           },
           body: JSON.stringify({ id }),
         });
+        if (!res.ok) throw new Error(`Failed to fetch faculty: ${res.status}`);
         const data = await res.json();
-        setFaculties(data);
-        setFilteredFaculties(data);
+        const safeData = Array.isArray(data) ? data : [];
+        setFaculties(safeData);
+        setFilteredFaculties(safeData);
       } catch (error) {
         console.error('Error fetching faculty data:', error);
       } finally {
@@ -317,7 +320,9 @@ const FacultyTable = () => {
                 <TableRow>
                   {/* COMMENTED OUT - Updated colSpan from 8 to 7 (removed Evaluator column) */}
                   <TableCell colSpan={7} className="py-3 px-4 text-center text-gray-500 dark:text-gray-400">
-                    No faculty found matching your search criteria
+                    {faculties.length === 0
+                      ? `No faculty imported for ${getCurrentAcademicYear()} yet. Upload the Excel file to get started.`
+                      : 'No faculty found matching your search criteria'}
                   </TableCell>
                 </TableRow>
               )}
