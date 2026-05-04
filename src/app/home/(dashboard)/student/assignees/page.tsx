@@ -248,8 +248,11 @@ export default function AssigneesPage() {
               />
             ))}
 
-            {mentor && <FacultyCard title="Internal Evaluator" faculty={mentor} />}
+            {mentor && <FacultyCard title="Evaluator" faculty={mentor} />}
+            {/* 
+            COMMENTED OUT - External Evaluator removed (only one mentor acts as evaluator)
             {evaluator && <FacultyCard title="External Evaluator" faculty={evaluator} />}
+            */}
           </>
         ) : (
           <NoAssigneesMessage />

@@ -808,13 +808,15 @@ export default function StudentModal({
                   <div>
                     <h2 className="mb-6">
                       {' '}
+                      {/* COMMENTED OUT - Internal Evaluation heading (only Poster Organization section used)
                       <i> Internal Evaluation </i>
+                      */}
                     </h2>
 
                     {/* Internal Evaluation Absent Toggle */}
                     <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center justify-between">
-                        <Label className="text-base font-medium">Mark Student as Absent (Internal Evaluation)</Label>
+                        <Label className="text-base font-medium">Mark Student as Absent (Poster Organization)</Label>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
@@ -955,7 +957,7 @@ export default function StudentModal({
                         Close
                       </Button>
                       <Button size="sm" onClick={saveinternalmarks}>
-                        {savingMarks ? 'Saving...' : isAbsentMentor ? 'Mark Internal Absent' : 'Save Internal Marks'}
+                        {savingMarks ? 'Saving...' : isAbsentMentor ? 'Mark Internal Absent' : 'Save Marks'}
                       </Button>
                     </div>
                   </div>
@@ -964,13 +966,15 @@ export default function StudentModal({
                   <div>
                     <h2 className="mb-6 mt-5">
                       {' '}
+                      {/* COMMENTED OUT - External Evaluation heading (only Presentation section used)
                       <i> External Evaluation </i>
+                      */}
                     </h2>
 
                     {/* External Evaluation Absent Toggle */}
                     <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center justify-between">
-                        <Label className="text-base font-medium">Mark Student as Absent (External Evaluation)</Label>
+                        <Label className="text-base font-medium">Mark Student as Absent (Presentation)</Label>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
@@ -1098,7 +1102,7 @@ export default function StudentModal({
                         Close
                       </Button>
                       <Button size="sm" onClick={saveexternalmarks}>
-                        {savingMarks ? 'Saving...' : isAbsentEvaluator ? 'Mark External Absent' : 'Save External Marks'}
+                        {savingMarks ? 'Saving...' : isAbsentEvaluator ? 'Mark External Absent' : 'Save Marks'}
                       </Button>
                     </div>
                   </div>

@@ -180,9 +180,9 @@ const Dashboard = () => {
               isOpen={showMentorModal}
               onCloseCross={() => setShowMentorModal(false)}
               onClose={confirmAssignMentors}
-              title="Confirm Mentor Assignment"
-              message={`You are about to assign ${faculties.length} faculty members as mentors to ${students.length} students. This action cannot be undone. Do you want to proceed?`}
-              buttonInfo="Yes, Assign Mentors"
+              title="Confirm Evaluator Assignment"
+              message={`You are about to assign ${faculties.length} faculty members as evaluators to ${students.length} students. This action cannot be undone. Do you want to proceed?`}
+              buttonInfo="Yes, Assign Evaluators"
             />
           )}
 
@@ -223,7 +223,7 @@ const Dashboard = () => {
               ))}
             </div>
           </div>
-          <Button onClick={handleAssignMentors}>Assign Mentors</Button>
+          <Button onClick={handleAssignMentors}>Assign Evaluators</Button>
         </>
       )}
     </>
