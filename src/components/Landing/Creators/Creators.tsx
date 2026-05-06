@@ -33,12 +33,6 @@ export default function TeamMembers() {
       imageUrl: '/images/profiles/Himanshu_gajera.jpg',
     },
     {
-      name: 'Dr. Dhaval Pujara',
-      role: 'Director SOT',
-      linkedIn: 'https://www.linkedin.com/in/dhaval-pujara-3a6889100?originalSubdomain=in',
-      imageUrl: '/images/profiles/dhaval.pujara_photo.jpg',
-    },
-    {
       name: 'Dr Abhishek Kumar',
       role: 'Associate Professor',
       linkedIn: 'https://orsp.pdpu.ac.in/adminfacviewprofile.aspx?facid=abhishek.k',
@@ -76,7 +70,7 @@ export default function TeamMembers() {
           <h1 className="text-xl font-bold dark:text-white">Under the Supervision of</h1>
         </div>
         <div className="flex justify-center">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-16 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-16 ">
             {guidanceOf.map((member, index) => (
               <div key={index} className="flex flex-col items-center">
                 <div className="relative w-40 h-40 mb-4 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-lg">

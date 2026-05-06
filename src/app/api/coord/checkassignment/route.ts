@@ -1,19 +1,28 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/drizzle/db';
-import { mentorStudent, evaluatorStudent, faculty, user } from '@/drizzle/schema';
+import { mentorStudent, evaluatorStudent, faculty, student, user } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 export async function GET() {
   try {
+    const academicYear = getCurrentAcademicYear();
+
     const [mentorList, evaluatorList, facultyList] = await Promise.all([
-      db.select().from(mentorStudent),
-      db.select().from(evaluatorStudent),
-      db
-        .select({ id: faculty.id })
+      db.select({ mentorId: mentorStudent.mentorId })
+        .from(mentorStudent)
+        .innerJoin(student, eq(mentorStudent.studentId, student.id))
+        .innerJoin(user, eq(student.userId, user.id))
+        .where(eq(user.academicYear, academicYear)),
+      db.select({ evaluatorId: evaluatorStudent.evaluatorId })
+        .from(evaluatorStudent)
+        .innerJoin(student, eq(evaluatorStudent.studentId, student.id))
+        .innerJoin(user, eq(student.userId, user.id))
+        .where(eq(user.academicYear, academicYear)),
+      db.select({ id: faculty.id })
         .from(faculty)
         .innerJoin(user, eq(faculty.userId, user.id))
-        .where(eq(user.academicYear, getCurrentAcademicYear())),
+        .where(eq(user.academicYear, academicYear)),
     ]);
 
     const mentorIds = new Set(mentorList.map((m) => m.mentorId));

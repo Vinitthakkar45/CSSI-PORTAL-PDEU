@@ -1,12 +1,15 @@
 import { db } from '@/drizzle/db';
-import { student, faculty, mentorStudent } from '@/drizzle/schema';
-import { eq, isNull, asc } from 'drizzle-orm';
+import { student, faculty, mentorStudent, user } from '@/drizzle/schema';
+import { eq, isNull, asc, and } from 'drizzle-orm';
+import { getCurrentAcademicYear } from '@/lib/academicYear';
 
 export async function mentorAssignment() {
   try {
     // NEW POLICY: Only one mentor is assigned to each student
     // The mentor acts as both mentor and evaluator
     // Same department mentors are assigned to same department students only
+
+    const academicYear = getCurrentAcademicYear();
 
     const students = await db
       .select({
@@ -15,6 +18,7 @@ export async function mentorAssignment() {
         rollNumber: student.rollNumber,
       })
       .from(student)
+      .innerJoin(user, and(eq(student.userId, user.id), eq(user.academicYear, academicYear)))
       .leftJoin(mentorStudent, eq(student.id, mentorStudent.studentId))
       .where(isNull(mentorStudent.id))
       .orderBy(asc(student.department), asc(student.rollNumber));
@@ -31,7 +35,8 @@ export async function mentorAssignment() {
         id: faculty.id,
         department: faculty.department,
       })
-      .from(faculty);
+      .from(faculty)
+      .innerJoin(user, and(eq(faculty.userId, user.id), eq(user.academicYear, academicYear)));
 
     const studentsByDept = new Map<string, { id: number }[]>();
     const facultiesByDept = new Map<string, { id: number }[]>();
