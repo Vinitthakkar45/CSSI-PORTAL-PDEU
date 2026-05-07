@@ -58,6 +58,8 @@ services:
     environment:
       NODE_ENV: production
       PORT: "3000"
+      NODE_OPTIONS: "--dns-result-order=ipv4first"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
     networks:
       - app_net
       - monitoring_net

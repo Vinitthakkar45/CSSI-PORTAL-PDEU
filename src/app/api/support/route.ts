@@ -40,8 +40,10 @@ export async function POST(req: NextRequest) {
         await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
       }
       return NextResponse.json({ msg: 'Emails sent successfully!' }, { status: 200 });
-    } catch (err) {
-      console.log(err);
+    } catch (err: unknown) {
+      const e = err as NodeJS.ErrnoException & { errors?: unknown[] };
+      console.error('[support] sendMail failed:', e.code, e.message);
+      if (e.errors) console.error('[support] sub-errors:', JSON.stringify(e.errors, null, 2));
       return NextResponse.json({ error: 'Failed to send emails' }, { status: 500 });
     }
   }
