@@ -294,11 +294,10 @@ export default function StudentModal({
                   {tabs.map((tab) => (
                     <button
                       key={tab}
-                      className={`px-4 py-2 text-sm font-medium max-w-[450px] ${
-                        activeTab === tab
+                      className={`px-4 py-2 text-sm font-medium max-w-[450px] ${activeTab === tab
                           ? 'border-b-2  border-blue-500 text-blue-500'
                           : ' border-b-2 border-gray-400 text-gray-400'
-                      }`}
+                        }`}
                       onClick={() => setActiveTab(tab)}
                     >
                       {tab === 'personal'
@@ -324,15 +323,14 @@ export default function StudentModal({
                   {/* Personal Details */}
                   <div className="flex justify-center gap-20 mb-5">
                     <div className="w-40 h-40 overflow-hidden rounded-full">
-                      <Image
-                        width={160}
-                        height={160}
+                      <img
                         src={
                           selectedStudent.student.profileImage
                             ? `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.student.profileImage}`
                             : '/images/user/DefaultProfile_Light.png'
                         }
                         alt={selectedStudent.student.name || ''}
+                        className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex flex-col justify-center">
@@ -524,9 +522,8 @@ export default function StudentModal({
                               />
                               <div className="flex items-center gap-3 mt-3">
                                 <button
-                                  className={`px-4 py-2 text-sm font-medium text-white rounded ${
-                                    declineReason ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'
-                                  }`}
+                                  className={`px-4 py-2 text-sm font-medium text-white rounded ${declineReason ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'
+                                    }`}
                                   onClick={handleDeclineOfferLetter}
                                   disabled={!declineReason || isDeclining}
                                 >
@@ -586,7 +583,7 @@ export default function StudentModal({
                       )}
                     </p>
                   </div>
-                  <div className="mb-4 ml-6">
+                  {/* <div className="mb-4 ml-6">
                     <Label>Poster</Label>
                     <p>
                       {selectedStudent.student.poster ? (
@@ -600,7 +597,7 @@ export default function StudentModal({
                         </span>
                       )}
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               )}
 

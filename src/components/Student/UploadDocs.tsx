@@ -158,7 +158,7 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
           )}
         </div>
 
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <h4 className="text-theme-xl font-medium text-gray-800 dark:text-white/90">
             Upload Poster <span className="text-error-500">*</span>
           </h4>
@@ -166,7 +166,7 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
             <DropzoneComponent onDrop={handlePosterDrop} isLoading={isLoading.Poster} title="" />
           </div>
           {posterUploaded && <p className="text-sm text-success-500 font-medium">Poster uploaded successfully!</p>}
-        </div>
+        </div> */}
 
         {error && <p className="text-sm text-error-500 font-medium">{error}</p>}
 
@@ -174,7 +174,7 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
           <Button
             onClick={handleSubmit}
             className="bg-brand-500 hover:bg-brand-600 text-white"
-            disabled={!reportUploaded || !certificateUploaded || !posterUploaded}
+            disabled={!reportUploaded || !certificateUploaded}
           >
             Submit All Documents
           </Button>

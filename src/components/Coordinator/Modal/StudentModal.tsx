@@ -269,22 +269,22 @@ export default function StudentModal({
           marks: isAbsent
             ? type === 'mentor'
               ? {
-                  posterOrganization: 0,
-                  dayToDayActivity: 0,
-                  contributionToWork: 0,
-                  learningOutcomes: 0,
-                  geoTagPhotos: 0,
-                  reportOrganization: 0,
-                  certificate: 0,
-                }
+                posterOrganization: 0,
+                dayToDayActivity: 0,
+                contributionToWork: 0,
+                learningOutcomes: 0,
+                geoTagPhotos: 0,
+                reportOrganization: 0,
+                certificate: 0,
+              }
               : {
-                  learningExplanation: 0,
-                  problemIdentification: 0,
-                  contributionExplanation: 0,
-                  proposedSolution: 0,
-                  presentationSkills: 0,
-                  qnaViva: 0,
-                }
+                learningExplanation: 0,
+                problemIdentification: 0,
+                contributionExplanation: 0,
+                proposedSolution: 0,
+                presentationSkills: 0,
+                qnaViva: 0,
+              }
             : marks,
           isAbsent,
           absentType: type === 'mentor' ? 'absentMentorEvaluation' : 'absentEvaluatorEvaluation',
@@ -476,11 +476,10 @@ export default function StudentModal({
                 {tabs.map((tab) => (
                   <button
                     key={tab}
-                    className={`px-4 py-2 text-sm font-medium max-w-[450px] relative ${
-                      activeTab === tab
+                    className={`px-4 py-2 text-sm font-medium max-w-[450px] relative ${activeTab === tab
                         ? 'border-b-2  border-blue-500 text-blue-500'
                         : ' border-b-2 border-gray-400 text-gray-400'
-                    }`}
+                      }`}
                     onClick={() => setActiveTab(tab)}
                   >
                     {tab === 'personal'
@@ -521,15 +520,14 @@ export default function StudentModal({
                 {/* Personal Details */}
                 <div className="flex justify-center gap-20 mb-5">
                   <div className="w-40 h-40 overflow-hidden rounded-full">
-                    <Image
-                      width={160}
-                      height={160}
+                    <img
                       src={
                         selectedStudent.student.profileImage
                           ? `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.student.profileImage}`
                           : '/images/user/DefaultProfile_Light.png'
                       }
                       alt={selectedStudent.student.name || ''}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="flex flex-col justify-center">
@@ -721,9 +719,8 @@ export default function StudentModal({
                             />
                             <div className="flex items-center gap-3 mt-3">
                               <button
-                                className={`px-4 py-2 text-sm font-medium text-white rounded ${
-                                  declineReason ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'
-                                }`}
+                                className={`px-4 py-2 text-sm font-medium text-white rounded ${declineReason ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'
+                                  }`}
                                 onClick={handleDeclineOfferLetter}
                                 disabled={!declineReason || isDeclining}
                               >
@@ -783,7 +780,7 @@ export default function StudentModal({
                     )}
                   </p>
                 </div>
-                <div className="mb-4 ml-6">
+                {/* <div className="mb-4 ml-6">
                   <Label>Poster</Label>
                   <p>
                     {selectedStudent.student.poster ? (
@@ -797,7 +794,7 @@ export default function StudentModal({
                       </span>
                     )}
                   </p>
-                </div>
+                </div> */}
               </div>
             )}
 
@@ -825,14 +822,12 @@ export default function StudentModal({
                             onChange={handleAbsentToggleMentor}
                           />
                           <div
-                            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${
-                              isAbsentMentor ? 'bg-red-500' : 'bg-gray-300'
-                            }`}
+                            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${isAbsentMentor ? 'bg-red-500' : 'bg-gray-300'
+                              }`}
                           >
                             <div
-                              className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${
-                                isAbsentMentor ? 'transform translate-x-5' : ''
-                              }`}
+                              className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${isAbsentMentor ? 'transform translate-x-5' : ''
+                                }`}
                             ></div>
                           </div>
                         </label>
@@ -983,14 +978,12 @@ export default function StudentModal({
                             onChange={handleAbsentToggleEvaluator}
                           />
                           <div
-                            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${
-                              isAbsentEvaluator ? 'bg-red-500' : 'bg-gray-300'
-                            }`}
+                            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${isAbsentEvaluator ? 'bg-red-500' : 'bg-gray-300'
+                              }`}
                           >
                             <div
-                              className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${
-                                isAbsentEvaluator ? 'transform translate-x-5' : ''
-                              }`}
+                              className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${isAbsentEvaluator ? 'transform translate-x-5' : ''
+                                }`}
                             ></div>
                           </div>
                         </label>

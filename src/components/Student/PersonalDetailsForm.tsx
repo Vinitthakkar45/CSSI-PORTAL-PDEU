@@ -123,7 +123,6 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
               placeholder="Enter division"
               error={errors.division}
               required
-              disabled
             />
             {errors.division && <span className="text-red-500 text-sm">{errors.division}</span>}
           </div>
@@ -136,7 +135,6 @@ export default function PersonalDetailsForm({ onComplete, userData }: PersonalDe
               placeholder="Enter group number"
               error={errors.groupNumber}
               required
-              disabled
             />
             {errors.groupNumber && <span className="text-red-500 text-sm">{errors.groupNumber}</span>}
           </div>

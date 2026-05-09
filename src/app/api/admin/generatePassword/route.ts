@@ -40,11 +40,8 @@ export async function POST(request: NextRequest) {
     let failCount = 0;
     const errors: { email: string; error: string }[] = [];
 
-    let count = 0;
     // Process users one by one
     for (const userData of usersToUpdate) {
-      if (count == 3) break;
-      count++;
       try {
         if (!userData.email) {
           throw new Error('User email is missing');
@@ -98,13 +95,13 @@ export async function POST(request: NextRequest) {
         </div>
         `;
 
-        await transporter.sendMail({
-          from: process.env.EMAIL,
-          // to: userData.email,
-          to: "45vinitthakkar@gmail.com",
-          subject: subject,
-          html: personalizedBody,
-        });
+        // await transporter.sendMail({
+        //   from: process.env.EMAIL,
+        //   // to: userData.email,
+        //   to: "45vinitthakkar@gmail.com",
+        //   subject: subject,
+        //   html: personalizedBody,
+        // });
 
         // Only update password in database if email was sent successfully
         await db.update(user).set({ password }).where(eq(user.id, userData.id));

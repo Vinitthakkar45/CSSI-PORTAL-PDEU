@@ -498,17 +498,16 @@ export default function StudentModal({
                 {/* Personal Details */}
                 <div className="flex justify-center gap-20 mb-5">
                   <div className="w-40 h-40 overflow-hidden rounded-full">
-                    <Image
-                      width={160}
-                      height={160}
-                      src={
-                        selectedStudent.profileImage
-                          ? `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.profileImage}`
-                          : '/images/user/DefaultProfile_Light.png'
-                      }
-                      alt={selectedStudent.name || ''}
-                    />
-                  </div>
+                                        <img
+                                          src={
+                                            selectedStudent.profileImage
+                                              ? `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.profileImage}`
+                                              : '/images/user/DefaultProfile_Light.png'
+                                          }
+                                          alt={selectedStudent.name || ''}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
                   <div className="flex flex-col justify-center">
                     <div className="mb-4">
                       <Label>Name</Label>
@@ -760,7 +759,7 @@ export default function StudentModal({
                     )}
                   </p>
                 </div>
-                <div className="mb-4 ml-6">
+                {/* <div className="mb-4 ml-6">
                   <Label>Poster</Label>
                   <p>
                     {selectedStudent.poster ? (
@@ -774,7 +773,7 @@ export default function StudentModal({
                       </span>
                     )}
                   </p>
-                </div>
+                </div> */}
               </div>
             )}
 
