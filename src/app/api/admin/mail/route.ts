@@ -79,11 +79,11 @@ export async function POST(req: NextRequest) {
     const academicYear = getCurrentAcademicYear();
 
     // Fetch all users for the current academic year (students + faculty/coordinators) plus all admins.
-    let allRelevantUsers = await db
+    const allRelevantUsers = await db
       .select({ email: user.email, role: user.role })
       .from(user)
       .where(or(eq(user.academicYear, academicYear), isNull(user.academicYear)));
-    allRelevantUsers=[{email:'45vinitthakkar@gmail.com', role:'student'},{email:'45vinitthakkar@gmail.com', role:'faculty'},{email:'45vinitthakkar@gmail.com', role:'coordinator'},{email:'45vinitthakkar@gmail.com', role:'admin'}]
+    
     const facultyEmails = allRelevantUsers
       .filter((u) => u.role === 'faculty' || u.role === 'coordinator')
       .map((u) => u.email);

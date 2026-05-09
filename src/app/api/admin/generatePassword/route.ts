@@ -95,13 +95,12 @@ export async function POST(request: NextRequest) {
         </div>
         `;
 
-        // await transporter.sendMail({
-        //   from: process.env.EMAIL,
-        //   // to: userData.email,
-        //   to: "45vinitthakkar@gmail.com",
-        //   subject: subject,
-        //   html: personalizedBody,
-        // });
+        await transporter.sendMail({
+          from: process.env.EMAIL,
+          to: userData.email,
+          subject: subject,
+          html: personalizedBody,
+        });
 
         // Only update password in database if email was sent successfully
         await db.update(user).set({ password }).where(eq(user.id, userData.id));
