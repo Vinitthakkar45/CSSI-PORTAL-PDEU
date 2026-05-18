@@ -44,6 +44,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 15,
   },
+  footerImage: {
+    width: '100%',
+    height: 'auto',
+  },
   signatureText: {
     fontSize: 11,
     marginBottom: 3,
@@ -83,10 +87,7 @@ const MyPDF = ({ name, branch, rollNo, template }: PDFProps) => {
 
         {/* Signature Section */}
         <View style={styles.signatureSection}>
-          <Text style={styles.signatureText}>Sincerely,</Text>
-          <Text style={{ ...styles.signatureText, marginTop: 40 }}>{template.signature.position},</Text>
-          <Text style={styles.signatureText}>{template.signature.organization},</Text>
-          <Text style={styles.signatureText}>{template.signature.address}</Text>
+          <Image src="/footer.png" style={styles.footerImage} />
         </View>
       </Page>
     </Document>
