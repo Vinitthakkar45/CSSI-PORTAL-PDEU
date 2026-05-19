@@ -87,7 +87,7 @@ const MyPDF = ({ name, branch, rollNo, template }: PDFProps) => {
 
         {/* Signature Section */}
         <View style={styles.signatureSection}>
-          <Image src="/footer.png" style={styles.footerImage} />
+          <Image src="/app/public/footer.png" style={styles.footerImage} />
         </View>
       </Page>
     </Document>
