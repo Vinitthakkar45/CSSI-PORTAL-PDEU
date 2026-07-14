@@ -294,10 +294,11 @@ export default function StudentModal({
                   {tabs.map((tab) => (
                     <button
                       key={tab}
-                      className={`px-4 py-2 text-sm font-medium max-w-[450px] ${activeTab === tab
+                      className={`px-4 py-2 text-sm font-medium max-w-[450px] ${
+                        activeTab === tab
                           ? 'border-b-2  border-blue-500 text-blue-500'
                           : ' border-b-2 border-gray-400 text-gray-400'
-                        }`}
+                      }`}
                       onClick={() => setActiveTab(tab)}
                     >
                       {tab === 'personal'
@@ -522,8 +523,9 @@ export default function StudentModal({
                               />
                               <div className="flex items-center gap-3 mt-3">
                                 <button
-                                  className={`px-4 py-2 text-sm font-medium text-white rounded ${declineReason ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'
-                                    }`}
+                                  className={`px-4 py-2 text-sm font-medium text-white rounded ${
+                                    declineReason ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'
+                                  }`}
                                   onClick={handleDeclineOfferLetter}
                                   disabled={!declineReason || isDeclining}
                                 >
@@ -612,11 +614,11 @@ export default function StudentModal({
                         <i> Internal Evaluation </i>
                         */}
                       </h2>
-                      <h3 className="mb-4">Poster Organization</h3>
+                      <h3 className="mb-4">Report Organization</h3>
 
                       <div className="mb-6 grid grid-cols-2 grid-rows-3 gap-6">
                         <div>
-                          <Label>{'Poster Organization'}</Label>
+                          <Label>{'Report Organization'}</Label>
                           <Input
                             error={marks.posterOrganization < 0 || marks.posterOrganization > 10 ? true : false}
                             id="posterOrganization"
@@ -670,11 +672,11 @@ export default function StudentModal({
                         <div></div>
                       </div>
 
-                      <h3 className="mb-4">Report Organization / Certificate</h3>
+                      <h3 className="mb-4">Certificate Organization</h3>
 
                       <div className="mb-6 grid grid-cols-2 grid-rows-1 gap-6">
                         <div>
-                          <Label>{'Report Organization'}</Label>
+                          <Label>{'Certificate Organization'}</Label>
                           <Input
                             error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
                             type="text"

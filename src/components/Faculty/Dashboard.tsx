@@ -115,7 +115,7 @@ const Dashboard = () => {
           ) : mentoredStudents.length > 0 ? (
             <TableList
               students={mentoredStudents}
-              option="mentor"
+              option="both"
               setMarksToggle={setMarksToggle}
               marksToggle={marksToggle}
               setStudents={setMentoredStudents}

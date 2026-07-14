@@ -66,7 +66,8 @@ export async function POST(req: NextRequest) {
       }
       await updateInternalMarks(studentid, marks, isAbsent || false);
     } else if (typeofmarks === 'final') {
-      if (!isEvaluator) {
+      // Allow if faculty is the student's mentor OR evaluator (mentor acts as both per current policy)
+      if (!isEvaluator && !isMentor) {
         return NextResponse.json({ error: 'Unauthorized to update final marks' }, { status: 403 });
       }
       await updateFinalMarks(studentid, marks, isAbsent || false);
