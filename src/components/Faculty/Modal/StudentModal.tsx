@@ -24,14 +24,15 @@ export default function StudentModal({
   isOpen: boolean;
   onClose: () => void;
   selectedStudent?: SelectStudent;
-  option: 'mentor' | 'evaluator';
+  option: 'mentor' | 'evaluator' | 'both';
   setMarksToggle: React.Dispatch<React.SetStateAction<boolean>>;
   marksToggle: boolean;
   students: SelectStudent[];
   setStudents: React.Dispatch<React.SetStateAction<SelectStudent[]>>;
 }) {
   const { data: session } = useSession(); // Get faculty ID from session
-  const [savingMarks, setSavingMarks] = useState(false);
+  const [savingInternal, setSavingInternal] = useState(false);
+  const [savingExternal, setSavingExternal] = useState(false);
   const [declineReason, setDeclineReason] = useState('');
   const [isDeclining, setIsDeclining] = useState(false);
   const [showDeclineInput, setShowDeclineInput] = useState(false);
@@ -212,14 +213,14 @@ export default function StudentModal({
     if (currentIndex < tabs.length - 1) setActiveTab(tabs[currentIndex + 1]);
   };
 
-  const handleSave = async (type: string) => {
+  const handleSave = async (type: 'mentor' | 'evaluator', setSaving: React.Dispatch<React.SetStateAction<boolean>>) => {
     if (!selectedStudent || !validateMarks()) {
       toast.warning('Please fix validation errors before saving.');
       return;
     }
-    setSavingMarks(true);
+    setSaving(true);
 
-    const typeofmarks = option === 'mentor' ? 'internal' : 'final';
+    const typeofmarks = type === 'mentor' ? 'internal' : 'final';
     const studentid = selectedStudent.id;
 
     try {
@@ -247,7 +248,7 @@ export default function StudentModal({
               }
             : marks,
           isAbsent,
-          absentType: option === 'mentor' ? 'absentMentorEvaluation' : 'absentEvaluatorEvaluation',
+          absentType: type === 'mentor' ? 'absentMentorEvaluation' : 'absentEvaluatorEvaluation',
         }),
       });
 
@@ -257,7 +258,7 @@ export default function StudentModal({
       const updated = students.map((student) => {
         if (student.id === studentid) {
           // Update absent status
-          if (option === 'mentor') {
+          if (type === 'mentor') {
             student.Absent_Mentor_Evaluation = isAbsent;
           } else {
             student.Absent_Evaluator_Evaluation = isAbsent;
@@ -304,24 +305,24 @@ export default function StudentModal({
         return student;
       });
       toast.success(isAbsent ? 'Student marked as absent' : 'Marks Saved Successfully');
-      setSavingMarks(false);
+      setSaving(false);
 
       setStudents(updated);
       setMarksToggle(!marksToggle);
       onClose();
     } catch (err) {
       console.error(err);
+      setSaving(false);
       toast.error('Failed to save marks');
     }
   };
 
-  function savemarks() {
-    if (option === 'mentor') {
-      handleSave('mentor');
-    } else {
-      handleSave('evaluator');
-    }
-    setMarksToggle(!marksToggle);
+  function saveinternalmarks() {
+    handleSave('mentor', setSavingInternal);
+  }
+
+  function saveexternalmarks() {
+    handleSave('evaluator', setSavingExternal);
   }
 
   const handleInputChange = (field: keyof typeof marks, value: string, upperlim: number) => {
@@ -448,16 +449,16 @@ export default function StudentModal({
               {/* Personal Details */}
               <div className="flex justify-center gap-20 mb-5">
                 <div className="w-40 h-40 overflow-hidden rounded-full">
-                                      <img
-                                        src={
-                                          selectedStudent.profileImage
-                                            ? `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.profileImage}`
-                                            : '/images/user/DefaultProfile_Light.png'
-                                        }
-                                        alt={selectedStudent.name || ''}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
+                  <img
+                    src={
+                      selectedStudent.profileImage
+                        ? `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.profileImage}`
+                        : '/images/user/DefaultProfile_Light.png'
+                    }
+                    alt={selectedStudent.name || ''}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <div className="flex flex-col justify-center">
                   <div className="mb-4">
                     <Label>Name</Label>
@@ -752,13 +753,13 @@ export default function StudentModal({
               </div>
 
               {/* Evaluation */}
-              {option === 'mentor' ? (
+              {(option === 'mentor' || option === 'both') && (
                 <div>
-                  <h3 className="mb-4">Poster Organization</h3>
+                  <h3 className="mb-4">Report Organization</h3>
 
                   <div className="mb-6 grid grid-cols-2 grid-rows-3 gap-6">
                     <div>
-                      <Label>{'Poster Organization'}</Label>
+                      <Label>{'Report Organization'}</Label>
                       <Input
                         error={marks.posterOrganization < 0 || marks.posterOrganization > 10 ? true : false}
                         id="posterOrganization"
@@ -817,11 +818,11 @@ export default function StudentModal({
                     <div></div>
                   </div>
 
-                  <h3 className="mb-4">Report Organization / Certificate</h3>
+                  <h3 className="mb-4">Certificate Organization</h3>
 
                   <div className="mb-6 grid grid-cols-2 grid-rows-1 gap-6">
                     <div>
-                      <Label>{'Report Organization'}</Label>
+                      <Label>{'Certificate Organization'}</Label>
                       <Input
                         error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
                         type="text"
@@ -845,7 +846,7 @@ export default function StudentModal({
                   </div>
                   <div>
                     <p>
-                      Total Marks:{' '}
+                      Total Internal Marks:{' '}
                       {marks.posterOrganization +
                         marks.dayToDayActivity +
                         marks.contributionToWork +
@@ -861,12 +862,13 @@ export default function StudentModal({
                     <Button size="sm" variant="outline" onClick={onClose}>
                       Close
                     </Button>
-                    <Button size="sm" onClick={savemarks}>
-                      {savingMarks ? 'Saving...' : isAbsent ? 'Mark as Absent' : 'Save Changes'}
+                    <Button size="sm" onClick={saveinternalmarks} disabled={savingInternal || savingExternal}>
+                      {savingInternal ? 'Saving...' : isAbsent ? 'Mark as Absent' : 'Save Changes'}
                     </Button>
                   </div>
                 </div>
-              ) : (
+              )}
+              {(option === 'evaluator' || option === 'both') && (
                 <div>
                   <div>
                     <h3 className="mb-4">Presentation</h3>
@@ -938,7 +940,7 @@ export default function StudentModal({
                         <Input
                           error={marks.qnaViva < 0 || marks.qnaViva > 10}
                           type="text"
-                          value={marks.qnaViva || ''}
+                          value={hasBeenSet.qnaViva ? marks.qnaViva.toString() : ''}
                           onChange={(e) => handleInputChange('qnaViva', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                           disabled={isAbsent}
@@ -949,7 +951,7 @@ export default function StudentModal({
                   </div>
                   <div>
                     <p>
-                      Total Marks:{' '}
+                      Total External Marks:{' '}
                       {marks.learningExplanation +
                         marks.problemIdentification +
                         marks.contributionExplanation +
@@ -963,8 +965,8 @@ export default function StudentModal({
                     <Button size="sm" variant="outline" onClick={onClose}>
                       Close
                     </Button>
-                    <Button size="sm" onClick={savemarks}>
-                      {savingMarks ? 'Saving...' : isAbsent ? 'Mark as Absent' : 'Save Changes'}
+                    <Button size="sm" onClick={saveexternalmarks} disabled={savingExternal || savingInternal}>
+                      {savingExternal ? 'Saving...' : isAbsent ? 'Mark as Absent' : 'Save Changes'}
                     </Button>
                   </div>
                 </div>

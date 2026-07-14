@@ -269,22 +269,22 @@ export default function StudentModal({
           marks: isAbsent
             ? type === 'mentor'
               ? {
-                posterOrganization: 0,
-                dayToDayActivity: 0,
-                contributionToWork: 0,
-                learningOutcomes: 0,
-                geoTagPhotos: 0,
-                reportOrganization: 0,
-                certificate: 0,
-              }
+                  posterOrganization: 0,
+                  dayToDayActivity: 0,
+                  contributionToWork: 0,
+                  learningOutcomes: 0,
+                  geoTagPhotos: 0,
+                  reportOrganization: 0,
+                  certificate: 0,
+                }
               : {
-                learningExplanation: 0,
-                problemIdentification: 0,
-                contributionExplanation: 0,
-                proposedSolution: 0,
-                presentationSkills: 0,
-                qnaViva: 0,
-              }
+                  learningExplanation: 0,
+                  problemIdentification: 0,
+                  contributionExplanation: 0,
+                  proposedSolution: 0,
+                  presentationSkills: 0,
+                  qnaViva: 0,
+                }
             : marks,
           isAbsent,
           absentType: type === 'mentor' ? 'absentMentorEvaluation' : 'absentEvaluatorEvaluation',
@@ -476,10 +476,11 @@ export default function StudentModal({
                 {tabs.map((tab) => (
                   <button
                     key={tab}
-                    className={`px-4 py-2 text-sm font-medium max-w-[450px] relative ${activeTab === tab
+                    className={`px-4 py-2 text-sm font-medium max-w-[450px] relative ${
+                      activeTab === tab
                         ? 'border-b-2  border-blue-500 text-blue-500'
                         : ' border-b-2 border-gray-400 text-gray-400'
-                      }`}
+                    }`}
                     onClick={() => setActiveTab(tab)}
                   >
                     {tab === 'personal'
@@ -719,8 +720,9 @@ export default function StudentModal({
                             />
                             <div className="flex items-center gap-3 mt-3">
                               <button
-                                className={`px-4 py-2 text-sm font-medium text-white rounded ${declineReason ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'
-                                  }`}
+                                className={`px-4 py-2 text-sm font-medium text-white rounded ${
+                                  declineReason ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'
+                                }`}
                                 onClick={handleDeclineOfferLetter}
                                 disabled={!declineReason || isDeclining}
                               >
@@ -813,7 +815,7 @@ export default function StudentModal({
                     {/* Internal Evaluation Absent Toggle */}
                     <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center justify-between">
-                        <Label className="text-base font-medium">Mark Student as Absent (Poster Organization)</Label>
+                        <Label className="text-base font-medium">Mark Student as Absent (Report Organization)</Label>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
@@ -822,12 +824,14 @@ export default function StudentModal({
                             onChange={handleAbsentToggleMentor}
                           />
                           <div
-                            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${isAbsentMentor ? 'bg-red-500' : 'bg-gray-300'
-                              }`}
+                            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${
+                              isAbsentMentor ? 'bg-red-500' : 'bg-gray-300'
+                            }`}
                           >
                             <div
-                              className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${isAbsentMentor ? 'transform translate-x-5' : ''
-                                }`}
+                              className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${
+                                isAbsentMentor ? 'transform translate-x-5' : ''
+                              }`}
                             ></div>
                           </div>
                         </label>
@@ -844,11 +848,11 @@ export default function StudentModal({
                       )}
                     </div>
 
-                    <h3 className="mb-4">Poster Organization</h3>
+                    <h3 className="mb-4">Report Organization</h3>
 
                     <div className="mb-6 grid grid-cols-2 grid-rows-3 gap-6">
                       <div>
-                        <Label>{'Poster Organization'}</Label>
+                        <Label>{'Report Organization'}</Label>
                         <Input
                           error={marks.posterOrganization < 0 || marks.posterOrganization > 10 ? true : false}
                           id="posterOrganization"
@@ -907,11 +911,11 @@ export default function StudentModal({
                       <div></div>
                     </div>
 
-                    <h3 className="mb-4">Report Organization / Certificate</h3>
+                    <h3 className="mb-4">Certificate Organization</h3>
 
                     <div className="mb-6 grid grid-cols-2 grid-rows-1 gap-6">
                       <div>
-                        <Label>{'Report Organization'}</Label>
+                        <Label>{'Certificate Organization'}</Label>
                         <Input
                           error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
                           type="text"
@@ -978,12 +982,14 @@ export default function StudentModal({
                             onChange={handleAbsentToggleEvaluator}
                           />
                           <div
-                            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${isAbsentEvaluator ? 'bg-red-500' : 'bg-gray-300'
-                              }`}
+                            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${
+                              isAbsentEvaluator ? 'bg-red-500' : 'bg-gray-300'
+                            }`}
                           >
                             <div
-                              className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${isAbsentEvaluator ? 'transform translate-x-5' : ''
-                                }`}
+                              className={`absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out ${
+                                isAbsentEvaluator ? 'transform translate-x-5' : ''
+                              }`}
                             ></div>
                           </div>
                         </label>

@@ -15,7 +15,7 @@ export default function TableList({
   setStudents,
 }: {
   students: SelectStudent[];
-  option: 'mentor' | 'evaluator';
+  option: 'mentor' | 'evaluator' | 'both';
   setMarksToggle: React.Dispatch<React.SetStateAction<boolean>>;
   marksToggle: boolean;
   setStudents: React.Dispatch<React.SetStateAction<SelectStudent[]>>;

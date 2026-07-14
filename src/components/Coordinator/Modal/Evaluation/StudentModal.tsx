@@ -498,16 +498,16 @@ export default function StudentModal({
                 {/* Personal Details */}
                 <div className="flex justify-center gap-20 mb-5">
                   <div className="w-40 h-40 overflow-hidden rounded-full">
-                                        <img
-                                          src={
-                                            selectedStudent.profileImage
-                                              ? `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.profileImage}`
-                                              : '/images/user/DefaultProfile_Light.png'
-                                          }
-                                          alt={selectedStudent.name || ''}
-                                          className="w-full h-full object-cover"
-                                        />
-                                      </div>
+                    <img
+                      src={
+                        selectedStudent.profileImage
+                          ? `${process.env.NEXT_PUBLIC_MEDIA_BASE_URL}/${process.env.NEXT_PUBLIC_MINIO_BUCKET}/${selectedStudent.profileImage}`
+                          : '/images/user/DefaultProfile_Light.png'
+                      }
+                      alt={selectedStudent.name || ''}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <div className="flex flex-col justify-center">
                     <div className="mb-4">
                       <Label>Name</Label>
@@ -814,11 +814,11 @@ export default function StudentModal({
                 {/* Evaluation */}
                 {option === 'mentor' ? (
                   <div>
-                    <h3 className="mb-4">Poster Organization</h3>
+                    <h3 className="mb-4">Report Organization</h3>
 
                     <div className="mb-6 grid grid-cols-2 grid-rows-3 gap-6">
                       <div>
-                        <Label>{'Poster Organization'}</Label>
+                        <Label>{'Report Organization'}</Label>
                         <Input
                           error={marks.posterOrganization < 0 || marks.posterOrganization > 10 ? true : false}
                           id="posterOrganization"
@@ -877,11 +877,11 @@ export default function StudentModal({
                       <div></div>
                     </div>
 
-                    <h3 className="mb-4">Report Organization / Certificate</h3>
+                    <h3 className="mb-4">Certificate Organization</h3>
 
                     <div className="mb-6 grid grid-cols-2 grid-rows-1 gap-6">
                       <div>
-                        <Label>{'Report Organization'}</Label>
+                        <Label>{'Certificate Organization'}</Label>
                         <Input
                           error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
                           type="text"
