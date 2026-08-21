@@ -50,12 +50,12 @@ export default function StudentModal({
   const [isAbsentMentor, setIsAbsentMentor] = useState(false);
   const [isAbsentEvaluator, setIsAbsentEvaluator] = useState(false);
   const [marks, setMarks] = useState({
-    posterOrganization: 0,
+    reportOrganization: 0,
     dayToDayActivity: 0,
     contributionToWork: 0,
     learningOutcomes: 0,
     geoTagPhotos: 0,
-    reportOrganization: 0,
+    certificateOrganization: 0,
     certificate: 0,
     learningExplanation: 0,
     problemIdentification: 0,
@@ -66,12 +66,12 @@ export default function StudentModal({
   });
 
   const [hasBeenSet, setHasBeenSet] = useState({
-    posterOrganization: false,
+    reportOrganization: false,
     dayToDayActivity: false,
     contributionToWork: false,
     learningOutcomes: false,
     geoTagPhotos: false,
-    reportOrganization: false,
+    certificateOrganization: false,
     certificate: false,
     learningExplanation: false,
     problemIdentification: false,
@@ -111,12 +111,12 @@ export default function StudentModal({
       setIsAbsentEvaluator(selectedStudent.student.Absent_Evaluator_Evaluation || false);
 
       setMarks({
-        posterOrganization: selectedStudent.student.posterOrganization || 0,
+        reportOrganization: selectedStudent.student.reportOrganization || 0,
         dayToDayActivity: selectedStudent.student.dayToDayActivity || 0,
         contributionToWork: selectedStudent.student.contributionToWork || 0,
         learningOutcomes: selectedStudent.student.learningOutcomes || 0,
         geoTagPhotos: selectedStudent.student.geotagPhotos || 0,
-        reportOrganization: selectedStudent.student.reportOrganization || 0,
+        certificateOrganization: selectedStudent.student.certificateOrganization || 0,
         certificate: selectedStudent.student.hardCopyCertificate || 0,
         learningExplanation: selectedStudent.student.learningExplanation || 0,
         problemIdentification: selectedStudent.student.problemIndentification || 0,
@@ -128,9 +128,9 @@ export default function StudentModal({
 
       // Set hasBeenSet flags - true if the value exists and is not null/undefined
       setHasBeenSet({
-        posterOrganization:
-          selectedStudent.student.posterOrganization !== null &&
-          selectedStudent.student.posterOrganization !== undefined,
+        reportOrganization:
+          selectedStudent.student.reportOrganization !== null &&
+          selectedStudent.student.reportOrganization !== undefined,
         dayToDayActivity:
           selectedStudent.student.dayToDayActivity !== null && selectedStudent.student.dayToDayActivity !== undefined,
         contributionToWork:
@@ -140,9 +140,9 @@ export default function StudentModal({
           selectedStudent.student.learningOutcomes !== null && selectedStudent.student.learningOutcomes !== undefined,
         geoTagPhotos:
           selectedStudent.student.geotagPhotos !== null && selectedStudent.student.geotagPhotos !== undefined,
-        reportOrganization:
-          selectedStudent.student.reportOrganization !== null &&
-          selectedStudent.student.reportOrganization !== undefined,
+        certificateOrganization:
+          selectedStudent.student.certificateOrganization !== null &&
+          selectedStudent.student.certificateOrganization !== undefined,
         certificate:
           selectedStudent.student.hardCopyCertificate !== null &&
           selectedStudent.student.hardCopyCertificate !== undefined,
@@ -166,12 +166,12 @@ export default function StudentModal({
   }, [selectedStudent]);
 
   const marksSchema = z.object({
-    posterOrganization: z.number().min(0).max(10),
+    reportOrganization: z.number().min(0).max(10),
     dayToDayActivity: z.number().min(0).max(10),
     contributionToWork: z.number().min(0).max(5),
     learningOutcomes: z.number().min(0).max(5),
     geoTagPhotos: z.number().min(0).max(5),
-    reportOrganization: z.number().min(0).max(10),
+    certificateOrganization: z.number().min(0).max(10),
     certificate: z.number().min(0).max(5),
     learningExplanation: z.number().min(0).max(5),
     problemIdentification: z.number().min(0).max(5),
@@ -209,12 +209,12 @@ export default function StudentModal({
     if (newAbsentState) {
       setMarks((prev) => ({
         ...prev,
-        posterOrganization: 0,
+        reportOrganization: 0,
         dayToDayActivity: 0,
         contributionToWork: 0,
         learningOutcomes: 0,
         geoTagPhotos: 0,
-        reportOrganization: 0,
+        certificateOrganization: 0,
         certificate: 0,
       }));
     }
@@ -269,12 +269,12 @@ export default function StudentModal({
           marks: isAbsent
             ? type === 'mentor'
               ? {
-                  posterOrganization: 0,
+                  reportOrganization: 0,
                   dayToDayActivity: 0,
                   contributionToWork: 0,
                   learningOutcomes: 0,
                   geoTagPhotos: 0,
-                  reportOrganization: 0,
+                  certificateOrganization: 0,
                   certificate: 0,
                 }
               : {
@@ -306,12 +306,12 @@ export default function StudentModal({
           // Update marks only if not absent
           if (!isAbsent) {
             if (typeofmarks === 'internal') {
-              student.student.posterOrganization = marks.posterOrganization;
+              student.student.reportOrganization = marks.reportOrganization;
               student.student.dayToDayActivity = marks.dayToDayActivity;
               student.student.contributionToWork = marks.contributionToWork;
               student.student.learningOutcomes = marks.learningOutcomes;
               student.student.geotagPhotos = marks.geoTagPhotos;
-              student.student.reportOrganization = marks.reportOrganization;
+              student.student.certificateOrganization = marks.certificateOrganization;
               student.student.hardCopyCertificate = marks.certificate;
             } else if (typeofmarks === 'final') {
               student.student.learningExplanation = marks.learningExplanation;
@@ -324,12 +324,12 @@ export default function StudentModal({
           } else {
             // Reset marks to 0 if absent
             if (typeofmarks === 'internal') {
-              student.student.posterOrganization = 0;
+              student.student.reportOrganization = 0;
               student.student.dayToDayActivity = 0;
               student.student.contributionToWork = 0;
               student.student.learningOutcomes = 0;
               student.student.geotagPhotos = 0;
-              student.student.reportOrganization = 0;
+              student.student.certificateOrganization = 0;
               student.student.hardCopyCertificate = 0;
             } else if (typeofmarks === 'final') {
               student.student.learningExplanation = 0;
@@ -368,12 +368,12 @@ export default function StudentModal({
   const handleInputChange = (field: keyof typeof marks, value: string, upperlim: number) => {
     // Check if this field is disabled due to absent status
     const mentorFields = [
-      'posterOrganization',
+      'reportOrganization',
       'dayToDayActivity',
       'contributionToWork',
       'learningOutcomes',
       'geoTagPhotos',
-      'reportOrganization',
+      'certificateOrganization',
       'certificate',
     ];
     const evaluatorFields = [
@@ -854,12 +854,12 @@ export default function StudentModal({
                       <div>
                         <Label>{'Report Organization'}</Label>
                         <Input
-                          error={marks.posterOrganization < 0 || marks.posterOrganization > 10 ? true : false}
-                          id="posterOrganization"
-                          name="posterOrganization"
+                          error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
+                          id="reportOrganization"
+                          name="reportOrganization"
                           type="text"
-                          value={hasBeenSet.posterOrganization ? marks.posterOrganization.toString() : ''}
-                          onChange={(e) => handleInputChange('posterOrganization', e.target.value, 10)}
+                          value={hasBeenSet.reportOrganization ? marks.reportOrganization.toString() : ''}
+                          onChange={(e) => handleInputChange('reportOrganization', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                           disabled={isAbsentMentor}
                         />
@@ -917,10 +917,10 @@ export default function StudentModal({
                       <div>
                         <Label>{'Certificate Organization'}</Label>
                         <Input
-                          error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
+                          error={marks.certificateOrganization < 0 || marks.certificateOrganization > 10 ? true : false}
                           type="text"
-                          value={hasBeenSet.reportOrganization ? marks.reportOrganization.toString() : ''}
-                          onChange={(e) => handleInputChange('reportOrganization', e.target.value, 10)}
+                          value={hasBeenSet.certificateOrganization ? marks.certificateOrganization.toString() : ''}
+                          onChange={(e) => handleInputChange('certificateOrganization', e.target.value, 10)}
                           placeholder="Marks - out of 10"
                           disabled={isAbsentMentor}
                         />
@@ -940,12 +940,12 @@ export default function StudentModal({
                     <div>
                       <p>
                         Total Internal Marks:{' '}
-                        {marks.posterOrganization +
+                        {marks.reportOrganization +
                           marks.dayToDayActivity +
                           marks.contributionToWork +
                           marks.learningOutcomes +
                           marks.geoTagPhotos +
-                          marks.reportOrganization +
+                          marks.certificateOrganization +
                           marks.certificate}{' '}
                         / 50
                       </p>

@@ -211,6 +211,36 @@ const StudentTable = () => {
   const handleCSVDownload = () => {
     try {
       const flattenedData = filteredStudents.map((item) => {
+        const isInternalAbsent = !!item.student.Absent_Mentor_Evaluation;
+        const isFinalAbsent = !!item.student.Absent_Evaluator_Evaluation;
+
+        const internalTotalFromComponents =
+          (item.student.reportOrganization ?? 0) +
+          (item.student.dayToDayActivity ?? 0) +
+          (item.student.contributionToWork ?? 0) +
+          (item.student.learningOutcomes ?? 0) +
+          (item.student.geotagPhotos ?? 0) +
+          (item.student.certificateOrganization ?? 0) +
+          (item.student.hardCopyCertificate ?? 0);
+
+        const finalTotalFromComponents =
+          (item.student.learningExplanation ?? 0) +
+          (item.student.problemIndentification ?? 0) +
+          (item.student.contributionExplanation ?? 0) +
+          (item.student.proposedSolutionExplanation ?? 0) +
+          (item.student.presentationSkill ?? 0) +
+          (item.student.qnaMarks ?? 0);
+
+        const internalTotal =
+          item.student.internal_evaluation_marks !== null && item.student.internal_evaluation_marks !== undefined
+            ? item.student.internal_evaluation_marks
+            : internalTotalFromComponents;
+
+        const finalTotal =
+          item.student.final_evaluation_marks !== null && item.student.final_evaluation_marks !== undefined
+            ? item.student.final_evaluation_marks
+            : finalTotalFromComponents;
+
         return {
           'Roll Number': item.student.rollNumber,
           Name: item.student.name,
@@ -231,31 +261,41 @@ const StudentTable = () => {
           'Problem Definition': item.student.problemDefinition,
           'Proposed Solution': item.student.proposedSolution,
           'Mentor Name': item.mentor?.name,
-          'Evaluator Name': item.evaluator?.name,
+          'Report Organization (10)': isInternalAbsent ? 'AB' : (item.student.reportOrganization ?? ''),
+          'Day To Day Activity (10)': isInternalAbsent ? 'AB' : (item.student.dayToDayActivity ?? ''),
+          'Contribution To Work (5)': isInternalAbsent ? 'AB' : (item.student.contributionToWork ?? ''),
+          'Learning Outcomes (5)': isInternalAbsent ? 'AB' : (item.student.learningOutcomes ?? ''),
+          'Geotag Photos (5)': isInternalAbsent ? 'AB' : (item.student.geotagPhotos ?? ''),
+          'Certificate Organization (10)': isInternalAbsent ? 'AB' : (item.student.certificateOrganization ?? ''),
+          'Hard Copy Certificate (5)': isInternalAbsent ? 'AB' : (item.student.hardCopyCertificate ?? ''),
           'Internal Evaluation Marks': (() => {
-            if (item.student.Absent_Mentor_Evaluation) {
-              return 'AB';
-            } else {
-              return item.student.internal_evaluation_marks;
-            }
-          })(),
-          //! this is temporary fix, in future when the final evaluation api is fixed, revert these changes
-          'Final Evaluation Marks': (() => {
-            if (item.student.Absent_Evaluator_Evaluation) {
+            if (isInternalAbsent) {
               return 'AB';
             }
-            const total =
-              (item.student.learningExplanation ?? 0) +
-              (item.student.problemIndentification ?? 0) +
-              (item.student.contributionExplanation ?? 0) +
-              (item.student.proposedSolutionExplanation ?? 0) +
-              (item.student.presentationSkill ?? 0) +
-              (item.student.qnaMarks ?? 0);
 
-            return total === 0 ? '' : total;
+            return internalTotal === 0 ? '' : internalTotal;
+          })(),
+          'Learning Explanation (5)': isFinalAbsent ? 'AB' : (item.student.learningExplanation ?? ''),
+          'Problem Identification (5)': isFinalAbsent ? 'AB' : (item.student.problemIndentification ?? ''),
+          'Contribution Explanation (10)': isFinalAbsent ? 'AB' : (item.student.contributionExplanation ?? ''),
+          'Proposed Solution Explanation (10)': isFinalAbsent ? 'AB' : (item.student.proposedSolutionExplanation ?? ''),
+          'Presentation Skill (10)': isFinalAbsent ? 'AB' : (item.student.presentationSkill ?? ''),
+          'QnA Marks (10)': isFinalAbsent ? 'AB' : (item.student.qnaMarks ?? ''),
+          'Final Evaluation Marks': (() => {
+            if (isFinalAbsent) {
+              return 'AB';
+            }
+
+            return finalTotal === 0 ? '' : finalTotal;
           })(),
         };
       });
+
+      if (flattenedData.length === 0) {
+        toast.warning('No student data available to download');
+        return;
+      }
+
       const workbook = XLSX.utils.book_new();
       const worksheet = XLSX.utils.json_to_sheet(flattenedData);
       const columnCount = Object.keys(flattenedData[0]).length;

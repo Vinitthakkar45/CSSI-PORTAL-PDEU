@@ -72,14 +72,14 @@ export const student = pgTable('student', {
 
   // Faculty Mentor Evaluation Fields
 
-  // Poster Organization
-  posterOrganization: integer('poster_organization'),
+  // Report Organization
+  reportOrganization: integer('report_organization'),
   dayToDayActivity: integer('day_to_day_activity'),
   contributionToWork: integer('contribution_to_work'),
   learningOutcomes: integer('learning_outcomes'),
   geotagPhotos: integer('geotag_photos'),
-  // Report Organization, Certificate
-  reportOrganization: integer('report_organization'),
+  // Certificate Organization, Certificate
+  certificateOrganization: integer('certificate_organization'),
   hardCopyCertificate: integer('hard_copy_certificate'),
 
   // Faculty Evaluator Evaluation Fields

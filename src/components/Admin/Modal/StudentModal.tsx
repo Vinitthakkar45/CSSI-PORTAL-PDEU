@@ -49,12 +49,12 @@ export default function StudentModal({
   const [isDeclining, setIsDeclining] = useState(false);
   const [showDeclineInput, setShowDeclineInput] = useState(false);
   const [marks, setMarks] = useState({
-    posterOrganization: 0,
+    reportOrganization: 0,
     dayToDayActivity: 0,
     contributionToWork: 0,
     learningOutcomes: 0,
     geoTagPhotos: 0,
-    reportOrganization: 0,
+    certificateOrganization: 0,
     certificate: 0,
     learningExplanation: 0,
     problemIdentification: 0,
@@ -90,12 +90,12 @@ export default function StudentModal({
       );
 
       setMarks({
-        posterOrganization: selectedStudent.student.posterOrganization || 0,
+        reportOrganization: selectedStudent.student.reportOrganization || 0,
         dayToDayActivity: selectedStudent.student.dayToDayActivity || 0,
         contributionToWork: selectedStudent.student.contributionToWork || 0,
         learningOutcomes: selectedStudent.student.learningOutcomes || 0,
         geoTagPhotos: selectedStudent.student.geotagPhotos || 0,
-        reportOrganization: selectedStudent.student.reportOrganization || 0,
+        certificateOrganization: selectedStudent.student.certificateOrganization || 0,
         certificate: selectedStudent.student.hardCopyCertificate || 0,
         learningExplanation: selectedStudent.student.learningExplanation || 0,
         problemIdentification: selectedStudent.student.problemIndentification || 0,
@@ -108,12 +108,12 @@ export default function StudentModal({
   }, [selectedStudent]);
 
   const marksSchema = z.object({
-    posterOrganization: z.number().min(0).max(10),
+    reportOrganization: z.number().min(0).max(10),
     dayToDayActivity: z.number().min(0).max(10),
     contributionToWork: z.number().min(0).max(5),
     learningOutcomes: z.number().min(0).max(5),
     geoTagPhotos: z.number().min(0).max(5),
-    reportOrganization: z.number().min(0).max(10),
+    certificateOrganization: z.number().min(0).max(10),
     certificate: z.number().min(0).max(5),
     learningExplanation: z.number().min(0).max(5),
     problemIdentification: z.number().min(0).max(5),
@@ -172,12 +172,12 @@ export default function StudentModal({
       const updated = students.map((student) => {
         if (student.student.id === studentid) {
           if (typeofmarks === 'internal') {
-            student.student.posterOrganization = marks.posterOrganization;
+            student.student.reportOrganization = marks.reportOrganization;
             student.student.dayToDayActivity = marks.dayToDayActivity;
             student.student.contributionToWork = marks.contributionToWork;
             student.student.learningOutcomes = marks.learningOutcomes;
             student.student.geotagPhotos = marks.geoTagPhotos;
-            student.student.reportOrganization = marks.reportOrganization;
+            student.student.certificateOrganization = marks.certificateOrganization;
             student.student.hardCopyCertificate = marks.certificate;
           } else if (typeofmarks === 'final') {
             student.student.learningExplanation = marks.learningExplanation;
@@ -620,12 +620,12 @@ export default function StudentModal({
                         <div>
                           <Label>{'Report Organization'}</Label>
                           <Input
-                            error={marks.posterOrganization < 0 || marks.posterOrganization > 10 ? true : false}
-                            id="posterOrganization"
-                            name="posterOrganization"
+                            error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
+                            id="reportOrganization"
+                            name="reportOrganization"
                             type="text"
-                            value={marks.posterOrganization || ''}
-                            onChange={(e) => handleInputChange('posterOrganization', e.target.value, 10)}
+                            value={marks.reportOrganization || ''}
+                            onChange={(e) => handleInputChange('reportOrganization', e.target.value, 10)}
                             placeholder="Marks - out of 10"
                           />
                         </div>
@@ -678,10 +678,12 @@ export default function StudentModal({
                         <div>
                           <Label>{'Certificate Organization'}</Label>
                           <Input
-                            error={marks.reportOrganization < 0 || marks.reportOrganization > 10 ? true : false}
+                            error={
+                              marks.certificateOrganization < 0 || marks.certificateOrganization > 10 ? true : false
+                            }
                             type="text"
-                            value={marks.reportOrganization || ''}
-                            onChange={(e) => handleInputChange('reportOrganization', e.target.value, 10)}
+                            value={marks.certificateOrganization || ''}
+                            onChange={(e) => handleInputChange('certificateOrganization', e.target.value, 10)}
                             placeholder="Marks - out of 10"
                           />
                         </div>
@@ -699,12 +701,12 @@ export default function StudentModal({
                       <div>
                         <p>
                           Total Internal Marks:{' '}
-                          {marks.posterOrganization +
+                          {marks.reportOrganization +
                             marks.dayToDayActivity +
                             marks.contributionToWork +
                             marks.learningOutcomes +
                             marks.geoTagPhotos +
-                            marks.reportOrganization +
+                            marks.certificateOrganization +
                             marks.certificate}{' '}
                           / 50
                         </p>
