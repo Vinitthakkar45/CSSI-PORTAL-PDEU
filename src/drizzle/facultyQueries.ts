@@ -3,12 +3,12 @@ import { eq, inArray } from 'drizzle-orm/expressions';
 import { faculty, mentorStudent, student, evaluatorStudent, user, SelectStudent } from './schema';
 
 export interface MarksType {
-  posterOrganization: number;
+  reportOrganization: number;
   dayToDayActivity: number;
   contributionToWork: number;
   learningOutcomes: number;
   geoTagPhotos: number;
-  reportOrganization: number;
+  certificateOrganization: number;
   certificate: number;
   learningExplanation: number;
   problemIdentification: number;
@@ -79,12 +79,12 @@ export const updateInternalMarks = async (studentId: number, marks: MarksType, i
   try {
     const total_marks = isAbsent
       ? 0
-      : marks.posterOrganization +
+      : marks.reportOrganization +
         marks.dayToDayActivity +
         marks.contributionToWork +
         marks.learningOutcomes +
         marks.geoTagPhotos +
-        marks.reportOrganization +
+        marks.certificateOrganization +
         marks.certificate;
 
     if (!isAbsent && total_marks > 50) {
@@ -94,12 +94,12 @@ export const updateInternalMarks = async (studentId: number, marks: MarksType, i
     await db
       .update(student)
       .set({
-        posterOrganization: isAbsent ? 0 : marks.posterOrganization,
+        reportOrganization: isAbsent ? 0 : marks.reportOrganization,
         dayToDayActivity: isAbsent ? 0 : marks.dayToDayActivity,
         contributionToWork: isAbsent ? 0 : marks.contributionToWork,
         learningOutcomes: isAbsent ? 0 : marks.learningOutcomes,
         geotagPhotos: isAbsent ? 0 : marks.geoTagPhotos,
-        reportOrganization: isAbsent ? 0 : marks.reportOrganization,
+        certificateOrganization: isAbsent ? 0 : marks.certificateOrganization,
         hardCopyCertificate: isAbsent ? 0 : marks.certificate,
         internal_evaluation_marks: total_marks,
         Absent_Mentor_Evaluation: isAbsent,
